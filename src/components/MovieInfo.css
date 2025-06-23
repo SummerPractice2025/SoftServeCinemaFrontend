@@ -1,0 +1,93 @@
+.movie-info-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Open Sans', sans-serif;
+  color: white;
+}
+
+.movie-info-table td {
+  padding: 6px 8px;
+  vertical-align: top;
+  text-align: left;
+}
+
+/* Перший стовпець — категорії */
+.category-cell {
+  width: 15%;
+  font-weight: bold;
+  user-select: none;
+  vertical-align: top;
+  padding-right: 4px;
+  white-space: nowrap;
+}
+
+/* Другий стовпець — значення */
+.value-cell {
+  width: 75%;
+  word-break: break-word;
+  vertical-align: top;
+  padding-left: 4px;
+  color: #888;
+}
+
+/* Третій стовпець — іконка */
+.icon-cell,
+.movie-title-icon-cell {
+  width: 10%;
+  text-align: left;
+  vertical-align: top;
+}
+
+/* Рядок з назвою фільму — назва */
+.movie-title-cell {
+  vertical-align: middle;
+  font-weight: bold;
+  font-size: 1.5rem;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  vertical-align: top;
+}
+
+.icon-image {
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) invert(1);
+}
+
+input[type='text'],
+input[type='number'] {
+  width: 100%;
+  padding: 4px 8px;
+  font-size: 1rem;
+  font-family: 'Montserrat', sans-serif;
+  border: 1px solid #434040;
+  border-radius: 4px;
+  box-sizing: border-box;
+  background-color: #2a2a2a;
+  color: white;
+}
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.auto-resize-textarea {
+  width: 100%;
+  resize: none;
+  overflow: hidden;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1rem;
+  color: white;
+  background-color: #2a2a2a;
+
+  border-radius: 4px;
+  padding: 4px 8px;
+  box-sizing: border-box;
+}

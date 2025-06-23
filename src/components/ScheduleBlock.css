@@ -1,0 +1,146 @@
+.schedule-block {
+  width: 100%;
+  max-width: 300px;
+  background-color: #5a5a5a;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  color: white;
+  font-family: 'Open Sans', sans-serif;
+  align-self: flex-start;
+  height: auto;
+  flex-grow: 0;
+  min-height: 0;
+}
+
+/* Верхня та нижня частини - світліші */
+.schedule-header,
+.schedule-footer {
+  background-color: #7a7a7a;
+  text-align: center;
+  padding-top: 4px; /* мінімальний відступ зверху */
+  padding-bottom: 16px; /* якщо потрібен відступ знизу */
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.schedule-header h3 {
+  font-size: 24px;
+  margin-bottom: 10px;
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500; /* можна також 400 або 700 */
+}
+
+/* Центр - темніший фон, гнучка висота */
+.schedule-middle {
+  background-color: #3a3a3a;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  box-sizing: border-box;
+
+  min-height: 200px; /* мінімальна висота */
+  height: auto; /* висота підлаштовується під вміст */
+  flex-grow: 0; /* не розтягуємо на весь простір */
+}
+
+/* Dropdown */
+.schedule-dropdown {
+  background-color: #434040;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  padding: 8px 20px;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: inherit; /* щоб наслідував шрифт батьків */
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+  width: 100%;
+  max-width: 360px;
+  outline: none; /* прибирає синю обведку при фокусі */
+  appearance: none; /* прибирає дефолтну стрілку в деяких браузерах */
+}
+
+/* Hover і фокус */
+.schedule-dropdown:hover,
+.schedule-dropdown:focus {
+  background-color: white;
+  color: black;
+  outline: none;
+}
+
+.schedule-dropdown option {
+  background-color: #302f2f;
+  color: white;
+  font-weight: bold;
+  font-family: inherit;
+  border-radius: 6px;
+}
+.schedule-dropdown option:hover {
+  background-color: white;
+  color: black;
+}
+
+/* Рядок кнопок */
+.schedule-row {
+  display: flex;
+  gap: 15px;
+  flex-wrap: nowrap; /* щоб кнопки не переносились, у тебе по 3 максимум */
+  justify-content: flex-start;
+}
+
+/* Кнопки часу */
+.schedule-time-button {
+  background: linear-gradient(90deg, #ff3366 0%, #ff6b99 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
+  font-weight: bold;
+  cursor: pointer;
+  width: auto;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+.schedule-time-button:hover {
+  background: none;
+  -webkit-background-clip: initial;
+  -webkit-text-fill-color: white;
+  color: white;
+}
+
+/* Нижня кнопка */
+.redact-button {
+  background-color: #434040;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  padding: 8px 20px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  width: 100%;
+  max-width: 360px;
+}
+
+.redact-button:hover {
+  background-color: white;
+  color: black;
+}
+
+.schedule-time-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0px;
+  min-width: 50px;
+}

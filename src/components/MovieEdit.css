@@ -1,0 +1,83 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  height: 100%;
+}
+
+.page {
+  background-color: #222222;
+  width: 100%;
+  padding-top: 80px; /* або скільки тобі треба для шапки */
+  box-sizing: border-box;
+  min-width: 100vw;
+  min-height: 100vh; /* дозволяє розтягуватися при потребі */
+  padding: 80px 40px 40px; /* верхній — під шапку */
+  color: white;
+  display: flex;
+  gap: 40px;
+  font-family: 'Open Sans', sans-serif;
+  box-sizing: border-box;
+}
+
+.poster-block {
+  flex-shrink: 0;
+}
+
+.poster-block img {
+  width: 300px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.info-block {
+  flex-grow: 1;
+  max-width: 700px;
+}
+
+.trailer-button {
+  margin-top: 20px;
+  background: linear-gradient(90deg, #ff3366 0%, #ff6b99 100%);
+  color: white;
+  padding: 8px 20px;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  width: 100%;
+  max-width: 360px;
+  justify-content: center;
+}
+
+.trailer-button:hover {
+  background: white;
+  color: black;
+  transition:
+    0.3s ease,
+    color 0.3s ease;
+}
+
+.confirm-button {
+  margin-top: 10px;
+  background-color: #434040;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  padding: 8px 20px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  width: 100%;
+  max-width: 360px;
+}
+
+.confirm-button:hover {
+  background-color: white;
+  color: black;
+  transition:
+    0.3s ease,
+    color 0.3s ease;
+}
