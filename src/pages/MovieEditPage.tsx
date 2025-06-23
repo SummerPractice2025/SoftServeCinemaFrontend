@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import MovieInfo, { type Movie } from './MovieInfo';
-import ScheduleBlock from './ScheduleBlock';
-import './MovieEdit.css';
-import './ScheduleBlock.css';
-import TrailerPlayer from './TrailerPlayer';
+import MovieInfo, { type Movie } from '../components/MovieInfo';
+import ScheduleBlock from '../components/ScheduleBlock';
+import '../styles/MovieEditPage.css';
+import '../styles/ScheduleBlock.css';
+import TrailerPlayer from '../components/TrailerPlayer';
 
 const MovieEdit = () => {
   const [movie, setMovie] = useState<Movie>({
@@ -15,12 +15,12 @@ const MovieEdit = () => {
     genre: 'Романтика, Комедія',
     duration: '1:56',
     studio: 'Sony Pictures',
-    screenplay: 'Сенін Сон',
     actors: 'Дакота Джонсон, Педро Паскаль Дакота Джонсон, Педро Паскаль...',
     description: 'Це короткий опис сюжету або деталей фільму...',
   });
 
   const [showPlayer, setShowPlayer] = useState(false);
+  const [isAdminCheck, setIsAdminCheck] = useState(true);
 
   const handleMovieChange = (updatedMovie: Movie) => {
     setMovie(updatedMovie);
@@ -32,7 +32,7 @@ const MovieEdit = () => {
         <img src="/img/poster_67d423a91a0a4.jpg" alt="Постер фільму" />
 
         <button className="trailer-button" onClick={() => setShowPlayer(true)}>
-          Дивитись трейлер
+          ▶ Дивитись трейлер
         </button>
 
         {showPlayer && (
@@ -42,14 +42,29 @@ const MovieEdit = () => {
           />
         )}
 
-        <button className="confirm-button">Підтвердити</button>
+        {isAdminCheck && (
+          <button className="confirm-button">Підтвердити</button>
+        )}
       </div>
 
       <div className="info-block">
-        <MovieInfo movie={movie} onChange={handleMovieChange} />
+        <MovieInfo
+          movie={movie}
+          onChange={handleMovieChange}
+          readonly={!isAdminCheck}
+        />
       </div>
 
-      <ScheduleBlock />
+      <div className="schedule-container">
+        <button
+          className="mode-toggle-small"
+          onClick={() => setIsAdminCheck((prev) => !prev)}
+        >
+          {isAdminCheck ? 'Режим клієнта' : 'Режим адміністратора'}
+        </button>
+
+        <ScheduleBlock isAdminCheck={isAdminCheck} />
+      </div>
     </div>
   );
 };

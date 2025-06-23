@@ -1,12 +1,16 @@
-import React from 'react';
-import MovieEditPage from './components/MovieEdit';
+import { Routes, Route } from 'react-router-dom';
+import MovieEditPage from './pages/MovieEditPage';
+import BookingPage from './pages/BookingPage';
 
-const App: React.FC = () => {
+const App = () => {
   return (
-    <div>
-      <MovieEditPage />
-    </div>
+    <Routes>
+      <Route path="/" element={<MovieEditPage />} />
+      <Route
+        path="/booking-session/:date/:time/:format"
+        element={<BookingPage />}
+      />
+    </Routes>
   );
 };
-
 export default App;

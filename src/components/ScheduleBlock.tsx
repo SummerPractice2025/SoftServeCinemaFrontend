@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import CustomSelectGrey from './CustomSelectGrey';
+import { useNavigate } from 'react-router-dom';
 
 interface Option {
   value: string;
@@ -9,6 +10,10 @@ interface Option {
 interface Session {
   time: string;
   format: '2D' | '3D';
+}
+
+interface ScheduleBlockProps {
+  isAdminCheck?: boolean;
 }
 
 const sessions: Session[] = [
@@ -68,7 +73,7 @@ const getDateOptions = (): Option[] => {
     }
 
     options.push({
-      value: date.toISOString().split('T')[0], // формат YYYY-MM-DD
+      value: date.toISOString().split('T')[0],
       label,
     });
   }
@@ -76,7 +81,11 @@ const getDateOptions = (): Option[] => {
   return options;
 };
 
-const ScheduleBlock = () => {
+const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
+  isAdminCheck = false,
+}) => {
+  const navigate = useNavigate(); // <-- перемістити сюди, всередину компонента
+
   const dayOptions = getDateOptions();
   const [selectedDay, setSelectedDay] = useState<Option>(dayOptions[0]);
 
@@ -88,7 +97,6 @@ const ScheduleBlock = () => {
 
   return (
     <div className="schedule-block">
-      {/* Верхня частина */}
       <div className="schedule-header">
         <h3>Розклад сеансів</h3>
         <CustomSelectGrey
@@ -98,13 +106,21 @@ const ScheduleBlock = () => {
         />
       </div>
 
-      {/* Середня частина */}
       <div className="schedule-middle">
         {rows2D.map((row, i) => (
           <div key={`2d-row-${i}`} className="schedule-row">
             {row.map(({ time, format }, j) => (
               <div key={`2d-${i}-${j}`} className="schedule-time-wrapper">
-                <button className="schedule-time-button">{time}</button>
+                <button
+                  className="schedule-time-button"
+                  onClick={() =>
+                    navigate(
+                      `/booking-session/${selectedDay.value}/${time}/${format}`,
+                    )
+                  }
+                >
+                  {time}
+                </button>
                 <div className="schedule-format">{format}</div>
               </div>
             ))}
@@ -115,7 +131,16 @@ const ScheduleBlock = () => {
           <div key={`3d-row-${i}`} className="schedule-row">
             {row.map(({ time, format }, j) => (
               <div key={`3d-${i}-${j}`} className="schedule-time-wrapper">
-                <button className="schedule-time-button">{time}</button>
+                <button
+                  className="schedule-time-button"
+                  onClick={() =>
+                    navigate(
+                      `/booking-session/${selectedDay.value}/${time}/${format}`,
+                    )
+                  }
+                >
+                  {time}
+                </button>
                 <div className="schedule-format">{format}</div>
               </div>
             ))}
@@ -123,10 +148,11 @@ const ScheduleBlock = () => {
         ))}
       </div>
 
-      {/* Нижня частина */}
-      <div className="schedule-footer">
-        <button className="redact-button">Редагувати розклад</button>
-      </div>
+      {isAdminCheck && (
+        <div className="schedule-footer">
+          <button className="redact-button">Редагувати розклад</button>
+        </div>
+      )}
     </div>
   );
 };

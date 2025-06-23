@@ -14,13 +14,12 @@
   min-height: 0;
 }
 
-/* Верхня та нижня частини - світліші */
 .schedule-header,
 .schedule-footer {
   background-color: #7a7a7a;
   text-align: center;
-  padding-top: 4px; /* мінімальний відступ зверху */
-  padding-bottom: 16px; /* якщо потрібен відступ знизу */
+  padding-top: 4px;
+  padding-bottom: 16px;
   padding-left: 20px;
   padding-right: 20px;
 }
@@ -30,10 +29,9 @@
   margin-bottom: 10px;
   color: white;
   font-family: 'Montserrat', sans-serif;
-  font-weight: 500; /* можна також 400 або 700 */
+  font-weight: 500;
 }
 
-/* Центр - темніший фон, гнучка висота */
 .schedule-middle {
   background-color: #3a3a3a;
   padding: 16px 20px;
@@ -41,13 +39,11 @@
   flex-direction: column;
   gap: 30px;
   box-sizing: border-box;
-
-  min-height: 200px; /* мінімальна висота */
-  height: auto; /* висота підлаштовується під вміст */
-  flex-grow: 0; /* не розтягуємо на весь простір */
+  min-height: 200px;
+  height: auto;
+  flex-grow: 0;
 }
 
-/* Dropdown */
 .schedule-dropdown {
   background-color: #434040;
   border: none;
@@ -56,17 +52,16 @@
   padding: 8px 20px;
   cursor: pointer;
   font-weight: bold;
-  font-family: inherit; /* щоб наслідував шрифт батьків */
+  font-family: inherit;
   transition:
     background-color 0.3s ease,
     color 0.3s ease;
   width: 100%;
   max-width: 360px;
-  outline: none; /* прибирає синю обведку при фокусі */
-  appearance: none; /* прибирає дефолтну стрілку в деяких браузерах */
+  outline: none;
+  appearance: none;
 }
 
-/* Hover і фокус */
 .schedule-dropdown:hover,
 .schedule-dropdown:focus {
   background-color: white;
@@ -86,15 +81,13 @@
   color: black;
 }
 
-/* Рядок кнопок */
 .schedule-row {
   display: flex;
   gap: 15px;
-  flex-wrap: nowrap; /* щоб кнопки не переносились, у тебе по 3 максимум */
+  flex-wrap: nowrap;
   justify-content: flex-start;
 }
 
-/* Кнопки часу */
 .schedule-time-button {
   background: linear-gradient(90deg, #ff3366 0%, #ff6b99 100%);
   -webkit-background-clip: text;
@@ -113,12 +106,10 @@
 
 .schedule-time-button:hover {
   background: none;
-  -webkit-background-clip: initial;
   -webkit-text-fill-color: white;
   color: white;
 }
 
-/* Нижня кнопка */
 .redact-button {
   background-color: #434040;
   border: none;

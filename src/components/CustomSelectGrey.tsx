@@ -45,9 +45,9 @@ const customStyles: StylesConfig<Option, false> = {
     padding: 10,
     cursor: 'pointer',
     transition: 'all 0.3s ease',
-    margin: '4px', // 👈 Робить опцію вужчою
-    borderRadius: '6px', // 👈 Закруглення країв
-    width: 'calc(100% - 8px)', // 👈 Компенсація margin для збереження розміру
+    margin: '4px',
+    borderRadius: '6px',
+    width: 'calc(100% - 8px)',
   }),
   dropdownIndicator: (base) => ({
     ...base,
