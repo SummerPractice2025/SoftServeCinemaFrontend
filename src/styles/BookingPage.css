@@ -1,0 +1,247 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Open Sans', sans-serif;
+  background-color: #222222;
+  color: white;
+}
+
+.booking-page {
+  display: flex;
+  flex-direction: row;
+  gap: clamp(40px, 6vw, 120px);
+  padding: clamp(20px, 4vw, 100px);
+  flex-wrap: wrap;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.main-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.top-block {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.poster {
+  width: 160px;
+  height: 250px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.movie-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.movie-details h2 {
+  line-height: 1;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.movie-details p {
+  line-height: 1.9;
+  margin: 0px;
+}
+
+.seat-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: flex-start; /* <-- Замість center */
+  margin-left: 8%;
+}
+
+.screen {
+  width: calc(var(--seats-per-row) * 40px);
+  height: 20px;
+  border-top: 4px solid white;
+  border-radius: 0 0 100% 100%;
+  text-align: center;
+  font-size: 14px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.seat-grid {
+  width: calc(var(--seats-per-row) * 40px);
+  display: grid;
+  grid-template-columns: repeat(var(--seats-per-row), 1fr);
+  gap: 9px;
+}
+
+.seat-button {
+  width: 30px;
+  height: 35px;
+  border: 3.5px solid #5a5a5a;
+  background-color: transparent;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.seat-button:hover {
+  background-color: #444;
+  border-color: white;
+}
+
+.seat-button.selected {
+  background-color: #5a5a5a;
+}
+
+.seat-button.vip {
+  position: relative;
+  width: 30px;
+  height: 35px;
+  background: #222222;
+  color: #ff6b99;
+  border-radius: 10px;
+  z-index: 0;
+  border: none;
+}
+
+.seat-button.vip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 2.8px;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #ff3366 0%, #ff6b99 100%);
+  -webkit-mask:
+    linear-gradient(#ff3366 0 0) content-box,
+    linear-gradient(#ff6b99 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.seat-button.vip:hover {
+  background: #991f40;
+}
+
+.seat-button.selected.vip {
+  background: linear-gradient(90deg, #ff3366 0%, #ff6b99 100%);
+  color: #222222;
+  border-radius: 5px;
+}
+
+.order-section {
+  position: fixed;
+  top: 40px;
+  height: 580px;
+  right: 150px;
+  background-color: #5a5a5a;
+  padding: 20px;
+  border-radius: 12px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-self: flex-start;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.order-section h3 {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.ticket-list-container {
+  overflow-y: auto;
+  flex-grow: 1;
+  max-height: 380px;
+  margin-bottom: 20px;
+  padding-right: 10px;
+  box-sizing: border-box;
+}
+
+.ticket-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.ticket-list-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ticket-list-container::-webkit-scrollbar-track {
+  background: #5a5a5a;
+  border-radius: 8px;
+}
+
+.ticket-list-container::-webkit-scrollbar-thumb {
+  background-color: #222222;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.ticket-list-container::-webkit-scrollbar-thumb:hover {
+  background-color: #222222;
+}
+
+.ticket-card {
+  background-color: #222222;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.order-actions {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.continue-button {
+  background: linear-gradient(90deg, #ff3366 0%, #ff6b99 100%);
+  color: white;
+  padding: 8px 20px;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 80%;
+  flex-grow: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.continue-button:hover {
+  background: white;
+  color: black;
+  transition:
+    0.3s ease,
+    color 0.3s ease;
+}
+
+.total-price {
+  font-weight: bold;
+  font-size: 1.1rem;
+  white-space: nowrap;
+}
+
+.gradient-vip {
+  background: linear-gradient(90deg, #ff3366 0%, #ff6b99 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './MovieInfo.css';
+import '../styles/MovieInfo.css';
 import CustomSelectGrey from './CustomSelectGrey';
+import { SquarePen } from 'lucide-react';
 
 export interface Movie {
   title: string;
@@ -11,7 +12,6 @@ export interface Movie {
   genre: string;
   duration: string;
   studio: string;
-  screenplay: string;
   actors: string;
   description: string;
 }
@@ -19,7 +19,7 @@ export interface Movie {
 interface MovieInfoProps {
   movie: Movie;
   onChange?: (updatedMovie: Movie) => void;
-  onIconClick?: () => void;
+  readonly?: boolean;
 }
 
 const editableFields = ['title', 'year', 'ageRating', 'description'] as const;
@@ -63,7 +63,7 @@ const AutoResizeTextarea: React.FC<{
   );
 };
 
-const MovieInfo: React.FC<MovieInfoProps> = ({ movie, onChange }) => {
+const MovieInfo: React.FC<MovieInfoProps> = ({ movie, onChange, readonly }) => {
   const [editingField, setEditingField] = useState<string | null>(null);
   const [tempValue, setTempValue] = useState<string | number>('');
 
@@ -89,8 +89,7 @@ const MovieInfo: React.FC<MovieInfoProps> = ({ movie, onChange }) => {
     { key: 'criticRating', label: 'Оцінка критиків' },
     { key: 'genre', label: 'Жанр' },
     { key: 'duration', label: 'Тривалість' },
-    { key: 'studio', label: 'Студія' },
-    { key: 'screenplay', label: 'Сценарій' },
+    { key: 'studio', label: 'Студія(-ї)' },
     { key: 'actors', label: 'Актори' },
     { key: 'description', label: 'Опис' },
   ];
@@ -118,20 +117,18 @@ const MovieInfo: React.FC<MovieInfoProps> = ({ movie, onChange }) => {
             )}
           </td>
           <td></td>
-          <td className="movie-title-icon-cell">
-            <button
-              type="button"
-              className="icon-button"
-              onClick={() => startEditing('title', movie.title)}
-              aria-label="Редагувати назву фільму"
-            >
-              <img
-                src="/img/free-icon-font-edit-alt-3917427.png"
-                alt="Редагувати"
-                className="icon-image"
-              />
-            </button>
-          </td>
+          {!readonly && (
+            <td className="movie-title-icon-cell">
+              <button
+                type="button"
+                className="icon-button"
+                onClick={() => startEditing('title', movie.title)}
+                aria-label="Редагувати назву фільму"
+              >
+                <SquarePen size={18} strokeWidth={1.8} className="icon-image" />
+              </button>
+            </td>
+          )}
         </tr>
 
         {rows.map(({ key, label }) => (
@@ -180,22 +177,22 @@ const MovieInfo: React.FC<MovieInfoProps> = ({ movie, onChange }) => {
                 movie[key]
               )}
             </td>
-            <td className="icon-cell">
-              {hasIcon(key) && (
+            {!readonly && hasIcon(key) && (
+              <td className="icon-cell">
                 <button
                   type="button"
                   className="icon-button"
                   onClick={() => startEditing(key, movie[key])}
                   aria-label={`Редагувати ${label.toLowerCase()}`}
                 >
-                  <img
-                    src="/img/free-icon-font-edit-alt-3917427.png"
-                    alt="Редагувати"
+                  <SquarePen
+                    size={18}
+                    strokeWidth={1.8}
                     className="icon-image"
                   />
                 </button>
-              )}
-            </td>
+              </td>
+            )}
           </tr>
         ))}
       </tbody>

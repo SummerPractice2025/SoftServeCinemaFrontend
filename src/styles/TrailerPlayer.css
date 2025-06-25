@@ -34,7 +34,6 @@
   display: block;
 }
 
-/* Переміщена кнопка закриття за межі відео */
 .close-button {
   position: fixed;
   top: 20px;

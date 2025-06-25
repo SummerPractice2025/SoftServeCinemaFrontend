@@ -3,30 +3,35 @@ body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
-  height: 100%;
+  min-height: 100vh;
 }
 
 .page {
   background-color: #222222;
   width: 100%;
-  padding-top: 80px; /* або скільки тобі треба для шапки */
+  padding-top: 80px;
   box-sizing: border-box;
   min-width: 100vw;
-  min-height: 100vh; /* дозволяє розтягуватися при потребі */
-  padding: 80px 40px 40px; /* верхній — під шапку */
+  min-height: 100vh;
+  padding: 80px 40px 40px;
   color: white;
   display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
   gap: 40px;
   font-family: 'Open Sans', sans-serif;
   box-sizing: border-box;
 }
 
 .poster-block {
-  flex-shrink: 0;
+  flex: 0 1 300px;
+  min-width: 220px;
 }
 
 .poster-block img {
-  width: 300px;
+  width: 100%;
+  max-width: 300px;
+  height: auto;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
@@ -75,6 +80,50 @@ body {
 }
 
 .confirm-button:hover {
+  background-color: white;
+  color: black;
+  transition:
+    0.3s ease,
+    color 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .page {
+    flex-direction: column;
+    padding: 40px 20px;
+  }
+
+  .poster-block img {
+    max-width: 100%;
+  }
+
+  .trailer-button,
+  .confirm-button {
+    max-width: 100%;
+  }
+
+  .info-block {
+    max-width: 100%;
+  }
+}
+
+.mode-toggle-small {
+  margin: 10px 0;
+  padding: 4px 10px;
+  font-size: 0.9rem;
+  background-color: #434040;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  width: 100%;
+  max-width: 360px;
+  cursor: pointer;
+  align-self: center;
+}
+
+.mode-toggle-small:hover {
   background-color: white;
   color: black;
   transition:
