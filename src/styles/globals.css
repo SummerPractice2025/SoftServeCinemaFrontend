@@ -1,0 +1,596 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap');
+@import "tailwindcss";
+
+/* === БАЗОВІ СТИЛІ === */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #222222; /* Основний фон як у MovieEditPage */
+  color: #ffffff;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* === КОЛЬОРОВА ПАЛІТРА (CSS-змінні для консистентності) === */
+:root {
+  /* Основні фонові кольори */
+  --bg-primary: #222222, !important; 
+  --bg-secondary: #2a2a2a;
+  --bg-tertiary: #1a1a1a;
+  
+  /* Інтерфейсні елементи */
+  --surface-primary: #434040;   /* Кнопки, інпути */
+  --surface-secondary: #5a5a5a; /* Контейнери */
+  --surface-tertiary: #363636;  /* Меню, дропдауни */
+  --surface-elevated: #3a3a3a;  /* Піднесені елементи */
+  
+  /* Текстові кольори */
+  --text-primary: #ffffff;
+  --text-secondary: #e5e7eb;    /* Вторинний текст */
+  --text-muted: #9ca3af;        /* Приглушений текст */
+  --text-subtle: #6b7280;       /* Тонкий текст */
+  
+  /* Акцентні кольори */
+  --accent-primary: #ff3366;
+  --accent-secondary: #ff6b99;
+  --accent-gradient: linear-gradient(90deg, #ff3366 0%, #ff6b99 100%);
+  
+  /* Стани */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #222222;
+  
+  /* Тіні */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+  
+  /* Переходи */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+/* === ТИПОГРАФІКА === */
+.font-primary {
+  font-family: 'Inter', sans-serif;
+}
+
+.font-heading {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.font-body {
+  font-family: 'Open Sans', sans-serif;
+}
+
+/* === КАСТОМНІ СКРОЛБАРИ === */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-primary);
+  border-radius: 4px;
+  transition: background var(--transition-fast);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-secondary);
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--bg-tertiary);
+}
+
+/* === КОМПОНЕНТНІ КЛАСИ === */
+
+/* Градієнти */
+.gradient-primary {
+  background: var(--accent-gradient);
+}
+
+.gradient-text {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-dark {
+  background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.9) 100%);
+}
+
+.gradient-card {
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--surface-elevated) 100%);
+}
+
+/* Поверхні та контейнери */
+.surface-primary {
+  background-color: var(--surface-primary);
+  color: var(--text-primary);
+}
+
+.surface-secondary {
+  background-color: var(--surface-secondary);
+  color: var(--text-primary);
+}
+
+.surface-elevated {
+  background-color: var(--surface-elevated);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-md);
+}
+
+/* Інтерактивні елементи */
+.interactive {
+  transition: all var(--transition-normal);
+  cursor: pointer;
+}
+
+.interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.interactive:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Кнопки */
+.btn-primary {
+  background: var(--accent-gradient);
+  color: var(--text-primary);
+  padding: 8px 20px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  font-family: inherit;
+}
+
+.btn-primary:hover {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-secondary {
+  background-color: var(--surface-primary);
+  color: var(--text-primary);
+  padding: 8px 20px;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  font-family: inherit;
+}
+
+.btn-secondary:hover {
+  background-color: var(--text-primary);
+  color: var(--bg-primary);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 8px 16px;
+  border: 1px solid var(--surface-primary);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  font-family: inherit;
+}
+
+.btn-ghost:hover {
+  background: var(--surface-primary);
+  color: var(--text-primary);
+  border-color: var(--accent-primary);
+}
+
+/* Форми */
+.input-primary {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  border: 1px solid var(--surface-primary);
+  border-radius: 6px;
+  background-color: var(--surface-elevated);
+  color: var(--text-primary);
+  transition: all var(--transition-fast);
+}
+
+.input-primary:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(255, 51, 102, 0.1);
+}
+
+.input-primary::placeholder {
+  color: var(--text-subtle);
+}
+
+/* Картки */
+.card {
+  background: var(--surface-secondary);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-normal);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.card-elevated {
+  background: var(--surface-elevated);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: var(--shadow-lg);
+}
+
+/* Hover ефекти */
+.hover-lift {
+  transition: all var(--transition-normal);
+}
+
+.hover-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(255, 51, 102, 0.3);
+}
+
+.hover-scale {
+  transition: transform var(--transition-normal);
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+.hover-glow {
+  transition: all var(--transition-normal);
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(255, 51, 102, 0.4);
+}
+
+/* Blur ефекти */
+.backdrop-blur {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.backdrop-blur-strong {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* === КАРУСЕЛІ ТА МЕДІА === */
+
+
+.movie-poster {
+  width: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-slow);
+}
+
+.movie-card:hover .movie-poster {
+  transform: scale(1.05);
+}
+
+/* Рейтинг */
+.rating-badge {
+  background: rgba(0, 0, 0, 0.8);
+  color: #fbbf24;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+}
+
+/* Навігаційні кнопки */
+.nav-button {
+  background: var(--surface-primary);
+  border: none;
+  border-radius: 50%;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.nav-button:hover:not(:disabled) {
+  background: var(--accent-primary);
+  transform: scale(1.1);
+}
+
+.nav-button:disabled {
+  background: var(--surface-tertiary);
+  color: var(--text-subtle);
+  cursor: not-allowed;
+}
+
+/* === УТИЛІТИ === */
+
+/* Обрізання тексту */
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.text-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.text-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Розміри з співвідношенням сторін */
+.aspect-poster {
+  aspect-ratio: 2/3;
+}
+
+.aspect-video {
+  aspect-ratio: 16/9;
+}
+
+.aspect-square {
+  aspect-ratio: 1/1;
+}
+
+/* === АДАПТИВНИЙ ДИЗАЙН === */
+
+/* Мобільні пристрої */
+@media (max-width: 480px) {
+  .card {
+    padding: 1rem;
+  }
+  
+  .card-elevated {
+    padding: 1.5rem;
+  }
+  
+  .btn-primary,
+  .btn-secondary {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Планшети */
+@media (max-width: 768px) {  
+  .movie-card {
+    border-radius: 8px;
+  }
+}
+
+/* Великі екрани */
+@media (min-width: 1440px) {
+  .carousel-container {
+    padding: 4rem 0;
+  }
+  
+  .card-elevated {
+    padding: 3rem;
+  }
+}
+
+/* === АНІМАЦІЇ === */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.animate-slide-in {
+  animation: slideIn 0.4s ease-out;
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* === СПЕЦІАЛЬНІ КЛАСИ ДЛЯ КОНКРЕТНИХ КОМПОНЕНТІВ === */
+
+/* Стилі для MovieEditPage */
+.movie-edit-page {
+  background-color: var(--bg-primary);
+  min-height: 100vh;
+  padding: 80px 40px 40px;
+  color: var(--text-primary);
+}
+
+.poster-block img {
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+}
+
+.trailer-button {
+  background: var(--accent-gradient);
+  color: var(--text-primary);
+  padding: 12px 24px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: center;
+}
+
+.trailer-button:hover {
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Стилі для BookingPage */
+.booking-page {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  padding: clamp(20px, 4vw, 100px);
+}
+
+.seat-button {
+  background: transparent;
+  border: 3px solid var(--surface-primary);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.seat-button:hover {
+  background: var(--surface-primary);
+  border-color: var(--accent-primary);
+}
+
+.seat-button.selected {
+  background: var(--surface-primary);
+}
+
+.seat-button.vip {
+  background: var(--bg-primary);
+  border: 2px solid;
+  border-image: var(--accent-gradient) 1;
+  color: var(--accent-primary);
+}
+
+.seat-button.vip:hover {
+  background: var(--accent-primary);
+  color: var(--text-primary);
+}
+
+/* === ТЕМНА ТЕМА (за замовчуванням) === */
+/* Всі змінні вже налаштовані для темної теми */
+
+/* === ДОСТУПНІСТЬ === */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Фокус для доступності */
+*:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* === РЕЖИМ ВИСОКОГО КОНТРАСТУ === */
+@media (prefers-contrast: high) {
+  :root {
+    --bg-primary: #000000;
+    --text-primary: #ffffff;
+    --accent-primary: #ff0066;
+  }
+}
+
+/* Стилі для карток фільмів з фоновими зображеннями */
+.movie-card {
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  position: relative;
+}
+
+/* Адаптивне масштабування фонового зображення */
+.movie-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  z-index: -1;
+}
+
+/* Hover блок для додаткових ефектів */
+.hover-block {
+  position: relative;
+  z-index: 1;
+}
+
+/* Адаптивні медіа-запити для оптимізації зображень */
+@media (max-width: 480px) {
+  .movie-card {
+    background-size: cover;
+    background-position: center top;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .movie-card {
+    background-size: cover;
+    background-position: center center;
+  }
+}
+
+@media (min-width: 769px) {
+  .movie-card {
+    background-size: cover;
+    background-position: center center;
+  }
+}
+
+/* Забезпечення кращої якості зображень на Retina дисплеях */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .movie-card {
+    background-size: cover;
+  }
+}
