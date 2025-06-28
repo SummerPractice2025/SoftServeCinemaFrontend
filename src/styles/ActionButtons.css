@@ -1,0 +1,68 @@
+/* Обновленные стили для кнопок */
+.btn-group {
+  display: flex;
+  justify-content: center;
+  gap: 42rem; /* Увеличиваем расстояние между кнопками */
+  margin-top: 3rem; /* Отступ сверху, чтобы кнопки не сливались с содержимым */
+}
+
+.save-btn,
+.cancel-btn {
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
+  color: white;
+  padding: 0.6rem 0.6rem; /* Уменьшаем размер кнопок */
+  font-size: 1rem; /* Уменьшаем размер шрифта */
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  width: 160px; /* Уменьшаем ширину кнопок */
+  text-align: center; /* Центрируем текст внутри кнопок */
+}
+
+.cancel-btn {
+  background: #444;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+  max-width: 320px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+}
+
+.modal h2 {
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+  margin-top: 16px;
+}
+
+.modal-buttons .cancel-btn,
+.modal-buttons .save-btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
