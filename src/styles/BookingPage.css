@@ -55,7 +55,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 15px;
-  align-items: flex-start; /* <-- Замість center */
+  align-items: flex-start;
   margin-left: 8%;
 }
 
