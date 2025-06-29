@@ -38,10 +38,10 @@
 }
 
 .modal {
-  background: white;
+  background: #5a5a5a;
   border-radius: 16px;
   padding: 16px;
-  max-width: 320px;
+  max-width: 365px;
   width: 90%;
   text-align: center;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
@@ -50,6 +50,7 @@
 .modal h2 {
   font-size: 16px;
   margin-bottom: 12px;
+  color: white;
 }
 
 .modal-buttons {

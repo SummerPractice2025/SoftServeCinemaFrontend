@@ -1,7 +1,7 @@
 html,
 body {
   margin: 0;
-  padding: 10px;
+  padding: 20px;
   overflow-x: hidden;
   min-height: 100vh;
   background-color: #222222;
@@ -15,6 +15,7 @@ body {
   min-width: 100vw;
   min-height: 100vh;
 }
+
 .year-select__control {
   background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%) !important;
   border-radius: 10px !important;

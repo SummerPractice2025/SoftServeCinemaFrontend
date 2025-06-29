@@ -1,3 +1,4 @@
+// AddMovies.tsx
 import React, { useState, useRef } from 'react';
 import CustomSelectGrey from '../components/CustomSelectGrey';
 import MovieInfo from '../components/MovieInfoAdmin';
@@ -18,7 +19,7 @@ const getLastYears = (count: number): { value: string; label: string }[] => {
   });
 };
 
-const MovieSearchAndFilter: React.FC = () => {
+const AddMovies: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState(
     String(new Date().getFullYear()),
   );
@@ -33,7 +34,6 @@ const MovieSearchAndFilter: React.FC = () => {
     Record<string, Record<string, Session[]>>
   >({});
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  // const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -118,7 +118,6 @@ const MovieSearchAndFilter: React.FC = () => {
   const confirmCancel = () => {
     if (filteredMovie) {
       const movieKey = filteredMovie.title;
-      // Відновлюємо сеанси для вибраного фільму з останніх збережених
       const restoredSessions = savedSessionsByDate[movieKey] || {};
       setSessionsByDate({
         ...sessionsByDate,
@@ -265,4 +264,4 @@ const MovieSearchAndFilter: React.FC = () => {
   );
 };
 
-export default MovieSearchAndFilter;
+export default AddMovies;

@@ -12,7 +12,7 @@ const App = () => {
     //     element={<BookingPage />}
     //   />
     // </Routes>
-    <div style={{ padding: 20 }}>
+    <div>
       <AddMovies />
     </div>
   );
