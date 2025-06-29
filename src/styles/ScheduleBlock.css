@@ -1,6 +1,7 @@
 .schedule-block {
   width: 100%;
   max-width: 300px;
+  min-width: 300px;
   background-color: #5a5a5a;
   border-radius: 8px;
   overflow: hidden;
@@ -84,7 +85,7 @@
 .schedule-row {
   display: flex;
   gap: 15px;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   justify-content: flex-start;
 }
 
@@ -134,4 +135,11 @@
   align-items: center;
   gap: 0px;
   min-width: 50px;
+}
+
+.no-sessions {
+  padding: 20px;
+  text-align: center;
+  font-size: 1.1em;
+  color: gray;
 }

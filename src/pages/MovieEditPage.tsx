@@ -1,58 +1,63 @@
-import { useState } from 'react';
-import MovieInfo, { type Movie } from '../components/MovieInfo';
+import { useState, useEffect } from 'react';
+import MovieInfo from '../components/MovieInfo';
 import ScheduleBlock from '../components/ScheduleBlock';
+import TrailerPlayer from '../components/TrailerPlayer';
 import '../styles/MovieEditPage.css';
 import '../styles/ScheduleBlock.css';
-import TrailerPlayer from '../components/TrailerPlayer';
+
+const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
 
 const MovieEdit = () => {
-  const [movie, setMovie] = useState<Movie>({
-    title: 'Формула1',
-    year: 2025,
-    ageRating: '16+',
-    director: 'Сенін Сон',
-    criticRating: '86%',
-    genre: 'Романтика, Комедія',
-    duration: '1:56',
-    studio: 'Sony Pictures',
-    actors: 'Дакота Джонсон, Педро Паскаль Дакота Джонсон, Педро Паскаль...',
-    description: 'Це короткий опис сюжету або деталей фільму...',
-  });
+  const [movieId] = useState<number>(2);
 
+  const [posterUrl, setPosterUrl] = useState<string>('');
+  const [trailerUrl, setTrailerUrl] = useState<string>('');
   const [showPlayer, setShowPlayer] = useState(false);
   const [isAdminCheck, setIsAdminCheck] = useState(true);
 
-  const handleMovieChange = (updatedMovie: Movie) => {
-    setMovie(updatedMovie);
-  };
+  useEffect(() => {
+    const fetchMovieDetails = async () => {
+      try {
+        const res = await fetch(`${backendBaseUrl}movie/${movieId}`);
+        if (!res.ok) throw new Error('Failed to fetch movie details');
+        const data = await res.json();
+
+        setPosterUrl(data.posterUrl ?? '');
+        setTrailerUrl(data.trailerUrl ?? '');
+      } catch (error) {
+        console.error(error);
+        setPosterUrl('');
+        setTrailerUrl('');
+      }
+    };
+
+    fetchMovieDetails();
+  }, [movieId]);
 
   return (
     <div className="page">
       <div className="poster-block">
-        <img src="/img/poster_67d423a91a0a4.jpg" alt="Постер фільму" />
-
-        <button className="trailer-button" onClick={() => setShowPlayer(true)}>
+        {posterUrl && <img src={posterUrl} alt="Постер фільму" />}
+        <button
+          className="trailer-button"
+          onClick={() => setShowPlayer(true)}
+          disabled={!trailerUrl}
+        >
           ▶ Дивитись трейлер
         </button>
-
-        {showPlayer && (
+        {showPlayer && trailerUrl && (
           <TrailerPlayer
-            videoUrl="https://www.youtube.com/watch?v=CT2_P2DZBR0"
+            videoUrl={trailerUrl}
             onClose={() => setShowPlayer(false)}
           />
         )}
-
         {isAdminCheck && (
           <button className="confirm-button">Підтвердити</button>
         )}
       </div>
 
       <div className="info-block">
-        <MovieInfo
-          movie={movie}
-          onChange={handleMovieChange}
-          readonly={!isAdminCheck}
-        />
+        <MovieInfo movieId={movieId} readonly={!isAdminCheck} />
       </div>
 
       <div className="schedule-container">
@@ -63,7 +68,7 @@ const MovieEdit = () => {
           {isAdminCheck ? 'Режим клієнта' : 'Режим адміністратора'}
         </button>
 
-        <ScheduleBlock isAdminCheck={isAdminCheck} />
+        <ScheduleBlock isAdminCheck={isAdminCheck} movieId={movieId} />
       </div>
     </div>
   );
