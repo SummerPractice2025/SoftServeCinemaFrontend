@@ -3,6 +3,7 @@
   border-collapse: collapse;
   font-family: 'Open Sans', sans-serif;
   color: white;
+  table-layout: fixed; /* фіксована ширина стовпців */
 }
 
 .movie-info-table td {
@@ -13,7 +14,7 @@
 
 /* Перший стовпець — категорії */
 .category-cell {
-  width: 15%;
+  width: 23%;
   font-weight: bold;
   user-select: none;
   vertical-align: top;
@@ -26,7 +27,7 @@
   width: 75%;
   word-break: break-word;
   vertical-align: top;
-  padding-left: 4px;
+  padding-left: 10px;
   color: #888;
 }
 
@@ -38,12 +39,41 @@
   vertical-align: top;
 }
 
-.movie-title-cell {
-  vertical-align: middle;
+/* Верхній блок з назвою фільму (не в таблиці) */
+.movie-title-row {
   font-weight: bold;
+  width: 100%;
   font-size: 1.5rem;
   font-family: 'Montserrat', sans-serif;
+  max-height: 3.5rem; /* обмежує висоту блоку */
+  overflow: hidden; /* обрізає, якщо текст занадто довгий */
+  text-overflow: ellipsis;
+  white-space: nowrap; /* не переносити текст */
+  padding: 6px 8px;
+  color: white;
 }
+
+.movie-title-input {
+  width: 100%;
+  font-size: 1.5rem;
+  font-family: 'Montserrat', sans-serif;
+  padding: 4px 8px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  border: 1px solid #434040;
+  background-color: #2a2a2a;
+  color: white;
+}
+
+/* Щоб редагування назви теж не збільшувало висоту */
+.movie-title-cell input.edit-input {
+  width: 100%;
+  max-height: 3.5rem;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Інші стилі залишаються без змін */
 
 .icon-button {
   background: none;
@@ -77,6 +107,7 @@ input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
 .auto-resize-textarea {
   width: 100%;
   resize: none;

@@ -14,21 +14,13 @@ interface Movie {
   id: number;
   name: string;
   posterUrl?: string;
-  description?: string;
-  duration?: number;
-  year?: number;
-  ageRate?: string;
-  rating?: number;
-  directors?: string[];
-  actors?: string[];
   genres?: string[];
-  studios?: string[];
 }
 
 interface SessionSummary {
   id: number;
   date: string;
-  sessionType?: { type: string };
+  session_type_id: number;
 }
 
 interface SeatInfo {
@@ -44,11 +36,22 @@ interface SessionDetails {
   date_time: string;
   price: number;
   price_VIP: number;
+  session_type_id: number;
+  is_deleted: boolean;
   seats: SeatInfo[];
 }
 
+const ADMIN_BEARER_TOKEN =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjowLCJpYXQiOjE3NTA2MTMxMzQsImV4cCI6MTc1MzIwNTEzNH0.__wtsnfhC2WIVeIVssF_UK_5IyfYHvFu-703CX5EGVA';
+
 const rows = 10;
 const seatsPerRow = 10;
+
+const sessionTypeMap: Record<number, string> = {
+  1: '2D',
+  2: '3D',
+  3: 'IMAX',
+};
 
 const BookingPage: React.FC = () => {
   const { date, time, format } = useParams<{
@@ -56,56 +59,33 @@ const BookingPage: React.FC = () => {
     time: string;
     format: string;
   }>();
-
   const location = useLocation();
   const state = location.state as { movieId?: number; format?: string } | null;
   const movieId = state?.movieId ?? null;
   const sessionFormat = format || state?.format || '2D';
-
   const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
-
-  console.log('REACT_APP_BACKEND_BASE_URL:', backendBaseUrl);
 
   const [movieInfo, setMovieInfo] = useState<Movie | null>(null);
   const [sessionId, setSessionId] = useState<number | null>(null);
-
   const [session, setSession] = useState<SessionDetails | null>(null);
-
   const [bookedSeats, setBookedSeats] = useState<string[]>([]);
   const [selectedSeats, setSelectedSeats] = useState<Seat[]>([]);
   const [allSeats, setAllSeats] = useState<Seat[]>([]);
-  const [prices, setPrices] = useState<{ standard: number; vip: number }>({
-    standard: 60,
-    vip: 120,
-  });
+  const [prices, setPrices] = useState({ standard: 60, vip: 120 });
+
+  const normalizeFormat = (fmt: string) =>
+    fmt.toLowerCase().replace(/[^a-z0-9]/gi, '');
 
   useEffect(() => {
-    if (!movieId) return;
-    if (!backendBaseUrl) {
-      console.error('BACKEND_BASE_URL не визначено');
-      return;
-    }
+    if (!movieId || !backendBaseUrl) return;
 
     const fetchMovie = async () => {
       try {
         const res = await fetch(`${backendBaseUrl}movie/${movieId}`);
         if (!res.ok) throw new Error('Помилка при завантаженні фільму');
         const data = await res.json();
-
-        setMovieInfo({
-          id: data.id,
-          name: data.name,
-          posterUrl: data.posterUrl,
-          description: data.description,
-          duration: data.duration,
-          year: data.year,
-          ageRate: data.ageRate,
-          rating: data.rating,
-          directors: data.directors ?? [],
-          actors: data.actors ?? [],
-          genres: data.genres ?? [],
-          studios: data.studios ?? [],
-        });
+        console.log('Завантажено дані фільму:', data);
+        setMovieInfo(data);
       } catch (err) {
         console.error('Помилка завантаження фільму:', err);
         setMovieInfo(null);
@@ -116,11 +96,7 @@ const BookingPage: React.FC = () => {
   }, [movieId, backendBaseUrl]);
 
   useEffect(() => {
-    if (!movieId || !date || !time || !sessionFormat) return;
-    if (!backendBaseUrl) {
-      console.error('BACKEND_BASE_URL не визначено');
-      return;
-    }
+    if (!movieId || !date || !time || !sessionFormat || !backendBaseUrl) return;
 
     const fetchSessions = async () => {
       const startDate = `${date}T00:00:00`;
@@ -133,31 +109,32 @@ const BookingPage: React.FC = () => {
         if (!res.ok) throw new Error('Помилка при завантаженні сесій');
         const data: SessionSummary[] = await res.json();
 
-        console.log('Сесії для фільму:', data);
-        console.log('time з URL:', time);
-        console.log('format з URL:', sessionFormat);
+        console.log('Сирі дані сеансів:', data);
 
-        const foundSession = data.find((s: SessionSummary, index: number) => {
-          const sessionTime = s.date.slice(11, 16);
-          const sessionType = s.sessionType?.type || '2D';
-
-          console.log(`Сеанс ${index}:`, {
-            originalDate: s.date,
-            sessionTime,
-            sessionFormatFromServer: sessionType,
-            порівняння:
-              sessionTime === time &&
-              sessionType.toLowerCase() === sessionFormat.toLowerCase(),
+        const foundSession = data.find((s) => {
+          const sessionTime = new Date(s.date).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
           });
+          const sessionType = sessionTypeMap[s.session_type_id] || '2D';
+
+          console.log(
+            `Перевірка сесії id=${s.id}:`,
+            `sessionTime=${sessionTime} === time=${time}?`,
+            sessionTime === time,
+            `sessionType=${sessionType} === sessionFormat=${sessionFormat}?`,
+            normalizeFormat(sessionType) === normalizeFormat(sessionFormat),
+          );
 
           return (
             sessionTime === time &&
-            sessionType.toLowerCase() === sessionFormat.toLowerCase()
+            normalizeFormat(sessionType) === normalizeFormat(sessionFormat)
           );
         });
 
+        console.log('Знайдений сеанс:', foundSession);
+
         if (foundSession) {
-          console.log('Знайдений сеанс:', foundSession);
           setSessionId(foundSession.id);
         } else {
           console.warn('Сеанс не знайдено');
@@ -171,29 +148,22 @@ const BookingPage: React.FC = () => {
   }, [movieId, date, time, sessionFormat, backendBaseUrl]);
 
   useEffect(() => {
-    if (!sessionId) return;
-    if (!backendBaseUrl) {
-      console.error('BACKEND_BASE_URL не визначено');
-      return;
-    }
+    if (!sessionId || !backendBaseUrl) return;
 
     const fetchSessionDetails = async () => {
+      console.log('Отримання деталей сеансу для sessionId:', sessionId);
       try {
         const res = await fetch(`${backendBaseUrl}session/${sessionId}`);
         if (!res.ok) throw new Error('Помилка при завантаженні сеансу');
         const data: SessionDetails = await res.json();
-
+        console.log('Деталі сеансу:', data);
         setSession(data);
+        setPrices({ standard: data.price, vip: data.price_VIP });
 
         const booked = data.seats
-          .filter((seat: SeatInfo) => seat.is_booked)
-          .map((seat: SeatInfo) => `R${seat.row + 1}S${seat.col + 1}`);
+          .filter((seat) => seat.is_booked)
+          .map((seat) => `R${seat.row}S${seat.col}`);
         setBookedSeats(booked);
-
-        setPrices({
-          standard: data.price,
-          vip: data.price_VIP,
-        });
       } catch (err) {
         console.error('Помилка при завантаженні сеансу:', err);
       }
@@ -215,7 +185,6 @@ const BookingPage: React.FC = () => {
       for (let number = 1; number <= seatsPerRow; number++) {
         const id = `R${row}S${number}`;
         const isVip = row === vipRow;
-
         seats.push({
           row,
           number,
@@ -238,52 +207,53 @@ const BookingPage: React.FC = () => {
     );
   };
 
-  const capitalize = (str: string) =>
-    str.charAt(0).toUpperCase() + str.slice(1);
+  const handleBooking = async () => {
+    if (!sessionId || !backendBaseUrl) {
+      console.error('Сеанс або BACKEND_BASE_URL не визначено');
+      return;
+    }
+    if (selectedSeats.length === 0) {
+      alert('Оберіть хоча б одне місце для бронювання');
+      return;
+    }
+    console.log('sessionId перед бронюванням:', sessionId, typeof sessionId);
+    const bookingData = selectedSeats.map((seat) => ({
+      sessionID: sessionId,
+      seatRow: seat.row,
+      seatCol: seat.number,
+      isVIP: seat.type === 'vip',
+    }));
 
-  const formatDateUkrainian = (isoDate: string): string => {
-    const dateObj = new Date(isoDate);
-    const dayNames = [
-      'неділя',
-      'понеділок',
-      'вівторок',
-      'середа',
-      'четвер',
-      'пʼятниця',
-      'субота',
-    ];
-    const monthNames = [
-      'січня',
-      'лютого',
-      'березня',
-      'квітня',
-      'травня',
-      'червня',
-      'липня',
-      'серпня',
-      'вересня',
-      'жовтня',
-      'листопада',
-      'грудня',
-    ];
+    console.log('Дані для бронювання:', JSON.stringify(bookingData, null, 2));
+    try {
+      const res = await fetch(`${backendBaseUrl}session/booking`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${ADMIN_BEARER_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(bookingData),
+      });
 
-    const dayName = capitalize(dayNames[dateObj.getDay()]);
-    const day = dateObj.getDate();
-    const monthName = monthNames[dateObj.getMonth()];
+      if (!res.ok) {
+        const errText = await res.text();
+        console.error('Відповідь при помилці бронювання:', errText);
+        throw new Error(`Помилка бронювання: ${errText}`);
+      }
 
-    return `${dayName}, ${day} ${monthName}`;
+      alert('Місця успішно заброньовано!');
+      setBookedSeats((prev) => [
+        ...prev,
+        ...selectedSeats.map((seat) => seat.id),
+      ]);
+      setSelectedSeats([]);
+    } catch (err) {
+      console.error('Помилка бронювання:', err);
+      alert('Не вдалося забронювати місця. Спробуйте ще раз.');
+    }
   };
 
   const totalPrice = selectedSeats.reduce((sum, seat) => sum + seat.price, 0);
-
-  const displayDate = session?.date_time
-    ? formatDateUkrainian(session.date_time)
-    : date
-      ? formatDateUkrainian(date)
-      : '';
-  const displayTime = session?.date_time
-    ? session.date_time.slice(11, 16)
-    : time || '';
 
   return (
     <div className="booking-page">
@@ -299,9 +269,6 @@ const BookingPage: React.FC = () => {
             <p>Жанр: {movieInfo?.genres?.join(', ') || 'Невідомий'}</p>
             <p>Формат: {sessionFormat}</p>
             <p>Зала: {session?.hall_name || 'Невідома'}</p>
-            <p>
-              Сеанс: {displayDate}, о {displayTime}
-            </p>
           </div>
         </div>
 
@@ -321,9 +288,7 @@ const BookingPage: React.FC = () => {
                     selectedSeats.find((s) => s.id === seat.id)
                       ? 'selected'
                       : ''
-                  } ${seat.type === 'vip' ? 'vip' : ''} ${
-                    isBooked ? 'booked' : ''
-                  }`}
+                  } ${seat.type === 'vip' ? 'vip' : ''} ${isBooked ? 'booked' : ''}`}
                   onClick={() => toggleSeat(seat)}
                 >
                   {isBooked ? '✖' : ''}
@@ -357,9 +322,10 @@ const BookingPage: React.FC = () => {
             </ul>
           )}
         </div>
-
         <div className="order-actions">
-          <button className="continue-button">Продовжити</button>
+          <button className="continue-button" onClick={handleBooking}>
+            Продовжити
+          </button>
           <div className="total-price">{totalPrice}₴</div>
         </div>
       </div>

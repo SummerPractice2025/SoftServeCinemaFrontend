@@ -23,7 +23,7 @@ interface MovieInfoProps {
   readonly?: boolean;
 }
 
-const editableFields = ['name', 'year', 'ageRate', 'description'] as const;
+const editableFields = ['ageRate', 'description'] as const;
 
 const ageOptions = [
   { value: '0+', label: '0+ (Без обмежень)' },
@@ -164,111 +164,110 @@ const MovieInfo: React.FC<MovieInfoProps> = ({
   if (!movie) return <div>Фільм не знайдено</div>;
 
   return (
-    <table className="movie-info-table">
-      <tbody>
-        <tr>
-          <td className="movie-title-cell">
-            {editingField === 'name' ? (
-              <input
-                type="text"
-                value={tempValue as string}
-                onChange={(e) => setTempValue(e.target.value)}
-                onBlur={finishEditing}
-                onKeyDown={(e) => e.key === 'Enter' && finishEditing()}
-                autoFocus
-                className="edit-input"
-              />
-            ) : (
-              movie.name
-            )}
-          </td>
-          <td></td>
-          {!readonly && (
-            <td className="movie-title-icon-cell">
-              <button
-                type="button"
-                className="icon-button"
-                onClick={() => startEditing('name', movie.name)}
-                aria-label="Редагувати назву фільму"
-              >
-                <SquarePen size={18} strokeWidth={1.8} className="icon-image" />
-              </button>
-            </td>
-          )}
-        </tr>
+    <div>
+      <div className="movie-title-row">
+        {editingField === 'name' ? (
+          <input
+            type="text"
+            value={tempValue as string}
+            onChange={(e) => setTempValue(e.target.value)}
+            onBlur={finishEditing}
+            onKeyDown={(e) => e.key === 'Enter' && finishEditing()}
+            autoFocus
+            className="edit-input movie-title-input"
+          />
+        ) : (
+          <div className="movie-title-cell">{movie.name}</div>
+        )}
+        {/* Кнопка редагування назви видалена */}
+      </div>
 
-        {rows.map(({ key, label }) => (
-          <tr key={key}>
-            <td className="category-cell">{label}:</td>
-            <td className="value-cell">
-              {editingField === key ? (
-                key === 'description' ? (
-                  <AutoResizeTextarea
-                    value={tempValue as string}
-                    onChange={(val) => setTempValue(val)}
-                    onEnter={finishEditing}
-                  />
-                ) : key === 'ageRate' ? (
-                  <CustomSelectGrey
-                    value={{ value: movie.ageRate, label: movie.ageRate }}
-                    options={ageOptions}
-                    onChange={(option) => {
-                      const updatedMovie = { ...movie, ageRate: option.value };
-                      setMovie(updatedMovie);
-                      onChange?.(updatedMovie);
-                      setEditingField(null);
-                    }}
-                  />
-                ) : (
-                  <input
-                    type={typeof movie[key] === 'number' ? 'number' : 'text'}
-                    value={tempValue}
-                    onChange={(e) =>
-                      setTempValue(
-                        typeof movie[key] === 'number'
-                          ? Number(e.target.value)
-                          : e.target.value,
-                      )
-                    }
-                    onBlur={finishEditing}
-                    onKeyDown={(e) => e.key === 'Enter' && finishEditing()}
-                    autoFocus
-                    className="edit-input"
-                  />
-                )
-              ) : (
-                renderValue(key)
-              )}
-            </td>
-            {!readonly &&
-              editableFields.includes(
-                key as (typeof editableFields)[number],
-              ) && (
-                <td className="icon-cell">
-                  <button
-                    type="button"
-                    className="icon-button"
-                    onClick={() => {
-                      const value = movie[key];
-                      const valToEdit = Array.isArray(value)
-                        ? value.join(', ')
-                        : value;
-                      startEditing(key, valToEdit);
-                    }}
-                    aria-label={`Редагувати ${label.toLowerCase()}`}
-                  >
-                    <SquarePen
-                      size={18}
-                      strokeWidth={1.8}
-                      className="icon-image"
-                    />
-                  </button>
+      <table className="movie-info-table">
+        <tbody>
+          {rows.map(({ key, label }) => {
+            // Приховуємо кнопки редагування для name і year
+            const showEditButton =
+              !readonly &&
+              editableFields.includes(key as (typeof editableFields)[number]) &&
+              key !== 'name' &&
+              key !== 'year';
+
+            return (
+              <tr key={key}>
+                <td className="category-cell">{label}:</td>
+                <td className="value-cell">
+                  {editingField === key ? (
+                    key === 'description' ? (
+                      <AutoResizeTextarea
+                        value={tempValue as string}
+                        onChange={(val) => setTempValue(val)}
+                        onEnter={finishEditing}
+                      />
+                    ) : key === 'ageRate' ? (
+                      <CustomSelectGrey
+                        value={{ value: movie.ageRate, label: movie.ageRate }}
+                        options={ageOptions}
+                        onChange={(option) => {
+                          const updatedMovie = {
+                            ...movie,
+                            ageRate: option.value,
+                          };
+                          setMovie(updatedMovie);
+                          onChange?.(updatedMovie);
+                          setEditingField(null);
+                        }}
+                      />
+                    ) : (
+                      <input
+                        type={
+                          typeof movie[key] === 'number' ? 'number' : 'text'
+                        }
+                        value={tempValue}
+                        onChange={(e) =>
+                          setTempValue(
+                            typeof movie[key] === 'number'
+                              ? Number(e.target.value)
+                              : e.target.value,
+                          )
+                        }
+                        onBlur={finishEditing}
+                        onKeyDown={(e) => e.key === 'Enter' && finishEditing()}
+                        autoFocus
+                        className="edit-input"
+                      />
+                    )
+                  ) : (
+                    renderValue(key)
+                  )}
                 </td>
-              )}
-          </tr>
-        ))}
-      </tbody>
-    </table>
+                {showEditButton && (
+                  <td className="icon-cell">
+                    <button
+                      type="button"
+                      className="icon-button"
+                      onClick={() => {
+                        const value = movie[key];
+                        const valToEdit = Array.isArray(value)
+                          ? value.join(', ')
+                          : value;
+                        startEditing(key, valToEdit);
+                      }}
+                      aria-label={`Редагувати ${label.toLowerCase()}`}
+                    >
+                      <SquarePen
+                        size={18}
+                        strokeWidth={1.8}
+                        className="icon-image"
+                      />
+                    </button>
+                  </td>
+                )}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
 };
 
