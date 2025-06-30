@@ -298,10 +298,6 @@ body {
   transition: transform var(--transition-slow);
 }
 
-.movie-card:hover .movie-poster {
-  transform: scale(1.05);
-}
-
 /* Рейтинг */
 .rating-badge {
   background: rgba(0, 0, 0, 0.8);
@@ -559,6 +555,8 @@ body {
   background-repeat: no-repeat;
   z-index: -1;
 }
+
+
 
 /* Hover блок для додаткових ефектів */
 .hover-block {

@@ -92,7 +92,7 @@ const MovieCarousel = () => {
       rating: 7.2,
       duration: "2г 34хв",
       image: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&h=600&fit=crop",
-      showTimes: ["10:30", "14:00", "17:30", "21:00"]
+      showTimes: []
     },
     {
       id: 5,
@@ -169,9 +169,13 @@ const MovieCarousel = () => {
   const posterHeight = Math.floor(cardDimensions.height * 0.65);
   const infoHeight = cardDimensions.height - posterHeight;
 
-  const MovieCard = ({ movie }) => (
+  const MovieCard = ({ movie }) => {
+      const nextShowTime = movie.showTimes.length > 0 
+    ? movie.showTimes[0] 
+    : 'Немає сеансів';
+    return(
     <div 
-      className="movie-card flex-shrink-0 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 flex flex-col"
+      className="movie-card flex-shrink-0 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col"
       style={{ 
         width: `${cardDimensions.width}px`,
         height: `${cardDimensions.height}px`,
@@ -179,7 +183,7 @@ const MovieCarousel = () => {
         backgroundImage: `url(${movie.image})`,
       }}
     >
-      <div className="hover-block w-full h-full flex flex-col">
+      <div className="hover-block w-full group hover:bg-black/40 transition-all duration-300 h-full flex flex-col">
         {/* Постер фільму */}
         <div className="relative group flex-shrink-0" style={{ height: `${posterHeight}px` }}>
           {/* Рейтинг
@@ -189,38 +193,61 @@ const MovieCarousel = () => {
           </div> */}
           
           {/* Кнопка відтворення при ховері */}
-          <div className="absolute inset-0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
-            <div className="w-12 h-12 bg-pink-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transform scale-75 group-hover:scale-100 transition-all duration-300 cursor-pointer">
-              <div className="w-0 h-0 border-l-4 border-l-white border-t-3 border-t-transparent border-b-3 border-b-transparent ml-1"></div>
+          <div className="absolute top-[15px] left-[15px] inset-0 group transition-all duration-300">
+            <div className="w-15 h-15 gradient-primary 500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transform scale-75 group-hover:scale-100 transition-all duration-300 cursor-pointer">
+              <div className="w-0 h-0 border-l-[15px] border-l-white border-t-[12px] border-t-transparent border-b-[15px] border-b-transparent opacity-80 hover:opacity-100 transition-opacity duration-200 cursor-pointer"></div>
             </div>
           </div>
         </div>
 
         {/* Інформація про фільм */}
-        <div className="p-3 flex flex-col justify-between flex-grow bg-gray-900/90" style={{ height: `${infoHeight}px` }}>
+        <div className="p-3 flex flex-col justify-between flex-grow bg-gray-900/9" style={{ height: `${infoHeight}px` }}>
           <div>
             {/* Назва фільму */}
             <h3 className="font-semibold mb-2 line-clamp-2 leading-tight text-sm text-white">
               {movie.title}
             </h3>
             
-            {/* Тривалість */}
+            {/* Тривалість
             <div className="flex items-center text-xs mb-2 text-gray-300">
               <Clock className="w-3 h-3 mr-1" />
               <span>{movie.duration}</span>
-            </div>
+            </div> */}
 
             {/* Жанр */}
-            <p className="text-xs mb-3 line-clamp-1 text-gray-400">{movie.genre}</p>
+            <p className="text-xs mb-3 line-clamp-1 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300">{movie.genre}</p>
           </div>
 
           {/* Сеанси */}
           <div>
-            <p className="text-xs font-medium uppercase tracking-wide mb-1 text-gray-300">
+            <p className="text-xs font-medium uppercase tracking-wide mb-1 text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               Сеанси:
             </p>
             <div className="flex flex-wrap gap-1">
-              {movie.showTimes.slice(0, 2).map((time, index) => (
+                            {/* Найближчий сеанс */}
+              <div className='opacity-0 group-hover:opacity-100 transition-opacity duration-300'>
+                <p className="text-sm font-medium text-gray-200 mb-1 ">
+                  Найближчий сеанс
+                </p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-2xl font-bold text-white">
+                      {nextShowTime}
+                    </span>
+                    {/* <span className="text-sm text-gray-300 uppercase">
+                      3DH
+                    </span> */}
+                  </div>
+                </div>
+              </div>
+
+              {/* Кнопка купити квиток */}
+              <button className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 opacity-0 group-hover:opacity-100  rounded transition-all duration-200 text-sm uppercase tracking-wide">
+                Купити квиток
+                <br />
+                <span className="text-xs normal-case">від 130 ₴</span>
+              </button>
+              {/* {movie.showTimes.slice(0, 2).map((time, index) => (
                 <button 
                   key={index}
                   className="px-2 py-1 text-xs rounded transition-colors duration-200 border border-gray-600 text-white hover:bg-pink-500 hover:border-pink-500"
@@ -232,14 +259,14 @@ const MovieCarousel = () => {
                 <button className="px-2 py-1 text-xs rounded bg-gray-700 text-gray-300">
                   +{movie.showTimes.length - 2}
                 </button>
-              )}
+              )} */}
             </div>
           </div>
         </div>
       </div>
     </div>
   );
-
+};
 
   return (
     <div className="min-h-screen py-8 w-full">
@@ -253,9 +280,9 @@ const MovieCarousel = () => {
             <h2 className="text-2xl md:text-3xl font-bold mb-2">
               Зараз у кіно
             </h2>
-            <p className="text-sm md:text-base">
+            {/* <p className="text-sm md:text-base">
               Найпопулярніші фільми цього тижня
-            </p>
+            </p> */}
           </div>
           
           {/* Навігаційні кнопки */}
@@ -333,11 +360,11 @@ const MovieCarousel = () => {
         </div> */}
 
         {/* Індикатор поточних налаштувань */}
-        <div className="text-center mt-4 text-xs w-full">
+        {/* <div className="text-center mt-4 text-xs w-full">
           Розміри картки: {cardDimensions.width}×{cardDimensions.height}px | 
           Співвідношення: {(cardDimensions.width / cardDimensions.height).toFixed(2)} | 
           Екран: {window.innerWidth}px
-        </div>
+        </div> */}
       </div>
     </div>
   );
