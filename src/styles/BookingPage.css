@@ -149,7 +149,12 @@ body {
   box-sizing: border-box;
   overflow: hidden;
 }
-
+.seat-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
 .order-section h3 {
   font-family: 'Montserrat', sans-serif;
 }
@@ -244,4 +249,10 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: bold;
+}
+
+.seat-button.booked {
+  background-color: #ccc;
+  color: #333;
+  cursor: not-allowed;
 }
