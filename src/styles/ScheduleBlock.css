@@ -90,7 +90,7 @@
 }
 
 .schedule-time-button {
-  background: linear-gradient(90deg, #ff3366 0%, #ff6b99 100%);
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;

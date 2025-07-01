@@ -3,7 +3,7 @@
   border-collapse: collapse;
   font-family: 'Open Sans', sans-serif;
   color: white;
-  table-layout: fixed; /* фіксована ширина стовпців */
+  table-layout: fixed;
 }
 
 .movie-info-table td {
@@ -12,7 +12,6 @@
   text-align: left;
 }
 
-/* Перший стовпець — категорії */
 .category-cell {
   width: 23%;
   font-weight: bold;
@@ -22,7 +21,6 @@
   white-space: nowrap;
 }
 
-/* Другий стовпець — значення */
 .value-cell {
   width: 75%;
   word-break: break-word;
@@ -31,7 +29,6 @@
   color: #888;
 }
 
-/* Третій стовпець — іконка */
 .icon-cell,
 .movie-title-icon-cell {
   width: 10%;
@@ -39,16 +36,15 @@
   vertical-align: top;
 }
 
-/* Верхній блок з назвою фільму (не в таблиці) */
 .movie-title-row {
   font-weight: bold;
   width: 100%;
   font-size: 1.5rem;
   font-family: 'Montserrat', sans-serif;
-  max-height: 3.5rem; /* обмежує висоту блоку */
-  overflow: hidden; /* обрізає, якщо текст занадто довгий */
+  max-height: 3.5rem;
+  overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap; /* не переносити текст */
+  white-space: nowrap;
   padding: 6px 8px;
   color: white;
 }
@@ -65,15 +61,12 @@
   color: white;
 }
 
-/* Щоб редагування назви теж не збільшувало висоту */
 .movie-title-cell input.edit-input {
   width: 100%;
   max-height: 3.5rem;
   box-sizing: border-box;
   overflow: hidden;
 }
-
-/* Інші стилі залишаються без змін */
 
 .icon-button {
   background: none;

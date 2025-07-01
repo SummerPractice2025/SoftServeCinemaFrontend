@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import MovieInfo, { type Movie } from '../components/MovieInfo';
 import ScheduleBlock from '../components/ScheduleBlock';
 import TrailerPlayer from '../components/TrailerPlayer';
+import CustomAlert from '../components/CustomAlert';
 import '../styles/MovieEditPage.css';
 import '../styles/ScheduleBlock.css';
+import { useParams } from 'react-router-dom';
 
 const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
 
-// Тут встав свій тестовий токен адміна
 const ADMIN_BEARER_TOKEN =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjowLCJpYXQiOjE3NTA2MTMxMzQsImV4cCI6MTc1MzIwNTEzNH0.__wtsnfhC2WIVeIVssF_UK_5IyfYHvFu-703CX5EGVA'; // заміни на свій токен
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjowLCJpYXQiOjE3NTA2MTMxMzQsImV4cCI6MTc1MzIwNTEzNH0.__wtsnfhC2WIVeIVssF_UK_5IyfYHvFu-703CX5EGVA';
 
-// Мапа текстових значень у ID
 const ageRateIdMap: Record<string, number> = {
   '0+': 1,
   '6+': 2,
@@ -21,17 +21,24 @@ const ageRateIdMap: Record<string, number> = {
 };
 
 const MovieEdit = () => {
-  const [movieId] = useState<number>(9);
+  const { movieId } = useParams<{ movieId: string }>();
+  const movieIdNum = movieId ? Number(movieId) : NaN;
+
   const [posterUrl, setPosterUrl] = useState<string>('');
   const [trailerUrl, setTrailerUrl] = useState<string>('');
   const [showPlayer, setShowPlayer] = useState(false);
   const [isAdminCheck, setIsAdminCheck] = useState(true);
   const [updatedMovie, setUpdatedMovie] = useState<Movie | null>(null);
+  const [customAlertMessage, setCustomAlertMessage] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
+    if (!movieId || isNaN(movieIdNum)) return;
+
     const fetchMovieDetails = async () => {
       try {
-        const res = await fetch(`${backendBaseUrl}movie/${movieId}`, {
+        const res = await fetch(`${backendBaseUrl}movie/${movieIdNum}`, {
           headers: {
             Authorization: `Bearer ${ADMIN_BEARER_TOKEN}`,
           },
@@ -45,25 +52,27 @@ const MovieEdit = () => {
         console.error(error);
         setPosterUrl('');
         setTrailerUrl('');
+        setCustomAlertMessage('Не вдалося завантажити деталі фільму');
       }
     };
 
     fetchMovieDetails();
-  }, [movieId]);
+  }, [movieId, movieIdNum]);
 
   const handleConfirm = async () => {
     if (!updatedMovie) {
       console.error('Немає оновлених даних для збереження');
+      setCustomAlertMessage('Немає оновлених даних для збереження');
       return;
     }
 
     const payload = {
       name: updatedMovie.name,
-      age_rate_id: ageRateIdMap[updatedMovie.ageRate], // конвертуємо ageRate -> ID
+      age_rate_id: ageRateIdMap[updatedMovie.ageRate],
       description: updatedMovie.description,
     };
 
-    const url = `${backendBaseUrl}movie/${movieId}`;
+    const url = `${backendBaseUrl}movie/${movieIdNum}`;
     console.log('Відправка PUT на:', url);
     console.log('Payload:', payload);
 
@@ -80,20 +89,32 @@ const MovieEdit = () => {
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         console.error('Помилка відповіді:', errorData);
+        setCustomAlertMessage('Помилка при збереженні змін');
         throw new Error('Помилка при збереженні змін');
       }
 
       const data = await res.json();
       console.log('Успішно оновлено:', data);
-      alert('Зміни збережено успішно!');
+      setCustomAlertMessage('Зміни збережено успішно!');
     } catch (error) {
       console.error(error);
-      alert('Не вдалося зберегти зміни');
+      setCustomAlertMessage('Не вдалося зберегти зміни');
     }
   };
 
+  if (!movieId || isNaN(movieIdNum)) {
+    return <div className="page">Невірний або відсутній ID фільму</div>;
+  }
+
   return (
     <div className="page">
+      {customAlertMessage && (
+        <CustomAlert
+          message={customAlertMessage}
+          onClose={() => setCustomAlertMessage(null)}
+        />
+      )}
+
       <div className="poster-block">
         {posterUrl && <img src={posterUrl} alt="Постер фільму" />}
         <button
@@ -118,7 +139,7 @@ const MovieEdit = () => {
 
       <div className="info-block">
         <MovieInfo
-          movieId={movieId}
+          movieId={movieIdNum}
           readonly={!isAdminCheck}
           onChange={(movie) => setUpdatedMovie(movie)}
         />
@@ -132,7 +153,7 @@ const MovieEdit = () => {
           {isAdminCheck ? 'Режим клієнта' : 'Режим адміністратора'}
         </button>
 
-        <ScheduleBlock isAdminCheck={isAdminCheck} movieId={movieId} />
+        <ScheduleBlock isAdminCheck={isAdminCheck} movieId={movieIdNum} />
       </div>
     </div>
   );

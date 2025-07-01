@@ -81,6 +81,7 @@ const MovieInfo: React.FC<MovieInfoProps> = ({
     const fetchMovie = async () => {
       setLoading(true);
       setError(null);
+
       try {
         const res = await fetch(`${backendBaseUrl}movie/${movieId}`);
         if (!res.ok) throw new Error('Помилка при завантаженні фільму');
@@ -100,6 +101,7 @@ const MovieInfo: React.FC<MovieInfoProps> = ({
           genres: raw.genres ?? [],
           studios: raw.studios ?? [],
         };
+        console.log('Backend movie data:', raw);
 
         setMovie(transformedMovie);
       } catch (err) {
@@ -179,13 +181,11 @@ const MovieInfo: React.FC<MovieInfoProps> = ({
         ) : (
           <div className="movie-title-cell">{movie.name}</div>
         )}
-        {/* Кнопка редагування назви видалена */}
       </div>
 
       <table className="movie-info-table">
         <tbody>
           {rows.map(({ key, label }) => {
-            // Приховуємо кнопки редагування для name і year
             const showEditButton =
               !readonly &&
               editableFields.includes(key as (typeof editableFields)[number]) &&
