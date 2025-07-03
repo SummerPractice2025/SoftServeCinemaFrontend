@@ -41,18 +41,6 @@ const Header: React.FC = () => {
             </button>
           </div>
         </div>
-
-        {/* Мобільне меню */}
-        {isMenuOpen && (
-          <div className="md:hidden mt-4 py-4 border-t border-gray-800 animate-slideIn">
-            <nav className="flex flex-col space-y-3">
-              <a href="#movies" className="hover:text-pink-500 transition-colors">Фільми</a>
-              <a href="#schedule" className="hover:text-pink-500 transition-colors">Розклад</a>
-              <a href="#news" className="hover:text-pink-500 transition-colors">Новинки</a>
-              <a href="#about" className="hover:text-pink-500 transition-colors">Про нас</a>
-            </nav>
-          </div>
-        )}
       </div>
     </header>
   );

@@ -204,7 +204,7 @@ const MovieCarousel = () => {
         <div className="p-3 flex flex-col justify-between flex-grow bg-gray-900/9" style={{ height: `${infoHeight}px` }}>
           <div>
             {/* Назва фільму */}
-            <h3 className="font-semibold mb-2 line-clamp-2 leading-tight text-sm text-white">
+            <h3 className="font-semibold mb-2 line-clamp-2 leading-tight text-sm text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               {movie.title}
             </h3>
             
