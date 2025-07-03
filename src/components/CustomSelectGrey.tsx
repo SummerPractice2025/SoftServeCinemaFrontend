@@ -10,6 +10,7 @@ interface CustomSelectGreyProps {
   options: Option[];
   value: Option;
   onChange: (value: Option) => void;
+  classNamePrefix?: string;
 }
 
 const customStyles: StylesConfig<Option, false> = {
@@ -61,6 +62,7 @@ const CustomSelectGrey = ({
   options,
   value,
   onChange,
+  classNamePrefix,
 }: CustomSelectGreyProps) => {
   const handleChange = (newValue: SingleValue<Option>) => {
     if (newValue) {
@@ -75,6 +77,7 @@ const CustomSelectGrey = ({
       options={options}
       styles={customStyles}
       isSearchable={false}
+      classNamePrefix={classNamePrefix}
     />
   );
 };
