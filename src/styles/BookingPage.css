@@ -13,6 +13,8 @@ body {
   padding: clamp(20px, 4vw, 100px);
   flex-wrap: wrap;
   font-family: 'Open Sans', sans-serif;
+  justify-content: center;
+  margin-right: 40rem;
 }
 
 .main-section {
@@ -114,7 +116,7 @@ body {
   inset: 0;
   padding: 2.8px;
   border-radius: 5px;
-  background: linear-gradient(90deg, #ff3366 0%, #ff6b99 100%);
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
   -webkit-mask:
     linear-gradient(#ff3366 0 0) content-box,
     linear-gradient(#ff6b99 0 0);
@@ -129,7 +131,7 @@ body {
 }
 
 .seat-button.selected.vip {
-  background: linear-gradient(90deg, #ff3366 0%, #ff6b99 100%);
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
   color: #222222;
   border-radius: 5px;
 }
@@ -138,14 +140,13 @@ body {
   position: fixed;
   top: 40px;
   height: 580px;
-  right: 150px;
+  right: 18%;
   background-color: #5a5a5a;
   padding: 20px;
   border-radius: 12px;
   width: 400px;
   display: flex;
   flex-direction: column;
-  align-self: flex-start;
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -217,7 +218,7 @@ body {
 }
 
 .continue-button {
-  background: linear-gradient(90deg, #ff3366 0%, #ff6b99 100%);
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
   color: white;
   padding: 8px 20px;
   font-weight: bold;
@@ -245,7 +246,7 @@ body {
 }
 
 .gradient-vip {
-  background: linear-gradient(90deg, #ff3366 0%, #ff6b99 100%);
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: bold;

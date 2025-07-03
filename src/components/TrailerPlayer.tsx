@@ -7,7 +7,6 @@ interface TrailerPlayerProps {
 }
 
 const getYouTubeEmbedUrl = (url: string) => {
-  // Витягує відео ID з посилання виду https://www.youtube.com/watch?v=VIDEO_ID
   const match = url.match(/(?:v=|\.be\/)([a-zA-Z0-9_-]{11})/);
   return match ? `https://www.youtube.com/embed/${match[1]}?autoplay=1` : '';
 };

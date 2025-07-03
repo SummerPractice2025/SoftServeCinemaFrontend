@@ -1,24 +1,47 @@
 import { useState, useEffect } from 'react';
-import MovieInfo from '../components/MovieInfo';
+import MovieInfo, { type Movie } from '../components/MovieInfo';
 import ScheduleBlock from '../components/ScheduleBlock';
 import TrailerPlayer from '../components/TrailerPlayer';
+import CustomAlert from '../components/CustomAlert';
 import '../styles/MovieEditPage.css';
 import '../styles/ScheduleBlock.css';
+import { useParams } from 'react-router-dom';
 
 const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
 
+const ADMIN_BEARER_TOKEN = import.meta.env.VITE_ACCESS_TOKEN_SECRET;
+
+const ageRateIdMap: Record<string, number> = {
+  '0+': 1,
+  '6+': 2,
+  '12+': 3,
+  '16+': 4,
+  '18+': 5,
+};
+
 const MovieEdit = () => {
-  const [movieId] = useState<number>(2);
+  const { movieId } = useParams<{ movieId: string }>();
+  const movieIdNum = movieId ? Number(movieId) : NaN;
 
   const [posterUrl, setPosterUrl] = useState<string>('');
   const [trailerUrl, setTrailerUrl] = useState<string>('');
   const [showPlayer, setShowPlayer] = useState(false);
   const [isAdminCheck, setIsAdminCheck] = useState(true);
+  const [updatedMovie, setUpdatedMovie] = useState<Movie | null>(null);
+  const [customAlertMessage, setCustomAlertMessage] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
+    if (!movieId || isNaN(movieIdNum)) return;
+
     const fetchMovieDetails = async () => {
       try {
-        const res = await fetch(`${backendBaseUrl}movie/${movieId}`);
+        const res = await fetch(`${backendBaseUrl}movie/${movieIdNum}`, {
+          headers: {
+            Authorization: `Bearer ${ADMIN_BEARER_TOKEN}`,
+          },
+        });
         if (!res.ok) throw new Error('Failed to fetch movie details');
         const data = await res.json();
 
@@ -28,14 +51,69 @@ const MovieEdit = () => {
         console.error(error);
         setPosterUrl('');
         setTrailerUrl('');
+        setCustomAlertMessage('Не вдалося завантажити деталі фільму');
       }
     };
 
     fetchMovieDetails();
-  }, [movieId]);
+  }, [movieId, movieIdNum]);
+
+  const handleConfirm = async () => {
+    if (!updatedMovie) {
+      console.error('Немає оновлених даних для збереження');
+      setCustomAlertMessage('Немає оновлених даних для збереження');
+      return;
+    }
+
+    const payload = {
+      name: updatedMovie.name,
+      age_rate_id: ageRateIdMap[updatedMovie.ageRate],
+      description: updatedMovie.description,
+    };
+
+    const url = `${backendBaseUrl}movie/${movieIdNum}`;
+    console.log('Відправка PUT на:', url);
+    console.log('Payload:', payload);
+
+    try {
+      const res = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${ADMIN_BEARER_TOKEN}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        console.error('Помилка відповіді:', errorData);
+        setCustomAlertMessage('Помилка при збереженні змін');
+        throw new Error('Помилка при збереженні змін');
+      }
+
+      const data = await res.json();
+      console.log('Успішно оновлено:', data);
+      setCustomAlertMessage('Зміни збережено успішно!');
+    } catch (error) {
+      console.error(error);
+      setCustomAlertMessage('Не вдалося зберегти зміни');
+    }
+  };
+
+  if (!movieId || isNaN(movieIdNum)) {
+    return <div className="page">Невірний або відсутній ID фільму</div>;
+  }
 
   return (
     <div className="page">
+      {customAlertMessage && (
+        <CustomAlert
+          message={customAlertMessage}
+          onClose={() => setCustomAlertMessage(null)}
+        />
+      )}
+
       <div className="poster-block">
         {posterUrl && <img src={posterUrl} alt="Постер фільму" />}
         <button
@@ -52,12 +130,18 @@ const MovieEdit = () => {
           />
         )}
         {isAdminCheck && (
-          <button className="confirm-button">Підтвердити</button>
+          <button className="confirm-button" onClick={handleConfirm}>
+            Підтвердити
+          </button>
         )}
       </div>
 
       <div className="info-block">
-        <MovieInfo movieId={movieId} readonly={!isAdminCheck} />
+        <MovieInfo
+          movieId={movieIdNum}
+          readonly={!isAdminCheck}
+          onChange={(movie) => setUpdatedMovie(movie)}
+        />
       </div>
 
       <div className="schedule-container">
@@ -68,7 +152,7 @@ const MovieEdit = () => {
           {isAdminCheck ? 'Режим клієнта' : 'Режим адміністратора'}
         </button>
 
-        <ScheduleBlock isAdminCheck={isAdminCheck} movieId={movieId} />
+        <ScheduleBlock isAdminCheck={isAdminCheck} movieId={movieIdNum} />
       </div>
     </div>
   );

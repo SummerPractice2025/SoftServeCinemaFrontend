@@ -3,15 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import CustomSelectGrey from './CustomSelectGrey';
 
 interface Option {
-  value: string; // дата у форматі YYYY-MM-DD
-  label: string; // "Сьогодні, 25 червня"
+  value: string;
+  label: string;
 }
 
 interface Session {
   id: number;
   date: string;
-  format: string; // '2D', '3D', ...
-  time: string; // час 'HH:MM'
+  format: string;
+  time: string;
 }
 
 interface RawSession {
@@ -99,8 +99,6 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
           map[item.id] = item.type;
         });
         setSessionTypeMap(map);
-        console.log('Сирі дані сеансів з бекенду:', data);
-        console.log('sessionTypeMap завантажено:', map);
       } catch (error) {
         console.error('Не вдалося завантажити типи сеансів:', error);
       }
@@ -142,7 +140,6 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
           .sort((a, b) => a.time.localeCompare(b.time));
 
         setSessions(formattedSessions);
-        console.log('Завантажені сеанси:', formattedSessions);
       } catch (error) {
         console.error('Не вдалося завантажити сеанси:', error);
       }
@@ -175,7 +172,7 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
           <>
             {rows2D.map((row, i) => (
               <div key={`2d-row-${i}`} className="schedule-row">
-                {row.map(({ time, format }, j) => (
+                {row.map(({ id, time, format }, j) => (
                   <div key={`2d-${i}-${j}`} className="schedule-time-wrapper">
                     <button
                       className="schedule-time-button"
@@ -183,7 +180,7 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
                         navigate(
                           `/booking-session/${selectedDay.value}/${time}/${format}`,
                           {
-                            state: { movieId, format },
+                            state: { movieId, format, sessionId: id },
                           },
                         )
                       }
@@ -198,7 +195,7 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
 
             {rows3D.map((row, i) => (
               <div key={`3d-row-${i}`} className="schedule-row">
-                {row.map(({ time, format }, j) => (
+                {row.map(({ id, time, format }, j) => (
                   <div key={`3d-${i}-${j}`} className="schedule-time-wrapper">
                     <button
                       className="schedule-time-button"
@@ -206,7 +203,7 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
                         navigate(
                           `/booking-session/${selectedDay.value}/${time}/${format}`,
                           {
-                            state: { movieId, format },
+                            state: { movieId, format, sessionId: id },
                           },
                         )
                       }
