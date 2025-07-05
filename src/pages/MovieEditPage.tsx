@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import MovieInfo, { type Movie } from '../components/MovieInfo';
 import ScheduleBlock from '../components/ScheduleBlock';
 import TrailerPlayer from '../components/TrailerPlayer';
 import CustomAlert from '../components/CustomAlert';
 import '../styles/MovieEditPage.css';
 import '../styles/ScheduleBlock.css';
-import { useParams } from 'react-router-dom';
 
 const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
-
 const ADMIN_BEARER_TOKEN = import.meta.env.VITE_ACCESS_TOKEN_SECRET;
 
 const ageRateIdMap: Record<string, number> = {
@@ -100,10 +99,6 @@ const MovieEdit = () => {
       setCustomAlertMessage('Не вдалося зберегти зміни');
     }
   };
-
-  if (!movieId || isNaN(movieIdNum)) {
-    return <div className="page">Невірний або відсутній ID фільму</div>;
-  }
 
   return (
     <div className="page">

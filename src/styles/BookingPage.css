@@ -7,21 +7,28 @@ body {
 }
 
 .booking-page {
+  background-color: #222222;
+  width: 100%;
+  padding: 2rem 2.5rem 2.5rem;
+  box-sizing: border-box;
+  min-width: 100vw;
+
+  color: white;
   display: flex;
   flex-direction: row;
-  gap: clamp(40px, 6vw, 120px);
-  padding: clamp(20px, 4vw, 100px);
   flex-wrap: wrap;
-  font-family: 'Open Sans', sans-serif;
+
   justify-content: center;
-  margin-right: 40rem;
+  align-items: flex-start;
+
+  font-family: 'Open Sans', sans-serif;
 }
 
 .main-section {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  margin-left: 5rem;
 }
 
 .top-block {
@@ -138,7 +145,7 @@ body {
 
 .order-section {
   position: fixed;
-  top: 40px;
+  top: 6rem;
   height: 580px;
   right: 18%;
   background-color: #5a5a5a;

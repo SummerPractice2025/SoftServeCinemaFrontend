@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Header from '../components/Header';
 import '../styles/AllMovies.css';
 import CustomSelectGradient from '../components/CustomSelectGradient';
 import TrailerPlayer from '../components/TrailerPlayer';
@@ -186,11 +187,21 @@ export default function AllMovies() {
   };
 
   if (loading) {
-    return <div className="page">Завантаження...</div>;
+    return (
+      <div className="page">
+        <Header />
+        Завантаження...
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="page">Сталася помилка: {error}</div>;
+    return (
+      <div className="page">
+        <Header />
+        Сталася помилка: {error}
+      </div>
+    );
   }
 
   return (
