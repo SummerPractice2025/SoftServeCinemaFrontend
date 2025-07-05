@@ -15,11 +15,13 @@ body {
 
 .page {
   max-width: 1200px;
-  margin: 0 auto;
-  padding: 40px;
+
+  padding: 1.5rem 2.5rem 2.5rem;
   background-color: #222222;
   box-sizing: border-box;
   width: 100%;
+  color: white;
+  font-family: 'Open Sans', sans-serif;
 }
 
 .grid {
@@ -168,4 +170,8 @@ body {
 .narrow-select {
   max-width: 200px;
   width: 100%;
+}
+
+.no-sessions {
+  color: white;
 }

@@ -137,6 +137,28 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
               format: format || '2D',
             };
           })
+          .filter((session) => {
+            const selectedDate = new Date(selectedDay.value);
+            const now = new Date();
+            const isToday =
+              selectedDate.getFullYear() === now.getFullYear() &&
+              selectedDate.getMonth() === now.getMonth() &&
+              selectedDate.getDate() === now.getDate();
+
+            if (isToday) {
+              const [hours, minutes] = session.time.split(':').map(Number);
+              const sessionDateTime = new Date(
+                selectedDate.getFullYear(),
+                selectedDate.getMonth(),
+                selectedDate.getDate(),
+                hours,
+                minutes,
+              );
+              return sessionDateTime > now;
+            }
+
+            return true;
+          })
           .sort((a, b) => a.time.localeCompare(b.time));
 
         setSessions(formattedSessions);

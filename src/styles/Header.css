@@ -1,0 +1,258 @@
+.header {
+  position: sticky;
+  top: 0;
+  width: 100%;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  height: 56px;
+  min-height: 56px;
+  max-height: 56px;
+  padding: 2.5rem 2.5rem;
+  box-sizing: border-box;
+
+  background-color: #222;
+  color: #fff;
+
+  border-bottom: 2px solid #fff;
+
+  z-index: 1000;
+  user-select: none;
+  overflow: hidden;
+}
+
+.header-left,
+.header-right {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.site-name {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #fff;
+  line-height: 1;
+  user-select: none;
+  font-family: 'Montserrat', sans-serif;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+  font-weight: normal;
+}
+
+.site-name:hover,
+.site-name:focus {
+  opacity: 0.8;
+  outline: none;
+}
+
+.gradient {
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+}
+
+.login-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0;
+  user-select: none;
+  white-space: nowrap;
+  height: auto;
+  line-height: normal;
+
+  margin-right: 1rem;
+}
+
+.login-button:hover,
+.login-button:focus {
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  border: none;
+  outline: none;
+}
+
+.user-icon {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  user-select: none;
+  filter: brightness(0) invert(1);
+}
+
+.side-panel {
+  position: fixed;
+  top: 0;
+  right: 16px;
+  width: 400px;
+  height: 100vh;
+  background-color: rgba(90, 90, 90, 0.9);
+  color: white;
+  box-shadow: -4px 0 8px rgba(0, 0, 0, 0.3);
+  transition:
+    transform 0.4s ease,
+    opacity 0.4s ease,
+    visibility 0.4s ease;
+  z-index: 1500;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  box-sizing: border-box;
+  overflow: hidden;
+
+  transform: translateX(100%);
+  opacity: 0;
+  visibility: hidden;
+}
+
+.side-panel.open {
+  transform: translateX(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  align-self: flex-end;
+  margin-bottom: 1rem;
+}
+
+.panel-content {
+  flex: 1;
+  overflow: hidden;
+}
+
+.user-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.user-button:focus {
+  outline: none;
+}
+.panel-header {
+  border-bottom: 1px solid #000;
+  padding-bottom: 1.17rem;
+  margin-bottom: 0.5rem;
+}
+
+.user-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.user-email {
+  font-size: 0.9rem;
+  color: #ddd;
+  margin: 0;
+}
+
+.tickets-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.1rem;
+  margin: 0.5rem 0;
+}
+
+.ticket-list-container {
+  scrollbar-width: none;
+  overflow-y: auto;
+  flex-grow: 1;
+  max-height: 80vh;
+  padding-right: 8px;
+}
+
+.ticket-list-container::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 8px;
+}
+
+.ticket-list-container {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overflow-y: auto;
+  flex-grow: 1;
+  max-height: 80vh;
+  padding-right: 8px;
+}
+
+.ticket-list-container::-webkit-scrollbar {
+  display: none;
+}
+
+.ticket-card {
+  background-color: #333;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  height: 150px;
+  align-items: center;
+}
+
+.ticket-poster {
+  height: 90%;
+  width: auto;
+  border-radius: 4px;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.ticket-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  font-size: 0.9rem;
+  flex-grow: 1;
+}
+
+.panel-footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid #000;
+  padding-top: 0.5rem;
+}
+
+.logout-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 0;
+  user-select: none;
+  font-weight: normal;
+  transition:
+    background 0.3s,
+    background-clip 0.3s,
+    -webkit-text-fill-color 0.3s;
+}
+
+.logout-button:hover,
+.logout-button:focus {
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  outline: none;
+}

@@ -2,22 +2,21 @@ import { Routes, Route } from 'react-router-dom';
 import MovieEditPage from './pages/MovieEditPage';
 import BookingPage from './pages/BookingPage';
 import AllMovies from './pages/AllMovies';
+import Header from './components/Header';
 
 const App = () => {
   return (
-    <Routes>
-      {/* Головна сторінка — всі фільми */}
-      <Route path="/" element={<AllMovies />} />
-
-      {/* Сторінка редагування фільму, отримує ID з URL */}
-      <Route path="/movie-info/:movieId" element={<MovieEditPage />} />
-
-      {/* Сторінка бронювання — як було у твоєму прикладі */}
-      <Route
-        path="/booking-session/:date/:time/:format/"
-        element={<BookingPage />}
-      />
-    </Routes>
+    <>
+      <Header />
+      <Routes>
+        <Route path="/" element={<AllMovies />} />
+        <Route path="/movie-info/:movieId" element={<MovieEditPage />} />
+        <Route
+          path="/booking-session/:date/:time/:format/"
+          element={<BookingPage />}
+        />
+      </Routes>
+    </>
   );
 };
 
