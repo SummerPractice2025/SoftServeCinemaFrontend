@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import '../styles/MovieInfo.css';
+import '../styles/MovieInfo1.css';
 import CustomSelectGrey from './CustomSelectGrey';
 import { SquarePen } from 'lucide-react';
 

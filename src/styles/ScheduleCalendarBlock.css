@@ -1,0 +1,248 @@
+.calendar-wrapper.layout {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 2rem;
+  background-color: #3a3a3a;
+  padding: 1rem;
+  border-radius: 12px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.react-calendar {
+  background-color: transparent;
+  border: none;
+  color: white;
+  width: 350px;
+}
+
+/* Белый цвет для всех элементов календаря */
+.react-calendar__tile,
+.react-calendar__navigation button,
+.react-calendar__month-view__weekdays {
+  color: white !important;
+  background: transparent;
+}
+
+/* Подписи дней недели */
+.react-calendar__month-view__weekdays__weekday {
+  border-bottom: none;
+  font-weight: 500;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
+.react-calendar__month-view__weekdays__weekday abbr {
+  text-decoration: none;
+  border: none;
+}
+
+/* Текущий день */
+.react-calendar__tile--now {
+  background: transparent;
+}
+
+/* Убираем стандартный синий цвет для выбранного дня */
+.react-calendar__tile--active {
+  background-color: transparent !important; /* Убираем синий фон */
+}
+/* Цвет при наведении на число */
+.react-calendar__tile:hover {
+  background-color: #5a5a5a !important; /* Цвет при наведении */
+  color: white !important; /* Белый текст */
+  border-radius: 8px; /* Радиус скругления */
+}
+
+/* Активный выбранный день */
+.active-day {
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%) !important;
+  color: white !important;
+  border-radius: 8px;
+}
+
+.react-calendar__navigation button:enabled:hover,
+.react-calendar__navigation button:enabled:focus {
+  background-color: #5a5a5a;
+}
+
+.session-panel {
+  background-color: #5a5a5a;
+  padding: 1rem;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: auto;
+}
+
+.date-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  margin-bottom: 0.5rem;
+}
+
+.add-btn {
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.session-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  color: white;
+  flex-wrap: wrap;
+  flex-grow: 1;
+  position: relative; /* Чтобы кнопка могла быть позиционирована внутри */
+}
+.movie-title-input {
+  font-size: 0.7rem;
+  padding: 4px 6px;
+  width: 100px;
+  background-color: #1e1e1e;
+  border: 1px solid #555;
+  color: white;
+  border-radius: 4px;
+}
+
+input[type='time'],
+select {
+  background-color: #1e1e1e;
+  border: 1px solid #555;
+  color: white;
+  border-radius: 4px;
+  padding: 4px;
+}
+
+.price-info {
+  display: flex;
+  gap: 1.2rem;
+  align-items: center;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  margin: 0 auto; /* Центрирование по горизонтали */
+  margin-top: 0.5rem;
+}
+
+.price-info .label {
+  font-size: 0.85rem;
+  margin-right: 4px;
+  font-weight: normal;
+}
+
+/* Общий стиль для дропдаунов и time-input */
+.session-row select,
+.session-row input[type='time'] {
+  background-color: #434040;
+  border: 1px solid #434040;
+  border-radius: 8px;
+  color: white;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  font-family: 'Montserrat', sans-serif;
+  appearance: none;
+  width: 120px;
+  outline: none;
+}
+
+/* Убираем встроенные стрелочки во всех браузерах */
+.session-row select::-ms-expand {
+  display: none;
+}
+
+.session-row select::-webkit-appearance {
+  appearance: none;
+}
+
+.session-row select {
+  background-image: none !important;
+}
+
+.session-card {
+  background-color: #2a2a2a;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 0; /* Убираем отступ снизу */
+}
+
+/* Стили для поля времени */
+.time-input {
+  background-color: #3c3939;
+  border: 1px solid #434040;
+  border-radius: 8px;
+  color: white;
+  padding: 6px 8px !important;
+  font-size: 0.9rem !important;
+  font-family: 'Montserrat', sans-serif;
+  width: 80px !important;
+  outline: none;
+  appearance: none;
+  text-align: center; /* Выравнивание текста по центру */
+  cursor: pointer;
+}
+/* Убираем встроенные стрелочки во всех браузерах */
+.time-input::-webkit-outer-spin-button,
+.time-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.time-input[type='time']::-webkit-appearance {
+  -webkit-appearance: none;
+}
+
+/* Убираем иконку календаря */
+.time-input::-webkit-calendar-picker-indicator {
+  display: none;
+}
+
+/* Убираем красную обводку при фокусе */
+.time-input:focus {
+  border-color: #434040;
+  box-shadow: none;
+}
+
+/* Стили для кнопки удаления */
+.delete-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: transparent;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.delete-btn img {
+  width: 20px;
+  height: 20px;
+  fill: aliceblue;
+}
+
+.delete-btn:hover img {
+  opacity: 0.8; /* Немного уменьшаем непрозрачность при наведении */
+}
+
+.react-calendar__tile.disabled-day {
+  color: #999999 !important; /* приглушённый серый */
+  background-color: transparent !important; /* фон прозрачный, чтобы не мешал */
+  cursor: not-allowed;
+}
+
+/* Можно ещё убрать ховер для disabled */
+.react-calendar__tile.disabled-day:hover {
+  background-color: transparent !important;
+}
