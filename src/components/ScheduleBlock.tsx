@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import CustomSelectGrey from './CustomSelectGrey';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import CustomSelectGrey from './CustomSelectGrey';
 
 interface Option {
   value: string;
@@ -8,32 +8,22 @@ interface Option {
 }
 
 interface Session {
+  id: number;
+  date: string;
+  format: string;
   time: string;
-  format: '2D' | '3D';
+}
+
+interface RawSession {
+  id: number;
+  date: string;
+  session_type_id: number;
 }
 
 interface ScheduleBlockProps {
+  movieId: number;
   isAdminCheck?: boolean;
 }
-
-const sessions: Session[] = [
-  { time: '12:00', format: '2D' },
-  { time: '15:00', format: '2D' },
-  { time: '18:00', format: '2D' },
-  { time: '20:00', format: '2D' },
-  { time: '12:00', format: '3D' },
-  { time: '14:00', format: '3D' },
-  { time: '17:00', format: '3D' },
-  { time: '19:00', format: '3D' },
-];
-
-const chunkArray = <T,>(arr: T[], size: number): T[][] => {
-  const chunks: T[][] = [];
-  for (let i = 0; i < arr.length; i += size) {
-    chunks.push(arr.slice(i, i + size));
-  }
-  return chunks;
-};
 
 const getDateOptions = (): Option[] => {
   const now = new Date();
@@ -64,13 +54,9 @@ const getDateOptions = (): Option[] => {
     const dayOfWeek = dayNames[date.getDay()];
 
     let label = '';
-    if (i === 0) {
-      label = `Сьогодні, ${day} ${month}`;
-    } else if (i === 1) {
-      label = `Завтра, ${day} ${month}`;
-    } else {
-      label = `${dayOfWeek}, ${day} ${month}`;
-    }
+    if (i === 0) label = `Сьогодні, ${day} ${month}`;
+    else if (i === 1) label = `Завтра, ${day} ${month}`;
+    else label = `${dayOfWeek}, ${day} ${month}`;
 
     options.push({
       value: date.toISOString().split('T')[0],
@@ -81,13 +67,108 @@ const getDateOptions = (): Option[] => {
   return options;
 };
 
+const chunkArray = <T,>(arr: T[], size: number): T[][] => {
+  const chunks: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) {
+    chunks.push(arr.slice(i, i + size));
+  }
+  return chunks;
+};
+
 const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
+  movieId,
   isAdminCheck = false,
 }) => {
-  const navigate = useNavigate(); // <-- перемістити сюди, всередину компонента
-
+  const navigate = useNavigate();
   const dayOptions = getDateOptions();
+  const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+
   const [selectedDay, setSelectedDay] = useState<Option>(dayOptions[0]);
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [sessionTypeMap, setSessionTypeMap] = useState<Record<number, string>>(
+    {},
+  );
+
+  useEffect(() => {
+    const fetchSessionTypes = async () => {
+      try {
+        const res = await fetch(`${backendBaseUrl}session/types`);
+        const data: { id: number; type: string }[] = await res.json();
+        const map: Record<number, string> = {};
+        data.forEach((item) => {
+          map[item.id] = item.type;
+        });
+        setSessionTypeMap(map);
+      } catch (error) {
+        console.error('Не вдалося завантажити типи сеансів:', error);
+      }
+    };
+
+    fetchSessionTypes();
+  }, [backendBaseUrl]);
+
+  useEffect(() => {
+    if (Object.keys(sessionTypeMap).length === 0) return;
+
+    const fetchSessions = async () => {
+      try {
+        const startDate = `${selectedDay.value}T00:00:00`;
+        const endDate = `${selectedDay.value}T23:59:59`;
+
+        const res = await fetch(
+          `${backendBaseUrl}session/by-movie/${movieId}?start_date=${encodeURIComponent(
+            startDate,
+          )}&end_date=${encodeURIComponent(endDate)}`,
+        );
+        const data: RawSession[] = await res.json();
+
+        const formattedSessions: Session[] = data
+          .map((s) => {
+            const format = sessionTypeMap[s.session_type_id];
+            if (!format) {
+              console.warn(
+                `Формат для session_type_id=${s.session_type_id} не знайдено!`,
+              );
+            }
+            return {
+              id: s.id,
+              date: s.date,
+              time: s.date.slice(11, 16),
+              format: format || '2D',
+            };
+          })
+          .filter((session) => {
+            const selectedDate = new Date(selectedDay.value);
+            const now = new Date();
+            const isToday =
+              selectedDate.getFullYear() === now.getFullYear() &&
+              selectedDate.getMonth() === now.getMonth() &&
+              selectedDate.getDate() === now.getDate();
+
+            if (isToday) {
+              const [hours, minutes] = session.time.split(':').map(Number);
+              const sessionDateTime = new Date(
+                selectedDate.getFullYear(),
+                selectedDate.getMonth(),
+                selectedDate.getDate(),
+                hours,
+                minutes,
+              );
+              return sessionDateTime > now;
+            }
+
+            return true;
+          })
+          .sort((a, b) => a.time.localeCompare(b.time));
+
+        setSessions(formattedSessions);
+      } catch (error) {
+        console.error('Не вдалося завантажити сеанси:', error);
+      }
+    };
+
+    fetchSessions();
+  }, [selectedDay, movieId, sessionTypeMap, backendBaseUrl]);
 
   const sessions2D = sessions.filter((s) => s.format === '2D');
   const sessions3D = sessions.filter((s) => s.format === '3D');
@@ -107,45 +188,57 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
       </div>
 
       <div className="schedule-middle">
-        {rows2D.map((row, i) => (
-          <div key={`2d-row-${i}`} className="schedule-row">
-            {row.map(({ time, format }, j) => (
-              <div key={`2d-${i}-${j}`} className="schedule-time-wrapper">
-                <button
-                  className="schedule-time-button"
-                  onClick={() =>
-                    navigate(
-                      `/booking-session/${selectedDay.value}/${time}/${format}`,
-                    )
-                  }
-                >
-                  {time}
-                </button>
-                <div className="schedule-format">{format}</div>
+        {rows2D.length === 0 && rows3D.length === 0 ? (
+          <div className="no-sessions">В цей день сеансів більше немає</div>
+        ) : (
+          <>
+            {rows2D.map((row, i) => (
+              <div key={`2d-row-${i}`} className="schedule-row">
+                {row.map(({ id, time, format }, j) => (
+                  <div key={`2d-${i}-${j}`} className="schedule-time-wrapper">
+                    <button
+                      className="schedule-time-button"
+                      onClick={() =>
+                        navigate(
+                          `/booking-session/${selectedDay.value}/${time}/${format}`,
+                          {
+                            state: { movieId, format, sessionId: id },
+                          },
+                        )
+                      }
+                    >
+                      {time}
+                    </button>
+                    <div className="schedule-format">{format}</div>
+                  </div>
+                ))}
               </div>
             ))}
-          </div>
-        ))}
 
-        {rows3D.map((row, i) => (
-          <div key={`3d-row-${i}`} className="schedule-row">
-            {row.map(({ time, format }, j) => (
-              <div key={`3d-${i}-${j}`} className="schedule-time-wrapper">
-                <button
-                  className="schedule-time-button"
-                  onClick={() =>
-                    navigate(
-                      `/booking-session/${selectedDay.value}/${time}/${format}`,
-                    )
-                  }
-                >
-                  {time}
-                </button>
-                <div className="schedule-format">{format}</div>
+            {rows3D.map((row, i) => (
+              <div key={`3d-row-${i}`} className="schedule-row">
+                {row.map(({ id, time, format }, j) => (
+                  <div key={`3d-${i}-${j}`} className="schedule-time-wrapper">
+                    <button
+                      className="schedule-time-button"
+                      onClick={() =>
+                        navigate(
+                          `/booking-session/${selectedDay.value}/${time}/${format}`,
+                          {
+                            state: { movieId, format, sessionId: id },
+                          },
+                        )
+                      }
+                    >
+                      {time}
+                    </button>
+                    <div className="schedule-format">{format}</div>
+                  </div>
+                ))}
               </div>
             ))}
-          </div>
-        ))}
+          </>
+        )}
       </div>
 
       {isAdminCheck && (

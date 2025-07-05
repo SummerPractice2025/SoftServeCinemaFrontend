@@ -1,6 +1,7 @@
 .schedule-block {
   width: 100%;
   max-width: 300px;
+  min-width: 300px;
   background-color: #5a5a5a;
   border-radius: 8px;
   overflow: hidden;
@@ -84,12 +85,12 @@
 .schedule-row {
   display: flex;
   gap: 15px;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   justify-content: flex-start;
 }
 
 .schedule-time-button {
-  background: linear-gradient(90deg, #ff3366 0%, #ff6b99 100%);
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -134,4 +135,11 @@
   align-items: center;
   gap: 0px;
   min-width: 50px;
+}
+
+.no-sessions {
+  padding: 20px;
+  text-align: center;
+  font-size: 1.1em;
+  color: gray;
 }

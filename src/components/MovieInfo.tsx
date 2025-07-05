@@ -4,25 +4,26 @@ import CustomSelectGrey from './CustomSelectGrey';
 import { SquarePen } from 'lucide-react';
 
 export interface Movie {
-  title: string;
-  year: number;
-  ageRating: string;
-  director: string;
-  criticRating: string;
-  genre: string;
-  duration: string;
-  studio: string;
-  actors: string;
+  id: number;
+  name: string;
   description: string;
+  duration: number;
+  year: number;
+  ageRate: string;
+  rating: number;
+  directors: string[];
+  actors: string[];
+  genres: string[];
+  studios: string[];
 }
 
 interface MovieInfoProps {
-  movie: Movie;
+  movieId: number;
   onChange?: (updatedMovie: Movie) => void;
   readonly?: boolean;
 }
 
-const editableFields = ['title', 'year', 'ageRating', 'description'] as const;
+const editableFields = ['ageRate', 'description'] as const;
 
 const ageOptions = [
   { value: '0+', label: '0+ (Без обмежень)' },
@@ -63,140 +64,210 @@ const AutoResizeTextarea: React.FC<{
   );
 };
 
-const MovieInfo: React.FC<MovieInfoProps> = ({ movie, onChange, readonly }) => {
-  const [editingField, setEditingField] = useState<string | null>(null);
+const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+
+const MovieInfo: React.FC<MovieInfoProps> = ({
+  movieId,
+  onChange,
+  readonly,
+}) => {
+  const [movie, setMovie] = useState<Movie | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [editingField, setEditingField] = useState<keyof Movie | null>(null);
   const [tempValue, setTempValue] = useState<string | number>('');
 
-  const startEditing = (field: string, currentValue: string | number) => {
+  useEffect(() => {
+    const fetchMovie = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const res = await fetch(`${backendBaseUrl}movie/${movieId}`);
+        if (!res.ok) throw new Error('Помилка при завантаженні фільму');
+        const raw = await res.json();
+        console.log('Backend movie data:', raw);
+
+        const transformedMovie: Movie = {
+          id: raw.id,
+          name: raw.name,
+          description: raw.description,
+          duration: raw.duration,
+          year: raw.year,
+          ageRate: raw.ageRate,
+          rating: raw.rating,
+          directors: raw.directors ?? [],
+          actors: raw.actors ?? [],
+          genres: raw.genres ?? [],
+          studios: raw.studios ?? [],
+        };
+        console.log('Backend movie data:', raw);
+
+        setMovie(transformedMovie);
+      } catch (err) {
+        setError((err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMovie();
+  }, [movieId]);
+
+  const startEditing = (field: keyof Movie, currentValue: string | number) => {
     setEditingField(field);
     setTempValue(currentValue);
   };
 
   const finishEditing = () => {
-    if (editingField && onChange) {
-      onChange({
+    if (editingField && movie && onChange) {
+      let updatedValue: string | number;
+
+      if (
+        editingField === 'year' ||
+        editingField === 'duration' ||
+        editingField === 'rating'
+      ) {
+        updatedValue = Number(tempValue);
+      } else {
+        updatedValue = String(tempValue);
+      }
+
+      const updatedMovie: Movie = {
         ...movie,
-        [editingField]: tempValue,
-      });
+        [editingField]: updatedValue,
+      };
+
+      setMovie(updatedMovie);
+      onChange(updatedMovie);
     }
     setEditingField(null);
   };
 
+  const renderValue = (key: keyof Movie) => {
+    const value = movie![key];
+    return Array.isArray(value) ? value.join(', ') : value;
+  };
+
   const rows: { key: keyof Movie; label: string }[] = [
     { key: 'year', label: 'Рік' },
-    { key: 'ageRating', label: 'Вікове обмеження' },
-    { key: 'director', label: 'Режисер' },
-    { key: 'criticRating', label: 'Оцінка критиків' },
-    { key: 'genre', label: 'Жанр' },
-    { key: 'duration', label: 'Тривалість' },
-    { key: 'studio', label: 'Студія(-ї)' },
+    { key: 'ageRate', label: 'Вікове обмеження' },
+    { key: 'directors', label: 'Режисери' },
+    { key: 'rating', label: 'Оцінка критиків' },
+    { key: 'genres', label: 'Жанри' },
+    { key: 'duration', label: 'Тривалість (хв)' },
+    { key: 'studios', label: 'Студії' },
     { key: 'actors', label: 'Актори' },
     { key: 'description', label: 'Опис' },
   ];
 
-  const hasIcon = (field: keyof Movie) =>
-    editableFields.includes(field as (typeof editableFields)[number]);
+  if (loading) return <div>Завантаження фільму...</div>;
+  if (error) return <div>Помилка: {error}</div>;
+  if (!movie) return <div>Фільм не знайдено</div>;
 
   return (
-    <table className="movie-info-table">
-      <tbody>
-        <tr>
-          <td className="movie-title-cell">
-            {editingField === 'title' ? (
-              <input
-                type="text"
-                value={tempValue as string}
-                onChange={(e) => setTempValue(e.target.value)}
-                onBlur={finishEditing}
-                onKeyDown={(e) => e.key === 'Enter' && finishEditing()}
-                autoFocus
-                className="edit-input"
-              />
-            ) : (
-              movie.title
-            )}
-          </td>
-          <td></td>
-          {!readonly && (
-            <td className="movie-title-icon-cell">
-              <button
-                type="button"
-                className="icon-button"
-                onClick={() => startEditing('title', movie.title)}
-                aria-label="Редагувати назву фільму"
-              >
-                <SquarePen size={18} strokeWidth={1.8} className="icon-image" />
-              </button>
-            </td>
-          )}
-        </tr>
+    <div>
+      <div className="movie-title-row">
+        {editingField === 'name' ? (
+          <input
+            type="text"
+            value={tempValue as string}
+            onChange={(e) => setTempValue(e.target.value)}
+            onBlur={finishEditing}
+            onKeyDown={(e) => e.key === 'Enter' && finishEditing()}
+            autoFocus
+            className="edit-input movie-title-input"
+          />
+        ) : (
+          <div className="movie-title-cell">{movie.name}</div>
+        )}
+      </div>
 
-        {rows.map(({ key, label }) => (
-          <tr key={key}>
-            <td className="category-cell">{label}:</td>
-            <td className="value-cell">
-              {editingField === key ? (
-                key === 'description' ? (
-                  <AutoResizeTextarea
-                    value={tempValue as string}
-                    onChange={(val) => setTempValue(val)}
-                    onEnter={finishEditing}
-                  />
-                ) : key === 'ageRating' ? (
-                  <CustomSelectGrey
-                    value={{ value: movie.ageRating, label: movie.ageRating }}
-                    options={ageOptions}
-                    onChange={(option) => {
-                      if (onChange) {
-                        onChange({
-                          ...movie,
-                          ageRating: option.value,
-                        });
-                      }
-                      setEditingField(null);
-                    }}
-                  />
-                ) : (
-                  <input
-                    type={typeof movie[key] === 'number' ? 'number' : 'text'}
-                    value={tempValue}
-                    onChange={(e) =>
-                      setTempValue(
-                        typeof movie[key] === 'number'
-                          ? Number(e.target.value)
-                          : e.target.value,
-                      )
-                    }
-                    onBlur={finishEditing}
-                    onKeyDown={(e) => e.key === 'Enter' && finishEditing()}
-                    autoFocus
-                    className="edit-input"
-                  />
-                )
-              ) : (
-                movie[key]
-              )}
-            </td>
-            {!readonly && hasIcon(key) && (
-              <td className="icon-cell">
-                <button
-                  type="button"
-                  className="icon-button"
-                  onClick={() => startEditing(key, movie[key])}
-                  aria-label={`Редагувати ${label.toLowerCase()}`}
-                >
-                  <SquarePen
-                    size={18}
-                    strokeWidth={1.8}
-                    className="icon-image"
-                  />
-                </button>
-              </td>
-            )}
-          </tr>
-        ))}
-      </tbody>
-    </table>
+      <table className="movie-info-table">
+        <tbody>
+          {rows.map(({ key, label }) => {
+            const showEditButton =
+              !readonly &&
+              editableFields.includes(key as (typeof editableFields)[number]) &&
+              key !== 'name' &&
+              key !== 'year';
+
+            return (
+              <tr key={key}>
+                <td className="category-cell">{label}:</td>
+                <td className="value-cell">
+                  {editingField === key ? (
+                    key === 'description' ? (
+                      <AutoResizeTextarea
+                        value={tempValue as string}
+                        onChange={(val) => setTempValue(val)}
+                        onEnter={finishEditing}
+                      />
+                    ) : key === 'ageRate' ? (
+                      <CustomSelectGrey
+                        value={{ value: movie.ageRate, label: movie.ageRate }}
+                        options={ageOptions}
+                        onChange={(option) => {
+                          const updatedMovie = {
+                            ...movie,
+                            ageRate: option.value,
+                          };
+                          setMovie(updatedMovie);
+                          onChange?.(updatedMovie);
+                          setEditingField(null);
+                        }}
+                      />
+                    ) : (
+                      <input
+                        type={
+                          typeof movie[key] === 'number' ? 'number' : 'text'
+                        }
+                        value={tempValue}
+                        onChange={(e) =>
+                          setTempValue(
+                            typeof movie[key] === 'number'
+                              ? Number(e.target.value)
+                              : e.target.value,
+                          )
+                        }
+                        onBlur={finishEditing}
+                        onKeyDown={(e) => e.key === 'Enter' && finishEditing()}
+                        autoFocus
+                        className="edit-input"
+                      />
+                    )
+                  ) : (
+                    renderValue(key)
+                  )}
+                </td>
+                {showEditButton && (
+                  <td className="icon-cell">
+                    <button
+                      type="button"
+                      className="icon-button"
+                      onClick={() => {
+                        const value = movie[key];
+                        const valToEdit = Array.isArray(value)
+                          ? value.join(', ')
+                          : value;
+                        startEditing(key, valToEdit);
+                      }}
+                      aria-label={`Редагувати ${label.toLowerCase()}`}
+                    >
+                      <SquarePen
+                        size={18}
+                        strokeWidth={1.8}
+                        className="icon-image"
+                      />
+                    </button>
+                  </td>
+                )}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
   );
 };
 
