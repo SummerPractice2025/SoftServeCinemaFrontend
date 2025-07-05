@@ -12,13 +12,18 @@ const PriceBlock: React.FC<PriceBlockProps> = ({
   priceVip,
   onPriceChange,
 }) => {
+  const safePriceStandard = Number.isNaN(priceStandard)
+    ? 0
+    : (priceStandard ?? 0);
+  const safePriceVip = Number.isNaN(priceVip) ? 0 : (priceVip ?? 0);
+
   const handlePriceChange = (value: string, isStandard: boolean) => {
     const numericValue = value.replace(/[^0-9]/g, '');
     const numericValueParsed = numericValue ? parseInt(numericValue) : 0;
     if (isStandard) {
-      onPriceChange(numericValueParsed, priceVip ?? 0);
+      onPriceChange(numericValueParsed, safePriceVip);
     } else {
-      onPriceChange(priceStandard ?? 0, numericValueParsed);
+      onPriceChange(safePriceStandard, numericValueParsed);
     }
   };
 
@@ -33,7 +38,7 @@ const PriceBlock: React.FC<PriceBlockProps> = ({
               inputMode="numeric"
               className="price-input"
               placeholder="0"
-              value={priceStandard ?? ''}
+              value={safePriceStandard}
               onChange={(e) => handlePriceChange(e.target.value, true)}
             />
             <span className="currency-symbol">₴</span>
@@ -48,7 +53,7 @@ const PriceBlock: React.FC<PriceBlockProps> = ({
               inputMode="numeric"
               className="price-input"
               placeholder="0"
-              value={priceVip ?? ''}
+              value={safePriceVip}
               onChange={(e) => handlePriceChange(e.target.value, false)}
             />
             <span className="currency-symbol">₴</span>

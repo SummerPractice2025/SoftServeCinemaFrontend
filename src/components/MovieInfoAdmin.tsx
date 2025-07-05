@@ -4,15 +4,16 @@ import CustomSelectGrey from './CustomSelectGrey';
 import { SquarePen } from 'lucide-react';
 
 export interface Movie {
+  id?: number;
   title: string;
   year: number;
-  ageRating: string;
-  director: string;
-  criticRating: string;
-  genre: string;
+  ageRate: string;
+  rating: number;
+  genres: string[];
+  actors: string[];
+  studios: string[];
+  directors: string[];
   duration: string;
-  studio: string;
-  actors: string;
   description: string;
   posterUrl?: string;
   trailerUrl?: string;
@@ -25,7 +26,17 @@ interface MovieInfoProps {
   onChange?: (updatedMovie: Movie) => void;
 }
 
-const editableFields = ['title', 'year', 'ageRating', 'description'] as const;
+const editableFields = [
+  'title',
+  'year',
+  'ageRate',
+  'description',
+  'rating',
+  'genres',
+  'directors',
+  'actors',
+  'studios',
+] as const;
 
 const ageOptions = [
   { value: '0+', label: '0+ (Без обмежень)' },
@@ -66,37 +77,74 @@ const AutoResizeTextarea: React.FC<{
   );
 };
 
+const arrayToString = (arr: string[]) => arr.join(', ');
+const stringToArray = (str: string) =>
+  str
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+
 const MovieInfo: React.FC<MovieInfoProps> = ({ movie, onChange }) => {
   const [editingField, setEditingField] = useState<string | null>(null);
-  const [tempValue, setTempValue] = useState<string | number>('');
-  // const [showPlayer, setShowPlayer] = useState(false);
+  const [tempValue, setTempValue] = useState<string>('');
 
-  const startEditing = (field: string, currentValue: string | number) => {
+  const startEditing = (
+    field: string,
+    currentValue: string | number | string[],
+  ) => {
     setEditingField(field);
-    setTempValue(currentValue);
+    if (
+      ['genres', 'directors', 'actors', 'studios'].includes(field) &&
+      Array.isArray(currentValue)
+    ) {
+      setTempValue(arrayToString(currentValue));
+    } else if (typeof currentValue === 'number') {
+      setTempValue(currentValue.toString());
+    } else if (typeof currentValue === 'string') {
+      setTempValue(currentValue);
+    } else {
+      setTempValue('');
+    }
   };
 
   const finishEditing = () => {
     if (editingField && onChange) {
-      onChange({ ...movie, [editingField]: tempValue });
+      let updatedValue: string | number | string[] = tempValue;
+
+      if (editingField === 'rating' || editingField === 'year') {
+        updatedValue = Number(tempValue);
+      } else if (
+        ['genres', 'directors', 'actors', 'studios'].includes(editingField)
+      ) {
+        updatedValue = stringToArray(tempValue);
+      }
+
+      onChange({ ...movie, [editingField]: updatedValue });
     }
     setEditingField(null);
   };
 
   const rows: { key: keyof Movie; label: string }[] = [
     { key: 'year', label: 'Рік' },
-    { key: 'ageRating', label: 'Вікове обмеження' },
-    { key: 'director', label: 'Режисер' },
-    { key: 'criticRating', label: 'Оцінка критиків' },
-    { key: 'genre', label: 'Жанр' },
+    { key: 'ageRate', label: 'Вікове обмеження' },
+    { key: 'rating', label: 'Оцінка критиків' },
+    { key: 'directors', label: 'Режисери' },
+    { key: 'genres', label: 'Жанр' },
     { key: 'duration', label: 'Тривалість' },
-    { key: 'studio', label: 'Студія' },
+    { key: 'studios', label: 'Студія' },
     { key: 'actors', label: 'Актори' },
     { key: 'description', label: 'Опис' },
   ];
 
   const hasIcon = (field: keyof Movie) =>
     editableFields.includes(field as (typeof editableFields)[number]);
+
+  const currentAgeOption = ageOptions.find(
+    (opt) => opt.value === movie.ageRate,
+  ) ?? {
+    value: movie.ageRate,
+    label: movie.ageRate,
+  };
 
   return (
     <div style={{ flex: 1 }}>
@@ -107,7 +155,7 @@ const MovieInfo: React.FC<MovieInfoProps> = ({ movie, onChange }) => {
               {editingField === 'title' ? (
                 <input
                   type="text"
-                  value={tempValue as string}
+                  value={tempValue}
                   onChange={(e) => setTempValue(e.target.value)}
                   onBlur={finishEditing}
                   onKeyDown={(e) => e.key === 'Enter' && finishEditing()}
@@ -138,36 +186,51 @@ const MovieInfo: React.FC<MovieInfoProps> = ({ movie, onChange }) => {
                 {editingField === key ? (
                   key === 'description' ? (
                     <AutoResizeTextarea
-                      value={tempValue as string}
+                      value={tempValue}
                       onChange={(val) => setTempValue(val)}
                       onEnter={finishEditing}
                     />
-                  ) : key === 'ageRating' ? (
+                  ) : key === 'ageRate' ? (
                     <CustomSelectGrey
-                      value={{ value: movie.ageRating, label: movie.ageRating }}
+                      value={currentAgeOption}
                       options={ageOptions}
                       onChange={(option) => {
-                        onChange?.({ ...movie, ageRating: option.value });
+                        onChange?.({ ...movie, ageRate: option.value });
                         setEditingField(null);
                       }}
                     />
+                  ) : ['genres', 'directors', 'actors', 'studios'].includes(
+                      key,
+                    ) ? (
+                    <input
+                      type="text"
+                      value={tempValue}
+                      onChange={(e) => setTempValue(e.target.value)}
+                      onBlur={finishEditing}
+                      onKeyDown={(e) => e.key === 'Enter' && finishEditing()}
+                      autoFocus
+                      className="edit-input"
+                      placeholder="Введіть через кому"
+                    />
                   ) : (
                     <input
-                      type={typeof movie[key] === 'number' ? 'number' : 'text'}
-                      value={tempValue}
-                      onChange={(e) =>
-                        setTempValue(
-                          typeof movie[key] === 'number'
-                            ? Number(e.target.value)
-                            : e.target.value,
-                        )
+                      type={
+                        key === 'rating' || typeof movie[key] === 'number'
+                          ? 'number'
+                          : 'text'
                       }
+                      value={tempValue}
+                      onChange={(e) => setTempValue(e.target.value)}
                       onBlur={finishEditing}
                       onKeyDown={(e) => e.key === 'Enter' && finishEditing()}
                       autoFocus
                       className="edit-input"
                     />
                   )
+                ) : ['genres', 'directors', 'actors', 'studios'].includes(
+                    key,
+                  ) ? (
+                  arrayToString(movie[key] as string[])
                 ) : (
                   movie[key]
                 )}

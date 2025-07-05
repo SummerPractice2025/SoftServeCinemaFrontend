@@ -1,4 +1,3 @@
-// ScheduleCalendarBlock.tsx
 import React, { useState } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
@@ -7,12 +6,14 @@ import CustomSelectGrey from './CustomSelectGrey';
 import type { Movie } from './MovieInfoAdmin';
 
 export type Session = {
+  id?: number;
   time: string;
   title: string;
   hall: string;
   format: '2D' | '3D';
   price: number;
   vipPrice: number;
+  is_deleted?: boolean;
 };
 
 type Props = {
@@ -23,6 +24,9 @@ type Props = {
   basePriceStandard: number;
   basePriceVip: number;
 };
+const ADMIN_BEARER_TOKEN = '';
+
+const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
 
 const hallOptions = ['Зала1', 'Зала2', 'Зала3', 'Зала4', 'Зала5'].map((h) => ({
   value: h,
@@ -54,12 +58,22 @@ export default function ScheduleCalendarBlock({
   basePriceVip,
 }: Props) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [sessionToDelete, setSessionToDelete] = useState<{
+    index: number;
+    dateKey: string;
+  } | null>(null);
+
   const dateKey = getLocalDateKey(selectedDate);
   const movieKey = movie?.title || '__unknown__';
   const currentSessions = sessionsByDate[movieKey]?.[dateKey] || [];
 
+  console.log('currentSessions при рендері:', currentSessions);
+
+  const visibleSessions = currentSessions.filter((s) => !s.is_deleted);
+
   const handleAddSession = () => {
-    if (currentSessions.length >= 5) return;
+    if (visibleSessions.length >= 5) return;
 
     const newSession: Session = {
       time: '12:00',
@@ -70,25 +84,88 @@ export default function ScheduleCalendarBlock({
       vipPrice: basePriceVip || 180,
     };
 
+    const updatedSessions = [...currentSessions, newSession];
+    console.log('Додаємо нову сесію, оновлений список:', updatedSessions);
+
     onUpdate({
       ...sessionsByDate,
       [movieKey]: {
         ...sessionsByDate[movieKey],
-        [dateKey]: [...currentSessions, newSession],
+        [dateKey]: updatedSessions,
       },
     });
   };
 
-  const handleDeleteSession = (index: number) => {
-    const updated = [...currentSessions];
-    updated.splice(index, 1);
-    onUpdate({
-      ...sessionsByDate,
-      [movieKey]: {
+  const openDeleteModal = (index: number) => {
+    const session = visibleSessions[index];
+    const realIndex = currentSessions.findIndex(
+      (s) => s.time === session.time && !s.is_deleted,
+    );
+
+    console.log('openDeleteModal - session для видалення:', session);
+    console.log('openDeleteModal - realIndex у currentSessions:', realIndex);
+
+    setSessionToDelete({ index: realIndex, dateKey });
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!sessionToDelete) return;
+
+    const updatedSessions = [...currentSessions];
+    const session = updatedSessions[sessionToDelete.index];
+
+    console.log('confirmDelete - сесія, яку видаляємо:', session);
+
+    if (!session?.id) {
+      console.error('Сеанс не має ID для видалення!');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${backendBaseUrl}session/${session.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${ADMIN_BEARER_TOKEN}`,
+        },
+      });
+
+      if (!response.ok) {
+        console.error('Помилка при видаленні сеансу на сервері');
+        return;
+      }
+
+      updatedSessions[sessionToDelete.index] = {
+        ...session,
+        is_deleted: true,
+      };
+
+      const updatedByMovie = {
         ...sessionsByDate[movieKey],
-        [dateKey]: updated,
-      },
-    });
+        [dateKey]: updatedSessions,
+      };
+
+      console.log(
+        'confirmDelete - оновлені сесії після видалення:',
+        updatedByMovie[dateKey],
+      );
+
+      onUpdate({
+        ...sessionsByDate,
+        [movieKey]: updatedByMovie,
+      });
+    } catch (error) {
+      console.error('Помилка при запиті до сервера:', error);
+    }
+
+    setShowDeleteModal(false);
+    setSessionToDelete(null);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setSessionToDelete(null);
   };
 
   const handleSessionChange = (
@@ -97,6 +174,7 @@ export default function ScheduleCalendarBlock({
   ) => {
     const updated = [...currentSessions];
     updated[index] = { ...updated[index], ...updatedSession };
+    console.log('handleSessionChange - оновлені сесії:', updated);
     onUpdate({
       ...sessionsByDate,
       [movieKey]: {
@@ -105,6 +183,8 @@ export default function ScheduleCalendarBlock({
       },
     });
   };
+
+  // ...далі без змін (Calendar, рендер сесій, модалки)
 
   const tileClassName = ({ date }: { date: Date }) => {
     const key = getLocalDateKey(date);
@@ -166,15 +246,15 @@ export default function ScheduleCalendarBlock({
       <div className="session-panel">
         <div className="date-header">
           <span>Сеанси на {selectedDate.toLocaleDateString('uk-UA')}</span>
-          {currentSessions.length < 5 && !isDateInPast(selectedDate) && (
+          {visibleSessions.length < 5 && !isDateInPast(selectedDate) && (
             <button className="add-btn" onClick={handleAddSession}>
               +
             </button>
           )}
         </div>
 
-        {currentSessions.map((session, index) => (
-          <div key={index} className="session-card">
+        {visibleSessions.map((session, index) => (
+          <div key={`${session.time}-${index}`} className="session-card">
             <div className="session-row">
               <input
                 type="time"
@@ -214,24 +294,63 @@ export default function ScheduleCalendarBlock({
 
               <button
                 className="delete-btn"
-                onClick={() => handleDeleteSession(index)}
-                aria-label="Удалити сеанс"
+                onClick={() => openDeleteModal(index)}
               >
-                <img src="/img/trash-icon.png" alt="Удалити" />
+                <img src="/img/trash-icon.png" alt="Видалити" />
               </button>
             </div>
 
             <div className="price-info">
-              <div>
-                <span className="label">Стандарт:</span> {session.price}₴
+              <div className="price-field">
+                <span className="label">Стандарт:</span>
+                <input
+                  type="number"
+                  className="price-input-calendar"
+                  value={session.price ?? 0}
+                  onChange={(e) =>
+                    handleSessionChange(index, {
+                      price: Number(e.target.value),
+                    })
+                  }
+                  min={0}
+                />
+                <span className="currency-symbol-calendar">₴</span>
               </div>
-              <div>
-                <span className="label">VIP:</span> {session.vipPrice}₴
+              <div className="price-field">
+                <span className="label">VIP:</span>
+                <input
+                  type="number"
+                  className="price-input-calendar"
+                  value={session.vipPrice ?? 0}
+                  onChange={(e) =>
+                    handleSessionChange(index, {
+                      vipPrice: Number(e.target.value),
+                    })
+                  }
+                  min={0}
+                />
+                <span className="currency-symbol-calendar">₴</span>
               </div>
             </div>
           </div>
         ))}
       </div>
+
+      {showDeleteModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h2>Ви точно хочете видалити цей сеанс?</h2>
+            <div className="modal-buttons">
+              <button className="save-btn" onClick={confirmDelete}>
+                Так, видалити
+              </button>
+              <button className="cancel-btn" onClick={cancelDelete}>
+                Скасувати
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
