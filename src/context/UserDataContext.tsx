@@ -14,6 +14,10 @@ interface Booking {
   moviePosterUrl: string;
   date: string;
   description: string;
+  seatRow: number;
+  seatCol: number;
+  isVIP: boolean;
+  hallID: number;
 }
 
 interface UserData {
@@ -52,7 +56,6 @@ export const UserDataProvider: React.FC<UserDataProviderProps> = ({
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const fetchUserData = async () => {
-    // Проверяем, авторизован ли пользователь
     if (!apiService.isAuthenticated()) {
       console.log('Користувач не авторизован, пропускаємо завантаження даних');
       return;
@@ -94,7 +97,6 @@ export const UserDataProvider: React.FC<UserDataProviderProps> = ({
     fetchUserData();
   }, [refreshTrigger]);
 
-  // Очищаем данные пользователя при выходе из системы
   useEffect(() => {
     if (!apiService.isAuthenticated()) {
       setUserData(null);

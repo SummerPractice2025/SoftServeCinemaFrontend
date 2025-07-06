@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = 'http://localhost:3000';
 
 class ApiService {
   private api: AxiosInstance;
@@ -172,7 +172,6 @@ class ApiService {
     if (!token) return null;
 
     try {
-      // Декодируем JWT токен (без проверки подписи, только для получения payload)
       const payload = JSON.parse(atob(token.split('.')[1]));
       return payload.user_id || null;
     } catch (error) {

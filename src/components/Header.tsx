@@ -17,10 +17,9 @@ const Header: React.FC = () => {
   const { openRegisterModal } = useModal();
   const { isAuthenticated, login, logout } = useAuth();
 
-  const { userData, refreshTrigger } = useUserData();
+  const { userData, refreshTrigger, refreshUserData } = useUserData();
   const [loading, setLoading] = useState(false);
 
-  // Сбрасываем админский режим, если пользователь не является админом
   useEffect(() => {
     if (userData && !userData.user.is_admin && isAdminMode) {
       setIsAdminMode(false);
@@ -34,7 +33,6 @@ const Header: React.FC = () => {
     }
   }, [isPanelOpen, refreshTrigger]);
 
-  // Проверяем, авторизован ли пользователь
   const isUserAuthenticated = apiService.isAuthenticated();
 
   const handleHome = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -66,7 +64,6 @@ const Header: React.FC = () => {
 
   const isOnAddPage = location.pathname === '/add';
 
-  // Показываем админские элементы только если пользователь авторизован, админ И включен админский режим
   const shouldHideAdminElements =
     !isUserAuthenticated || !userData?.user.is_admin || !isAdminMode;
 
@@ -194,6 +191,15 @@ const Header: React.FC = () => {
                       <div>{booking.description}</div>
                       <div>Дата: {formatDate(booking.date)}</div>
                       <div>Час: {booking.date.slice(11, 16)}</div>
+                      <div>
+                        Місце: Ряд {booking.seatRow}, Місце {booking.seatCol}{' '}
+                        <span
+                          className={`vip-status ${booking.isVIP ? 'vip' : 'regular'}`}
+                        >
+                          {booking.isVIP ? 'VIP' : 'Стандарт'}
+                        </span>
+                      </div>
+                      <div>Зала: {booking.hallID + 1}</div>
                     </div>
                   </li>
                 ))}
@@ -230,7 +236,10 @@ const Header: React.FC = () => {
         isOpen={isLoginModalOpen}
         onClose={closeLoginModal}
         onRegisterClick={openRegisterModal}
-        onLoginSuccess={login}
+        onLoginSuccess={() => {
+          login();
+          refreshUserData();
+        }}
       />
     </>
   );

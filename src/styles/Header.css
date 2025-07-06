@@ -218,8 +218,8 @@
 }
 
 .side-panel .ticket-poster {
-  height: 90px;
-  width: 60px;
+  height: 100px;
+  width: 65px;
   border-radius: 4px;
   flex-shrink: 0;
   object-fit: cover;
@@ -329,4 +329,21 @@
   font-size: 0.9rem;
   margin: 0;
   text-align: center;
+}
+
+.vip-status {
+  font-size: 0.8rem;
+  font-weight: bold;
+  display: inline-block;
+  margin-left: 8px;
+}
+
+.vip-status.vip {
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.vip-status.regular {
+  color: #ccc;
 }

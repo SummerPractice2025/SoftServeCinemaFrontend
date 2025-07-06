@@ -4,6 +4,7 @@ import '../styles/AllMovies.css';
 import CustomSelectGradient from '../components/CustomSelectGradient';
 import TrailerPlayer from '../components/TrailerPlayer';
 import CustomAlert from '../components/CustomAlert';
+import apiService from '../services/api';
 
 const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
 
@@ -172,6 +173,10 @@ export default function AllMovies() {
     movieId: number,
     session: { id: number; date: string; type: string },
   ) => {
+    if (!apiService.isAuthenticated()) {
+      setCustomAlertMessage('Щоб купити квитки спочатку треба авторизуватися');
+      return;
+    }
     const dateObj = new Date(session.date);
     const dateStr = dateObj.toISOString().slice(0, 10);
     const timeStr = dateObj.toTimeString().slice(0, 5);

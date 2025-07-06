@@ -9,6 +9,7 @@ import { ModalProvider, useModal } from './context/ModalContext';
 import { AuthProvider } from './context/AuthContext';
 import { AdminProvider } from './context/AdminContext';
 import { UserDataProvider } from './context/UserDataContext';
+import AdminRoute from './components/AdminRoute';
 
 const AppContent = () => {
   const { isRegisterModalOpen, closeRegisterModal } = useModal();
@@ -18,7 +19,14 @@ const AppContent = () => {
       <Header />
       <Routes>
         <Route path="/" element={<AllMovies />} />
-        <Route path="/add" element={<AddMovies />} />
+        <Route
+          path="/add"
+          element={
+            <AdminRoute>
+              <AddMovies />
+            </AdminRoute>
+          }
+        />
         <Route path="/movie-info/:movieId" element={<MovieEditPage />} />
         <Route
           path="/booking-session/:date/:time/:format/"

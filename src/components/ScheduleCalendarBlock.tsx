@@ -7,6 +7,7 @@ import { SquarePen } from 'lucide-react';
 import CustomAlert from './CustomAlert';
 import type { Movie } from './MovieInfoAdmin';
 import apiService from '../services/api';
+import { useUserData } from '../context/UserDataContext';
 
 export type Session = {
   id?: number;
@@ -75,6 +76,8 @@ export default function ScheduleCalendarBlock({
     field: keyof Session;
   } | null>(null);
   const [tempValue, setTempValue] = useState<string>('');
+
+  const { refreshUserData } = useUserData();
 
   const startEditing = (
     sessionIndex: number,
@@ -229,6 +232,7 @@ export default function ScheduleCalendarBlock({
 
     setShowDeleteModal(false);
     setSessionToDelete(null);
+    refreshUserData();
   };
 
   const cancelDelete = () => {
