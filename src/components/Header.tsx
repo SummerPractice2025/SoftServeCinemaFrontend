@@ -2,12 +2,16 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAdmin } from '../contexts/AdminContext';
 import '../styles/Header.css';
+import LoginModal from './LoginModal';
+import { useModal } from '../context/ModalContext';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const { isAdminMode, setIsAdminMode } = useAdmin();
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const { openRegisterModal } = useModal();
 
   const user = {
     firstName: 'Іван',
@@ -50,10 +54,6 @@ const Header: React.FC = () => {
     },
   ];
 
-  const handleLogin = () => {
-    navigate('/login');
-  };
-
   const handleHome = (e: React.MouseEvent<HTMLButtonElement>) => {
     navigate('/');
     e.currentTarget.blur();
@@ -61,6 +61,8 @@ const Header: React.FC = () => {
 
   const openPanel = () => setIsPanelOpen(true);
   const closePanel = () => setIsPanelOpen(false);
+  const openLoginModal = () => setIsLoginModalOpen(true);
+  const closeLoginModal = () => setIsLoginModalOpen(false);
 
   const handleLogout = () => {
     console.log('Вихід користувача');
@@ -114,8 +116,12 @@ const Header: React.FC = () => {
           </button>
         </div>
         <div className="header-right">
-          <button className="login-button" onClick={handleLogin} type="button">
-            Увійти
+          <button
+            className="login-button"
+            onClick={openLoginModal}
+            type="button"
+          >
+            Вхід
           </button>
           <button
             className="user-button"
@@ -131,6 +137,8 @@ const Header: React.FC = () => {
           </button>
         </div>
       </header>
+
+      {isLoginModalOpen && <div className="header-dark-overlay" />}
 
       <div className={`side-panel ${isPanelOpen ? 'open' : ''}`}>
         <button
@@ -193,6 +201,7 @@ const Header: React.FC = () => {
           </button>
         </div>
       </div>
+
       <button
         className={`add-button ${isOnAddPage || shouldHideAdminElements ? 'hidden' : ''} ${isPanelOpen ? 'moved' : ''}`}
         onClick={handleAddMovie}
@@ -201,6 +210,12 @@ const Header: React.FC = () => {
       >
         +
       </button>
+
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={closeLoginModal}
+        onRegisterClick={openRegisterModal}
+      />
     </>
   );
 };
