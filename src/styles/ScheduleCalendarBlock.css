@@ -4,7 +4,7 @@
   justify-content: center;
   gap: 2rem;
   background-color: #3a3a3a;
-  padding: 1rem;
+  padding: 2rem;
   border-radius: 12px;
   max-width: 1000px;
   margin: 0 auto;
@@ -340,7 +340,6 @@
   color: white;
 }
 
-/* Стилі для редагування полів */
 .field-container {
   position: relative;
   display: flex;
@@ -375,7 +374,6 @@
   justify-content: center;
 }
 
-/* Стилі для полів цін */
 .price-field .field-display {
   background-color: transparent;
   padding: 0;

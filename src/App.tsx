@@ -4,10 +4,11 @@ import BookingPage from './pages/BookingPage';
 import AllMovies from './pages/AllMovies';
 import Header from './components/Header';
 import AddMovies from './pages/AddMovies';
+import { AdminProvider } from './contexts/AdminContext';
 
 const App = () => {
   return (
-    <>
+    <AdminProvider>
       <Header />
       <Routes>
         <Route path="/" element={<AllMovies />} />
@@ -18,7 +19,7 @@ const App = () => {
           element={<BookingPage />}
         />
       </Routes>
-    </>
+    </AdminProvider>
   );
 };
 

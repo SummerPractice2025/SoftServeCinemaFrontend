@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAdmin } from '../contexts/AdminContext';
 import '../styles/Header.css';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const { isAdminMode, setIsAdminMode } = useAdmin();
 
   const user = {
     firstName: 'Іван',
@@ -63,6 +66,14 @@ const Header: React.FC = () => {
     console.log('Вихід користувача');
     closePanel();
   };
+
+  const handleAddMovie = () => {
+    navigate('/add');
+  };
+
+  const isOnAddPage = location.pathname === '/add';
+
+  const shouldHideAdminElements = !isAdminMode;
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
@@ -136,6 +147,13 @@ const Header: React.FC = () => {
             {user.firstName} {user.lastName}
           </p>
           <p className="user-email">{user.email}</p>
+          <button
+            className="mode-toggle-button"
+            onClick={() => setIsAdminMode(!isAdminMode)}
+            type="button"
+          >
+            {isAdminMode ? 'Режим клієнта' : 'Режим адміністратора'}
+          </button>
         </div>
 
         <div className="panel-content">
@@ -175,6 +193,14 @@ const Header: React.FC = () => {
           </button>
         </div>
       </div>
+      <button
+        className={`add-button ${isOnAddPage || shouldHideAdminElements ? 'hidden' : ''} ${isPanelOpen ? 'moved' : ''}`}
+        onClick={handleAddMovie}
+        type="button"
+        aria-label="Додати фільм"
+      >
+        +
+      </button>
     </>
   );
 };
