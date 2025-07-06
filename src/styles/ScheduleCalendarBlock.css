@@ -4,7 +4,7 @@
   justify-content: center;
   gap: 2rem;
   background-color: #3a3a3a;
-  padding: 1rem;
+  padding: 2rem;
   border-radius: 12px;
   max-width: 1000px;
   margin: 0 auto;
@@ -315,6 +315,14 @@
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
 }
 
+.modal .booking-warning {
+  color: #ff6b6b;
+  font-size: 14px;
+  margin: 10px 0;
+  font-weight: bold;
+  padding: 8px 12px;
+}
+
 .modal-buttons {
   display: flex;
   justify-content: center;
@@ -340,7 +348,6 @@
   color: white;
 }
 
-/* Стилі для редагування полів */
 .field-container {
   position: relative;
   display: flex;
@@ -375,7 +382,6 @@
   justify-content: center;
 }
 
-/* Стилі для полів цін */
 .price-field .field-display {
   background-color: transparent;
   padding: 0;

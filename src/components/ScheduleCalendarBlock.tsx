@@ -4,6 +4,7 @@ import 'react-calendar/dist/Calendar.css';
 import '../styles/ScheduleCalendarBlock.css';
 import CustomSelectGrey from './CustomSelectGrey';
 import { SquarePen } from 'lucide-react';
+import CustomAlert from './CustomAlert';
 import type { Movie } from './MovieInfoAdmin';
 
 export type Session = {
@@ -68,7 +69,9 @@ export default function ScheduleCalendarBlock({
   const [sessionToDelete, setSessionToDelete] = useState<{
     index: number;
     dateKey: string;
+    bookingCount?: number;
   } | null>(null);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
   const [editingField, setEditingField] = useState<{
     sessionIndex: number;
@@ -141,13 +144,10 @@ export default function ScheduleCalendarBlock({
     };
 
     onUpdate(updatedSessionsByDate);
-
-    if (onSavedUpdate) {
-      onSavedUpdate(updatedSessionsByDate);
-    }
+    onSavedUpdate?.(updatedSessionsByDate);
   };
 
-  const openDeleteModal = (index: number) => {
+  const openDeleteModal = async (index: number) => {
     const session = visibleSessions[index];
     const realIndex = currentSessions.findIndex(
       (s) => s.time === session.time && !s.is_deleted,
@@ -156,7 +156,21 @@ export default function ScheduleCalendarBlock({
     console.log('openDeleteModal - session для видалення:', session);
     console.log('openDeleteModal - realIndex у currentSessions:', realIndex);
 
-    setSessionToDelete({ index: realIndex, dateKey });
+    let bookingCount = 0;
+
+    if (session.id) {
+      try {
+        const response = await fetch(`${backendBaseUrl}session/${session.id}`);
+        if (response.ok) {
+          const data = await response.json();
+          bookingCount = data.bookings_count || 0;
+        }
+      } catch (error) {
+        console.error('Помилка при отриманні кількості бронювань:', error);
+      }
+    }
+
+    setSessionToDelete({ index: realIndex, dateKey, bookingCount });
     setShowDeleteModal(true);
   };
 
@@ -180,6 +194,7 @@ export default function ScheduleCalendarBlock({
 
         if (!response.ok) {
           console.error('Помилка при видаленні сеансу на сервері');
+          setAlertMessage('Помилка при видаленні сеансу на сервері');
           return;
         }
 
@@ -189,6 +204,7 @@ export default function ScheduleCalendarBlock({
         };
       } catch (error) {
         console.error('Помилка при запиті до сервера:', error);
+        setAlertMessage('Помилка мережі при видаленні сеансу');
         return;
       }
     } else {
@@ -212,10 +228,7 @@ export default function ScheduleCalendarBlock({
     };
 
     onUpdate(updatedSessionsByDate);
-
-    if (onSavedUpdate) {
-      onSavedUpdate(updatedSessionsByDate);
-    }
+    onSavedUpdate?.(updatedSessionsByDate);
 
     setShowDeleteModal(false);
     setSessionToDelete(null);
@@ -242,10 +255,7 @@ export default function ScheduleCalendarBlock({
     };
 
     onUpdate(updatedSessionsByDate);
-
-    if (onSavedUpdate) {
-      onSavedUpdate(updatedSessionsByDate);
-    }
+    onSavedUpdate?.(updatedSessionsByDate);
   };
 
   const tileClassName = ({ date }: { date: Date }) => {
@@ -482,6 +492,24 @@ export default function ScheduleCalendarBlock({
         <div className="modal-overlay">
           <div className="modal">
             <h2>Ви точно хочете видалити цей сеанс?</h2>
+            {sessionToDelete?.bookingCount &&
+            sessionToDelete.bookingCount > 0 ? (
+              <p className="booking-warning">
+                У цьому сеансі вже {sessionToDelete.bookingCount} куплених
+                квитків!
+              </p>
+            ) : sessionToDelete?.bookingCount === 0 ? (
+              <p
+                style={{
+                  color: '#4caf50',
+                  fontSize: '14px',
+                  margin: '10px 0',
+                  fontWeight: 'bold',
+                }}
+              >
+                У цьому сеансі немає куплених квитків
+              </p>
+            ) : null}
             <div className="modal-buttons">
               <button
                 className="save-btn"
@@ -504,6 +532,13 @@ export default function ScheduleCalendarBlock({
             </div>
           </div>
         </div>
+      )}
+
+      {alertMessage && (
+        <CustomAlert
+          message={alertMessage}
+          onClose={() => setAlertMessage(null)}
+        />
       )}
     </div>
   );

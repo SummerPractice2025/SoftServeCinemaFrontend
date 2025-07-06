@@ -58,12 +58,10 @@
   transform: scale(1.2);
 }
 
-/* Глобальні стилі для забезпечення правильного відображення модальних вікон */
 .trailer-modal * {
   box-sizing: border-box;
 }
 
-/* Забезпечуємо, що модальне вікно завжди поверх всього */
 .trailer-modal {
   position: fixed !important;
   z-index: 99999 !important;

@@ -10,6 +10,24 @@ const getAuthToken = () => {
   return localStorage.getItem('access_token');
 };
 
+const formatConflictMessage = (errorText: string): string => {
+  if (errorText.includes('конфліктує з сеансом о')) {
+    const dateTimeRegex = /(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})/g;
+
+    return errorText.replace(
+      dateTimeRegex,
+      (year, month, day, hour, minute) => {
+        const formattedDate = `${day}.${month}.${year}`;
+        const formattedTime = `${hour}:${minute}`;
+
+        return `${formattedDate} ${formattedTime}`;
+      },
+    );
+  }
+
+  return errorText;
+};
+
 interface Option {
   value: string;
   label: string;
@@ -301,7 +319,9 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
         if (session.is_deleted) continue;
         const key = `${session.time}-${session.hall}`;
         if (seen.has(key)) {
-          return `Сеанс на ${session.time} у ${session.hall} вже існує.`;
+          const [year, month, day] = dateStr.split('-');
+          const formattedDate = `${day}.${month}.${year}`;
+          return `Сеанс фільму "${movieInfo.title}" на ${session.time} у ${session.hall} ${formattedDate} вже існує.`;
         }
         seen.add(key);
       }
@@ -404,6 +424,7 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
 
         if (!response.ok) {
           const errorText = await response.text();
+          const formattedError = formatConflictMessage(errorText);
           console.error(
             `Помилка при створенні ${sessionsArray.length} сеансів:`,
             response.status,
@@ -411,7 +432,7 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
           );
           console.error('Деталі помилки:', errorText);
           throw new Error(
-            `Помилка при створенні сеансів: ${response.statusText} - ${errorText}`,
+            `Помилка при створенні сеансів: ${response.statusText} - ${formattedError}`,
           );
         }
 
@@ -484,6 +505,7 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
 
         if (!updateResponse.ok) {
           const errorText = await updateResponse.text();
+          const formattedError = formatConflictMessage(errorText);
           console.error(
             `Помилка при оновленні ${updateSessionsArray.length} сеансів:`,
             updateResponse.status,
@@ -491,7 +513,7 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
           );
           console.error('Деталі помилки:', errorText);
           throw new Error(
-            `Помилка при оновленні сеансів: ${updateResponse.statusText} - ${errorText}`,
+            `Помилка при оновленні сеансів: ${updateResponse.statusText} - ${formattedError}`,
           );
         }
 
@@ -745,7 +767,7 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
                     color: '#ff3366',
                     fontSize: '12px',
                     textAlign: 'center',
-                    marginTop: '8px',
+
                     padding: '4px 8px',
                     borderRadius: '4px',
                   }}

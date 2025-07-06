@@ -7,6 +7,8 @@ import AddMovies from './pages/AddMovies';
 import RegisterModal from './components/RegisterModal';
 import { ModalProvider, useModal } from './context/ModalContext';
 import { AuthProvider } from './context/AuthContext';
+import { AdminProvider } from './context/AdminContext';
+import { UserDataProvider } from './context/UserDataContext';
 
 const AppContent = () => {
   const { isRegisterModalOpen, closeRegisterModal } = useModal();
@@ -34,9 +36,13 @@ const AppContent = () => {
 const App = () => {
   return (
     <AuthProvider>
-      <ModalProvider>
-        <AppContent />
-      </ModalProvider>
+      <AdminProvider>
+        <UserDataProvider>
+          <ModalProvider>
+            <AppContent />
+          </ModalProvider>
+        </UserDataProvider>
+      </AdminProvider>
     </AuthProvider>
   );
 };

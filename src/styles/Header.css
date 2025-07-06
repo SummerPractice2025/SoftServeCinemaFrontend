@@ -58,7 +58,7 @@
   font-weight: bold;
 }
 
-.login-button {
+.header .login-button {
   background: none;
   border: none;
   color: white;
@@ -73,8 +73,8 @@
   margin-right: 1rem;
 }
 
-.login-button:hover,
-.login-button:focus {
+.header .login-button:hover,
+.header .login-button:focus {
   background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -121,22 +121,28 @@
   visibility: visible;
 }
 
-.close-button {
+.side-panel .close-button {
   background: none;
+  width: 40px;
+  height: 20px;
   border: none;
   color: white;
   font-size: 2rem;
   cursor: pointer;
   align-self: flex-end;
   margin-bottom: 1rem;
+  top: 5px;
+  right: 1rem;
 }
 
 .panel-content {
   flex: 1;
-  overflow: hidden;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
 }
 
-.user-button {
+.header .user-button {
   background: none;
   border: none;
   cursor: pointer;
@@ -145,13 +151,16 @@
   align-items: center;
 }
 
-.user-button:focus {
+.header .user-button:focus {
   outline: none;
 }
 .panel-header {
   border-bottom: 1px solid #000;
   padding-bottom: 1.17rem;
   margin-bottom: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .user-name {
@@ -166,58 +175,57 @@
   margin: 0;
 }
 
-.tickets-title {
+.side-panel .tickets-title {
   font-family: 'Montserrat', sans-serif;
   font-size: 1.1rem;
   margin: 0.5rem 0;
 }
 
-.ticket-list-container {
-  scrollbar-width: none;
-  overflow-y: auto;
-  flex-grow: 1;
-  max-height: 80vh;
-  padding-right: 8px;
-}
-
-.ticket-list-container::-webkit-scrollbar-thumb {
-  background: transparent;
-  border-radius: 8px;
-}
-
-.ticket-list-container {
+.side-panel .ticket-list-container {
   scrollbar-width: none;
   -ms-overflow-style: none;
   overflow-y: auto;
   flex-grow: 1;
-  max-height: 80vh;
+  max-height: 62vh;
   padding-right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.ticket-list-container::-webkit-scrollbar {
+.side-panel .ticket-list-container::-webkit-scrollbar {
   display: none;
 }
 
-.ticket-card {
+.side-panel .ticket-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.side-panel .ticket-card {
   background-color: #333;
   display: flex;
   flex-direction: row;
   gap: 10px;
   padding: 10px;
   border-radius: 8px;
-  height: 500px !important;
+  min-height: 120px;
   align-items: center;
 }
 
-.ticket-poster {
-  height: 90%;
-  width: auto;
+.side-panel .ticket-poster {
+  height: 90px;
+  width: 60px;
   border-radius: 4px;
   flex-shrink: 0;
   object-fit: cover;
 }
 
-.ticket-info {
+.side-panel .ticket-info {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -231,28 +239,94 @@
   display: flex;
   justify-content: flex-end;
   border-top: 1px solid #000;
-  padding-top: 2rem;
+  padding-top: 1rem;
 }
 
-.logout-button {
-  background: none;
-  border: none;
+.side-panel .logout-button {
+  background-color: #434040;
   color: white;
-  font-size: 1.3rem;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  font-weight: bold;
   cursor: pointer;
-  padding: 0;
-  user-select: none;
-  font-weight: normal;
-  transition:
-    background 0.3s,
-    background-clip 0.3s,
-    -webkit-text-fill-color 0.3s;
+  transition: background-color 0.3s ease;
+  margin-top: 0.5rem;
+  width: 40%;
 }
 
-.logout-button:hover,
-.logout-button:focus {
+.side-panel .logout-button:hover,
+.side-panel .logout-button:focus {
+  background-color: white;
+  color: black;
+}
+
+.add-button {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
   background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: white;
+  font-size: 3rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(255, 51, 102, 0.3);
+  transition: all 0.3s ease;
+  z-index: 1400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.add-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(255, 51, 102, 0.4);
+}
+
+.add-button:focus {
   outline: none;
+  transform: scale(1.05);
+}
+
+.add-button:active {
+  transform: scale(0.95);
+}
+
+.add-button.moved {
+  right: calc(416px + 2rem);
+}
+
+.add-button.hidden {
+  display: none;
+}
+
+.side-panel .mode-toggle-button {
+  background-color: #434040;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 0.5rem;
+  width: 50%;
+}
+
+.side-panel .mode-toggle-button:hover {
+  background-color: white;
+  color: black;
+}
+
+.error-message {
+  color: #ff3366;
+  font-size: 0.9rem;
+  margin: 0;
+  text-align: center;
 }

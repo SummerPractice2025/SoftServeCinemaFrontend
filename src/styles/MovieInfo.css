@@ -47,6 +47,17 @@
   white-space: nowrap;
   padding: 6px 8px;
   color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.movie-title-cell {
+  flex: 1;
+  margin-right: 8px;
+  font-size: 1.5rem;
+  font-family: 'Montserrat', sans-serif;
+  color: white;
 }
 
 .movie-title-input {
@@ -74,6 +85,7 @@
   cursor: pointer;
   padding: 0;
   vertical-align: top;
+  flex-shrink: 0;
 }
 
 .icon-image {
@@ -113,4 +125,13 @@ input[type='number']::-webkit-outer-spin-button {
   border-radius: 4px;
   padding: 4px 8px;
   box-sizing: border-box;
+}
+
+.movie-info-admin-table td {
+  padding: 16px 8px;
+}
+
+.movie-info-admin-table {
+  max-width: 800px;
+  width: 100%;
 }

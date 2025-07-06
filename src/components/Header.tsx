@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAdmin } from '../context/AdminContext';
+import { useUserData } from '../context/UserDataContext';
 import '../styles/Header.css';
 import LoginModal from './LoginModal';
 import { useModal } from '../context/ModalContext';
@@ -8,51 +10,22 @@ import apiService from '../services/api';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const { isAdminMode, setIsAdminMode } = useAdmin();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const { openRegisterModal } = useModal();
   const { isAuthenticated, login, logout } = useAuth();
 
-  const user = {
-    firstName: 'Іван',
-    lastName: 'Петренко',
-    email: 'ivan.petrenko@example.com',
-  };
+  const { userData, refreshTrigger } = useUserData();
+  const [loading, setLoading] = useState(false);
 
-  const purchasedTickets = [
-    {
-      id: 1,
-      posterURL: '/img/poster1.jpg',
-      movieTitle: 'Інтерстеллар',
-      hall: 'Зал 1',
-      date: '2025-07-05',
-      time: '18:30',
-    },
-    {
-      id: 2,
-      posterURL: '/img/poster2.jpg',
-      movieTitle: 'Темний Лицар',
-      hall: 'Зал 2',
-      date: '2025-07-06',
-      time: '20:00',
-    },
-    {
-      id: 3,
-      posterURL: '/img/poster2.jpg',
-      movieTitle: 'Темний Лицар',
-      hall: 'Зал 2',
-      date: '2025-07-06',
-      time: '20:00',
-    },
-    {
-      id: 4,
-      posterURL: '/img/poster2.jpg',
-      movieTitle: 'Темний Лицар',
-      hall: 'Зал 2',
-      date: '2025-07-06',
-      time: '20:00',
-    },
-  ];
+  useEffect(() => {
+    if (isPanelOpen) {
+      setLoading(true);
+      setTimeout(() => setLoading(false), 300);
+    }
+  }, [isPanelOpen, refreshTrigger]);
 
   const handleHome = (e: React.MouseEvent<HTMLButtonElement>) => {
     navigate('/');
@@ -76,6 +49,14 @@ const Header: React.FC = () => {
       console.error('Помилка виходу:', error);
     }
   };
+
+  const handleAddMovie = () => {
+    navigate('/add');
+  };
+
+  const isOnAddPage = location.pathname === '/add';
+
+  const shouldHideAdminElements = !isAdminMode;
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
@@ -140,6 +121,7 @@ const Header: React.FC = () => {
           )}
         </div>
       </header>
+
       {isLoginModalOpen && <div className="header-dark-overlay" />}
 
       <div className={`side-panel ${isPanelOpen ? 'open' : ''}`}>
@@ -153,35 +135,57 @@ const Header: React.FC = () => {
         </button>
 
         <div className="panel-header">
-          <p className="user-name">
-            {user.firstName} {user.lastName}
-          </p>
-          <p className="user-email">{user.email}</p>
+          {loading ? (
+            <p>Завантаження...</p>
+          ) : userData ? (
+            <>
+              <p className="user-name">
+                {userData.user.first_name} {userData.user.last_name}
+              </p>
+              <p className="user-email">{userData.user.email}</p>
+              <button
+                className="mode-toggle-button"
+                onClick={() => setIsAdminMode(!isAdminMode)}
+                type="button"
+              >
+                {isAdminMode ? 'Режим клієнта' : 'Режим адміністратора'}
+              </button>
+            </>
+          ) : (
+            <p>Дані користувача не знайдено</p>
+          )}
         </div>
 
         <div className="panel-content">
           <h3 className="tickets-title">Куплені квитки</h3>
           <div className="ticket-list-container">
-            {purchasedTickets.length === 0 ? (
+            {loading ? (
+              <p>Завантаження квитків...</p>
+            ) : userData?.bookings.length === 0 ? (
               <p>Квитків немає</p>
-            ) : (
+            ) : userData?.bookings ? (
               <ul className="ticket-list">
-                {purchasedTickets.map((ticket) => (
-                  <li key={ticket.id} className="ticket-card">
+                {userData.bookings.map((booking, index) => (
+                  <li key={index} className="ticket-card">
                     <img
-                      src="/img/poster_67d423a91a0a4.jpg"
-                      alt={ticket.movieTitle}
+                      src={
+                        booking.moviePosterUrl ||
+                        '/img/poster_67d423a91a0a4.jpg'
+                      }
+                      alt={booking.movieName}
                       className="ticket-poster"
                     />
                     <div className="ticket-info">
-                      <strong>{ticket.movieTitle}</strong>
-                      <div>Зала: {ticket.hall}</div>
-                      <div>Дата: {formatDate(ticket.date)}</div>
-                      <div>Час: {ticket.time}</div>
+                      <strong>{booking.movieName}</strong>
+                      <div>{booking.description}</div>
+                      <div>Дата: {formatDate(booking.date)}</div>
+                      <div>Час: {booking.date.slice(11, 16)}</div>
                     </div>
                   </li>
                 ))}
               </ul>
+            ) : (
+              <p>Дані про квитки не знайдено</p>
             )}
           </div>
         </div>
@@ -196,6 +200,15 @@ const Header: React.FC = () => {
           </button>
         </div>
       </div>
+
+      <button
+        className={`add-button ${isOnAddPage || shouldHideAdminElements ? 'hidden' : ''} ${isPanelOpen ? 'moved' : ''}`}
+        onClick={handleAddMovie}
+        type="button"
+        aria-label="Додати фільм"
+      >
+        +
+      </button>
 
       <LoginModal
         isOpen={isLoginModalOpen}

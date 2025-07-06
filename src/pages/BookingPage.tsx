@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import CustomAlert from '../components/CustomAlert';
+import { useUserData } from '../context/UserDataContext';
 import '../styles/BookingPage.css';
 
 interface Seat {
@@ -53,6 +54,8 @@ const getAuthToken = () => {
 
 const BookingPage: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { refreshUserData } = useUserData();
   const state = location.state as {
     movieId?: number;
     sessionId?: number;
@@ -256,6 +259,9 @@ const BookingPage: React.FC = () => {
         message: 'Місця успішно заброньовано!',
         type: 'success',
       });
+
+      refreshUserData();
+
       setBookedSeats((prev) => [
         ...prev,
         ...selectedSeats.map((seat) => seat.id),
@@ -282,7 +288,12 @@ const BookingPage: React.FC = () => {
       {customAlert && (
         <CustomAlert
           message={customAlert.message}
-          onClose={() => setCustomAlert(null)}
+          onClose={() => {
+            setCustomAlert(null);
+            if (customAlert.type === 'success') {
+              navigate('/');
+            }
+          }}
         />
       )}
 

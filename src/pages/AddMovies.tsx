@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import CustomSelectGrey from '../components/CustomSelectGrey';
 import MovieInfo from '../components/MovieInfoAdmin';
 import type { Movie } from '../components/MovieInfoAdmin';
 import TrailerPlayer from '../components/TrailerPlayer';
 import PriceBlock from '../components/PriceBlock';
+import CustomAlert from '../components/CustomAlert';
 import '../styles/AddMovies.css';
 import ScheduleCalendarBlock from '../components/ScheduleCalendarBlock';
 import type { Session } from '../components/ScheduleCalendarBlock';
@@ -160,6 +162,27 @@ const getAgeRateId = (ageRateStr: string): number => {
   return map[ageRateStr] ?? 1;
 };
 
+const formatConflictMessage = (
+  errorText: string,
+  movieTitle?: string,
+): string => {
+  if (errorText.includes('конфліктує з сеансом о')) {
+    const dateTimeRegex = /(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})/g;
+
+    return errorText.replace(
+      dateTimeRegex,
+      (year, month, day, hour, minute) => {
+        const formattedDate = `${day}.${month}.${year}`;
+        const formattedTime = `${hour}:${minute}`;
+
+        return `${formattedDate} ${formattedTime}`;
+      },
+    );
+  }
+
+  return errorText;
+};
+
 const buildMoviePayload = (
   movie: Movie,
   sessions: SessionForPayload[],
@@ -199,6 +222,7 @@ const getAuthToken = () => {
 };
 
 const AddMovies: React.FC = () => {
+  const navigate = useNavigate();
   const [selectedYear, setSelectedYear] = useState(
     String(new Date().getFullYear()),
   );
@@ -216,9 +240,9 @@ const AddMovies: React.FC = () => {
   >({});
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const errorRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!filteredMovie) return;
@@ -396,23 +420,30 @@ const AddMovies: React.FC = () => {
     const movieKey = filteredMovie.title;
     const currentMovieSessions = sessionsByDate[movieKey] || {};
 
-    for (const [, sessions] of Object.entries(currentMovieSessions)) {
-      const seen = new Set<string>();
+    const allSessions: { date: string; time: string; hall: string }[] = [];
+
+    for (const [date, sessions] of Object.entries(currentMovieSessions)) {
       for (const session of sessions) {
-        const key = `${session.time}-${session.hall}`;
-        if (seen.has(key)) {
-          const message = `Сеанс на ${session.time} у ${session.hall} вже існує.`;
-          setErrorMessage(message);
-          setTimeout(() => {
-            errorRef.current?.scrollIntoView({
-              behavior: 'smooth',
-              block: 'center',
-            });
-          }, 0);
-          return;
-        }
-        seen.add(key);
+        allSessions.push({
+          date,
+          time: session.time,
+          hall: session.hall,
+        });
       }
+    }
+
+    const seen = new Set<string>();
+    for (const session of allSessions) {
+      const key = `${session.date}-${session.time}-${session.hall}`;
+      if (seen.has(key)) {
+        const [year, month, day] = session.date.split('-');
+        const formattedDate = `${day}.${month}.${year}`;
+
+        const message = `Сеанс фільму "${filteredMovie.title}" на ${session.time} у ${session.hall} ${formattedDate} вже існує.`;
+        setErrorMessage(message);
+        return;
+      }
+      seen.add(key);
     }
 
     const allRawSessions: SessionForPayload[] = Object.entries(
@@ -448,8 +479,7 @@ const AddMovies: React.FC = () => {
       });
 
       if (response.status === 201) {
-        alert('Фільм створено успішно!');
-        setErrorMessage(null);
+        setShowSuccessModal(true);
 
         const movieId = await fetchMovieIdByName(movieKey);
         if (movieId) {
@@ -518,12 +548,18 @@ const AddMovies: React.FC = () => {
             typeof errorData === 'object' &&
             'message' in errorData
           ) {
-            msg = errorData.message;
+            msg = formatConflictMessage(errorData.message, filteredMovie.title);
           } else {
-            msg = JSON.stringify(errorData);
+            msg = formatConflictMessage(
+              JSON.stringify(errorData),
+              filteredMovie.title,
+            );
           }
         } catch {
-          msg = response.statusText || msg;
+          msg = formatConflictMessage(
+            response.statusText || msg,
+            filteredMovie.title,
+          );
         }
         setErrorMessage(msg);
       }
@@ -551,6 +587,24 @@ const AddMovies: React.FC = () => {
     setErrorMessage(null);
     setShowPlayer(false);
     setShowCancelModal(false);
+  };
+
+  const handleAddAnotherMovie = () => {
+    setFilteredMovie(null);
+    setSearchText('');
+    setSessionsByDate({});
+    setSavedSessionsByDate({});
+    setErrorMessage(null);
+    setShowPlayer(false);
+    setShowSuccessModal(false);
+
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  };
+
+  const handleGoToAllMovies = () => {
+    navigate('/');
   };
 
   return (
@@ -588,19 +642,10 @@ const AddMovies: React.FC = () => {
       </div>
 
       {errorMessage && (
-        <div
-          ref={errorRef}
-          style={{
-            background: 'linear-gradient(135deg, #ff3366 0%, #ff6b99 100%)',
-            color: 'white',
-            padding: '10px',
-            borderRadius: '8px',
-            marginTop: '10px',
-            textAlign: 'center',
-          }}
-        >
-          {errorMessage}
-        </div>
+        <CustomAlert
+          message={errorMessage}
+          onClose={() => setErrorMessage(null)}
+        />
       )}
 
       {loading ? (
@@ -673,6 +718,10 @@ const AddMovies: React.FC = () => {
 
               setSessionsByDate(updated);
             }}
+            onSavedUpdate={(updated) => {
+              console.log('ScheduleCalendarBlock onSavedUpdate:', updated);
+              setSavedSessionsByDate(updated);
+            }}
             basePriceStandard={filteredMovie.priceStandard ?? 0}
             basePriceVip={filteredMovie.priceVip ?? 0}
           />
@@ -692,6 +741,23 @@ const AddMovies: React.FC = () => {
                     onClick={() => setShowCancelModal(false)}
                   >
                     Ні, повернутись
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {showSuccessModal && (
+            <div className="modal-overlay">
+              <div className="modal">
+                <h2>Фільм створено успішно!</h2>
+                <p>Ви хочете додати ще фільм?</p>
+                <div className="modal-buttons">
+                  <button className="save-btn" onClick={handleAddAnotherMovie}>
+                    Так, додати ще
+                  </button>
+                  <button className="cancel-btn" onClick={handleGoToAllMovies}>
+                    Ні
                   </button>
                 </div>
               </div>
