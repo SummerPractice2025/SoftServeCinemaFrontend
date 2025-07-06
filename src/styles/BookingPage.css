@@ -11,7 +11,6 @@ body {
   width: 100%;
   padding: 2rem 2.5rem 2.5rem;
   box-sizing: border-box;
-  min-width: 100vw;
 
   color: white;
   display: flex;
@@ -38,9 +37,9 @@ body {
   align-items: flex-start;
 }
 
-.poster {
-  width: 160px;
-  height: 250px;
+.booking-page .poster {
+  width: 150px !important;
+  height: 240px !important;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
@@ -207,13 +206,52 @@ body {
 
 .ticket-card {
   background-color: #222222;
-  padding: 10px 14px;
+  padding: 6px 12px;
   border-radius: 8px;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   gap: 4px;
+  max-height: 60px;
+  min-height: 60px;
+  position: relative;
+}
+
+.seat-location {
+  font-weight: bold;
+  color: white;
+  line-height: 1.1;
+  margin-top: -30px;
+  position: absolute;
+
+  left: 12px;
+  right: 12px;
+  z-index: 2;
+}
+
+.seat-type-price {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  position: absolute;
+  bottom: 8px;
+  left: 12px;
+  right: 12px;
+  z-index: 1;
+}
+
+.seat-type {
+  text-align: left;
+  color: #ccc;
+  margin-right: 90px;
+}
+
+.seat-price {
+  font-weight: bold;
+  color: white;
+  text-align: right;
+  margin-left: 50px;
 }
 
 .order-actions {

@@ -94,13 +94,20 @@
 
 .session-row {
   display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
   padding: 0.5rem 0;
   color: white;
   flex-wrap: wrap;
   flex-grow: 1;
   position: relative;
+}
+
+.session-row-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-grow: 1;
 }
 
 .movie-title-input {
@@ -179,6 +186,13 @@
   margin-bottom: 0;
 }
 
+.session-dropdowns {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+  flex-wrap: wrap;
+}
+
 .price-info {
   display: flex;
   gap: 1.2rem;
@@ -237,23 +251,26 @@
 }
 
 .delete-btn {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background: transparent;
+  background: none;
   border: none;
-  padding: 8px;
+  padding: 4px;
   cursor: pointer;
+  transition: opacity 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .delete-btn img {
-  width: 20px;
-  height: 20px;
-  fill: aliceblue;
+  width: 18px;
+  height: 18px;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
 }
 
 .delete-btn:hover img {
-  opacity: 0.8;
+  opacity: 1;
 }
 
 .react-calendar__tile.disabled-day {
@@ -321,4 +338,51 @@
 .cancel-btn {
   background-color: #555;
   color: white;
+}
+
+/* Стилі для редагування полів */
+.field-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.field-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.05);
+  min-height: 32px;
+}
+
+.field-display span {
+  color: white;
+  font-size: 0.9rem;
+}
+
+.edit-icon-button {
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Стилі для полів цін */
+.price-field .field-display {
+  background-color: transparent;
+  padding: 0;
+  min-height: auto;
+}
+
+.price-field .field-display span {
+  font-weight: 600;
+  margin-right: 4px;
 }

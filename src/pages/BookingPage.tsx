@@ -290,7 +290,7 @@ const BookingPage: React.FC = () => {
             className="poster"
             src={movieInfo?.posterUrl || '/img/poster_67d423a91a0a4.jpg'}
             alt="Постер"
-            style={{ width: '160px', height: '250px', objectFit: 'cover' }}
+            style={{ width: '160px', height: '160px', objectFit: 'cover' }}
           />
           <div className="movie-details">
             <h2>{movieInfo?.name || 'Фільм'}</h2>
@@ -339,14 +339,16 @@ const BookingPage: React.FC = () => {
             <ul className="ticket-list">
               {selectedSeats.map((seat) => (
                 <li key={seat.id} className="ticket-card">
-                  <div>
+                  <div className="seat-location">
                     Ряд {seat.row}, Місце {seat.number}
                   </div>
-                  <div className="seat-info">
-                    <span className={seat.type === 'vip' ? 'gradient-vip' : ''}>
+                  <div className="seat-type-price">
+                    <span
+                      className={`seat-type ${seat.type === 'vip' ? 'gradient-vip' : ''}`}
+                    >
                       {seat.type === 'vip' ? 'VIP' : 'Стандарт'}
                     </span>
-                    <span>{seat.price}₴</span>
+                    <span className="seat-price">{seat.price}₴</span>
                   </div>
                 </li>
               ))}

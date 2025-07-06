@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
 import '../styles/AllMovies.css';
 import CustomSelectGradient from '../components/CustomSelectGradient';
 import TrailerPlayer from '../components/TrailerPlayer';
@@ -18,6 +17,7 @@ interface MovieFromBackend {
     id?: number | null;
     date?: string | null;
     type?: string | null;
+    is_deleted?: boolean;
   } | null;
 }
 
@@ -116,6 +116,9 @@ export default function AllMovies() {
         const moviesData: MovieFromBackend[] = await moviesResponse.json();
         const genresData: Genre[] = await genresResponse.json();
 
+        console.log('Movies data from API:', moviesData);
+        console.log('Sample movie session:', moviesData[0]?.session);
+
         setMovies(moviesData);
         setGenres(genresData);
       } catch (error: unknown) {
@@ -187,21 +190,11 @@ export default function AllMovies() {
   };
 
   if (loading) {
-    return (
-      <div className="page">
-        <Header />
-        Завантаження...
-      </div>
-    );
+    return <div className="page">Завантаження...</div>;
   }
 
   if (error) {
-    return (
-      <div className="page">
-        <Header />
-        Сталася помилка: {error}
-      </div>
-    );
+    return <div className="page">Сталася помилка: {error}</div>;
   }
 
   return (
@@ -223,6 +216,7 @@ export default function AllMovies() {
             const sessionId = session.id ?? null;
             const sessionDate = session.date ?? null;
             const sessionType = session.type ?? null;
+            const isDeleted = session.is_deleted ?? false;
 
             const isSessionValid =
               typeof sessionId === 'number' &&
@@ -231,7 +225,8 @@ export default function AllMovies() {
               sessionDate.trim() !== '' &&
               !isNaN(new Date(sessionDate).getTime()) &&
               typeof sessionType === 'string' &&
-              sessionType.trim() !== '';
+              sessionType.trim() !== '' &&
+              !isDeleted;
 
             return (
               <div

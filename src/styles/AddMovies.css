@@ -1,19 +1,7 @@
-html,
-body {
-  margin: 0;
-  padding: 20px;
-  overflow-x: hidden;
-  min-height: 100vh;
-  background-color: #222222;
-  font-family: 'Open Sans', sans-serif;
-}
-
 .search-filter-container {
   margin-bottom: 20px;
   background-color: #222222;
   width: 100%;
-  min-width: 100vw;
-  min-height: 100vh;
 }
 
 .year-select__control {
