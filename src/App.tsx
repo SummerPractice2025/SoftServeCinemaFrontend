@@ -6,7 +6,8 @@ import Header from './components/Header';
 import AddMovies from './pages/AddMovies';
 import RegisterModal from './components/RegisterModal';
 import { ModalProvider, useModal } from './context/ModalContext';
-import { AdminProvider } from './contexts/AdminContext';
+import { AdminProvider } from './context/AdminContext';
+import { UserDataProvider } from './context/UserDataContext';
 
 const AppContent = () => {
   const { isRegisterModalOpen, closeRegisterModal } = useModal();
@@ -35,7 +36,9 @@ const App = () => {
   return (
     <AdminProvider>
       <ModalProvider>
-        <AppContent />
+        <UserDataProvider>
+          <AppContent />
+        </UserDataProvider>
       </ModalProvider>
     </AdminProvider>
   );

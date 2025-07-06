@@ -166,7 +166,7 @@ body {
   font-family: 'Montserrat', sans-serif;
 }
 
-.ticket-list-container {
+.booking-page .ticket-list-container {
   overflow-y: auto;
   flex-grow: 1;
   max-height: 380px;
@@ -175,7 +175,7 @@ body {
   box-sizing: border-box;
 }
 
-.ticket-list {
+.booking-page .ticket-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -184,27 +184,27 @@ body {
   list-style: none;
 }
 
-.ticket-list-container::-webkit-scrollbar {
+.booking-page .ticket-list-container::-webkit-scrollbar {
   width: 8px;
 }
 
-.ticket-list-container::-webkit-scrollbar-track {
+.booking-page .ticket-list-container::-webkit-scrollbar-track {
   background: #5a5a5a;
   border-radius: 8px;
 }
 
-.ticket-list-container::-webkit-scrollbar-thumb {
+.booking-page .ticket-list-container::-webkit-scrollbar-thumb {
   background-color: #222222;
   border-radius: 8px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
 
-.ticket-list-container::-webkit-scrollbar-thumb:hover {
+.booking-page .ticket-list-container::-webkit-scrollbar-thumb:hover {
   background-color: #222222;
 }
 
-.ticket-card {
+.booking-page .ticket-card {
   background-color: #222222;
   padding: 6px 12px;
   border-radius: 8px;
@@ -217,11 +217,11 @@ body {
   position: relative;
 }
 
-.seat-location {
+.booking-page .seat-location {
   font-weight: bold;
   color: white;
   line-height: 1.1;
-  margin-top: -30px;
+  margin-top: 6px;
   position: absolute;
 
   left: 12px;
@@ -229,7 +229,7 @@ body {
   z-index: 2;
 }
 
-.seat-type-price {
+.booking-page .seat-type-price {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -241,13 +241,13 @@ body {
   z-index: 1;
 }
 
-.seat-type {
+.booking-page .seat-type {
   text-align: left;
   color: #ccc;
   margin-right: 90px;
 }
 
-.seat-price {
+.booking-page .seat-price {
   font-weight: bold;
   color: white;
   text-align: right;

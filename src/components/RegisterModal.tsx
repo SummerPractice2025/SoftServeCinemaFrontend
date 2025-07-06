@@ -20,7 +20,6 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
-  // Валидация
   const validateName = (value: string): boolean => {
     return /^[а-яА-ЯіІїЇєЄa-zA-Z\s]{2,30}$/.test(value);
   };
@@ -72,7 +71,6 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose }) => {
 
     setIsLoading(true);
 
-    // Здесь будет логика регистрации (пока просто симуляция)
     setTimeout(() => {
       console.log('Реєстрація:', {
         firstName,
@@ -83,7 +81,6 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose }) => {
       });
       setIsLoading(false);
       setShowConfirmationModal(true);
-      // Очистка формы
       setFirstName('');
       setLastName('');
       setEmail('');
@@ -95,7 +92,6 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose }) => {
   };
 
   const handleClose = () => {
-    // Сбрасываем ошибки при закрытии модального окна
     setErrors({});
     setShowConfirmationModal(false);
     onClose();
