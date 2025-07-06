@@ -6,6 +6,7 @@ import Header from './components/Header';
 import AddMovies from './pages/AddMovies';
 import RegisterModal from './components/RegisterModal';
 import { ModalProvider, useModal } from './context/ModalContext';
+import { AuthProvider } from './context/AuthContext';
 import { AdminProvider } from './context/AdminContext';
 import { UserDataProvider } from './context/UserDataContext';
 
@@ -34,13 +35,15 @@ const AppContent = () => {
 
 const App = () => {
   return (
-    <AdminProvider>
-      <ModalProvider>
+    <AuthProvider>
+      <AdminProvider>
         <UserDataProvider>
-          <AppContent />
+          <ModalProvider>
+            <AppContent />
+          </ModalProvider>
         </UserDataProvider>
-      </ModalProvider>
-    </AdminProvider>
+      </AdminProvider>
+    </AuthProvider>
   );
 };
 

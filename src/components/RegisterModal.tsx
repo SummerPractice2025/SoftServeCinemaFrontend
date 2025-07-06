@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import '../styles/RegisterModal.css';
 import RegistrationConfirmationModal from './RegistrationConfirmationModal';
+import apiService from '../services/api';
 
 interface RegisterModalProps {
   isOpen: boolean;
@@ -71,16 +72,18 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose }) => {
 
     setIsLoading(true);
 
-    setTimeout(() => {
-      console.log('Реєстрація:', {
-        firstName,
-        lastName,
+    try {
+      await apiService.signUp({
         email,
+        first_name: firstName,
+        last_name: lastName,
         password,
-        notification,
       });
+
+      console.log('Успішна реєстрація');
       setIsLoading(false);
       setShowConfirmationModal(true);
+
       setFirstName('');
       setLastName('');
       setEmail('');
@@ -88,7 +91,29 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose }) => {
       setConfirmPassword('');
       setNotification(false);
       setErrors({});
-    }, 1000);
+    } catch (error: any) {
+      console.error('Помилка реєстрації:', error);
+      setIsLoading(false);
+
+      const serverError = error.response?.data?.message;
+      const statusCode = error.response?.status;
+
+      if (statusCode === 500) {
+        setErrors({ email: 'Користувач з таким email вже існує' });
+      } else if (serverError) {
+        if (serverError.includes('email') || serverError.includes('Email')) {
+          setErrors({ email: serverError });
+        } else {
+          setErrors({ general: serverError });
+        }
+      } else if (error.code === 'ERR_NETWORK') {
+        setErrors({
+          general: "Помилка підключення до сервера. Перевірте з'єднання.",
+        });
+      } else {
+        setErrors({ general: 'Помилка реєстрації. Спробуйте ще раз.' });
+      }
+    }
   };
 
   const handleClose = () => {
@@ -116,6 +141,9 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose }) => {
         <h2>Реєстрація</h2>
 
         <form onSubmit={handleSubmit}>
+          {errors.general && (
+            <div className="error-message general-error">{errors.general}</div>
+          )}
           <div className="input-group">
             <input
               type="text"

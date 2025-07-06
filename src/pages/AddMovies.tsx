@@ -217,7 +217,9 @@ const buildMoviePayload = (
   };
 };
 
-const ADMIN_BEARER_TOKEN = '';
+const getAuthToken = () => {
+  return localStorage.getItem('access_token');
+};
 
 const AddMovies: React.FC = () => {
   const navigate = useNavigate();
@@ -470,7 +472,7 @@ const AddMovies: React.FC = () => {
       const response = await fetch(url, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${ADMIN_BEARER_TOKEN}`,
+          Authorization: `Bearer ${getAuthToken()}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),

@@ -6,7 +6,9 @@ import CustomAlert from './CustomAlert';
 import type { Movie } from './MovieInfoAdmin';
 import type { Session } from './ScheduleCalendarBlock';
 
-const ADMIN_BEARER_TOKEN = '';
+const getAuthToken = () => {
+  return localStorage.getItem('access_token');
+};
 
 const formatConflictMessage = (errorText: string): string => {
   if (errorText.includes('конфліктує з сеансом о')) {
@@ -415,7 +417,7 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${ADMIN_BEARER_TOKEN}`,
+            Authorization: `Bearer ${getAuthToken()}`,
           },
           body: JSON.stringify(sessionsArray),
         });
@@ -496,7 +498,7 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${ADMIN_BEARER_TOKEN}`,
+            Authorization: `Bearer ${getAuthToken()}`,
           },
           body: JSON.stringify(updateSessionsArray),
         });

@@ -5,6 +5,8 @@ import { useUserData } from '../context/UserDataContext';
 import '../styles/Header.css';
 import LoginModal from './LoginModal';
 import { useModal } from '../context/ModalContext';
+import { useAuth } from '../context/AuthContext';
+import apiService from '../services/api';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
@@ -13,6 +15,7 @@ const Header: React.FC = () => {
   const { isAdminMode, setIsAdminMode } = useAdmin();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const { openRegisterModal } = useModal();
+  const { isAuthenticated, login, logout } = useAuth();
 
   const { userData, refreshTrigger } = useUserData();
   const [loading, setLoading] = useState(false);
@@ -31,12 +34,20 @@ const Header: React.FC = () => {
 
   const openPanel = () => setIsPanelOpen(true);
   const closePanel = () => setIsPanelOpen(false);
-  const openLoginModal = () => setIsLoginModalOpen(true);
+  const openLoginModal = () => {
+    setIsLoginModalOpen(true);
+  };
   const closeLoginModal = () => setIsLoginModalOpen(false);
 
-  const handleLogout = () => {
-    console.log('Вихід користувача');
-    closePanel();
+  const handleLogout = async () => {
+    try {
+      await apiService.signOut();
+      logout();
+      console.log('Вихід користувача');
+      closePanel();
+    } catch (error) {
+      console.error('Помилка виходу:', error);
+    }
   };
 
   const handleAddMovie = () => {
@@ -86,25 +97,28 @@ const Header: React.FC = () => {
           </button>
         </div>
         <div className="header-right">
-          <button
-            className="login-button"
-            onClick={openLoginModal}
-            type="button"
-          >
-            Вхід
-          </button>
-          <button
-            className="user-button"
-            onClick={openPanel}
-            type="button"
-            aria-label="Панель користувача"
-          >
-            <img
-              src="/img/user.png"
-              alt="Іконка користувача"
-              className="user-icon"
-            />
-          </button>
+          {!isAuthenticated ? (
+            <button
+              className="login-button"
+              onClick={openLoginModal}
+              type="button"
+            >
+              Вхід
+            </button>
+          ) : (
+            <button
+              className="user-button"
+              onClick={openPanel}
+              type="button"
+              aria-label="Панель користувача"
+            >
+              <img
+                src="/img/user.png"
+                alt="Іконка користувача"
+                className="user-icon"
+              />
+            </button>
+          )}
         </div>
       </header>
 
@@ -200,6 +214,7 @@ const Header: React.FC = () => {
         isOpen={isLoginModalOpen}
         onClose={closeLoginModal}
         onRegisterClick={openRegisterModal}
+        onLoginSuccess={login}
       />
     </>
   );
