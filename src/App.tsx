@@ -6,10 +6,10 @@ import Header from './components/Header';
 import AddMovies from './pages/AddMovies';
 import RegisterModal from './components/RegisterModal';
 import { ModalProvider, useModal } from './context/ModalContext';
+import { AuthProvider } from './context/AuthContext';
 
 const AppContent = () => {
   const { isRegisterModalOpen, closeRegisterModal } = useModal();
-
 
   return (
     <>
@@ -33,11 +33,11 @@ const AppContent = () => {
 
 const App = () => {
   return (
-    <ModalProvider>
-      <AppContent />
-    </ModalProvider>
-
-
+    <AuthProvider>
+      <ModalProvider>
+        <AppContent />
+      </ModalProvider>
+    </AuthProvider>
   );
 };
 

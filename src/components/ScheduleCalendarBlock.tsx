@@ -26,7 +26,6 @@ type Props = {
   basePriceStandard: number;
   basePriceVip: number;
 };
-const ADMIN_BEARER_TOKEN = '';
 
 const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
 
@@ -49,6 +48,10 @@ const isDateInPast = (date: Date) => {
   const d = new Date(date);
   d.setHours(0, 0, 0, 0);
   return d < today;
+};
+
+const getAuthToken = () => {
+  return localStorage.getItem('access_token');
 };
 
 export default function ScheduleCalendarBlock({
@@ -171,7 +174,7 @@ export default function ScheduleCalendarBlock({
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${ADMIN_BEARER_TOKEN}`,
+            Authorization: `Bearer ${getAuthToken()}`,
           },
         });
 

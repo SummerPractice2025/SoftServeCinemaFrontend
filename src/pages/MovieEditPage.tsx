@@ -8,7 +8,10 @@ import '../styles/MovieEditPage.css';
 import '../styles/ScheduleBlock.css';
 
 const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
-const ADMIN_BEARER_TOKEN = import.meta.env.VITE_ACCESS_TOKEN_SECRET;
+
+const getAuthToken = () => {
+  return localStorage.getItem('access_token');
+};
 
 const ageRateIdMap: Record<string, number> = {
   '0+': 1,
@@ -38,7 +41,7 @@ const MovieEdit = () => {
       try {
         const res = await fetch(`${backendBaseUrl}movie/${movieIdNum}`, {
           headers: {
-            Authorization: `Bearer ${ADMIN_BEARER_TOKEN}`,
+            Authorization: `Bearer ${getAuthToken()}`,
           },
         });
         if (!res.ok) throw new Error('Failed to fetch movie details');
@@ -79,7 +82,7 @@ const MovieEdit = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${ADMIN_BEARER_TOKEN}`,
+          Authorization: `Bearer ${getAuthToken()}`,
         },
         body: JSON.stringify(payload),
       });

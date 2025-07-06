@@ -47,7 +47,9 @@ interface SessionDetails {
 const rows = 10;
 const seatsPerRow = 10;
 
-const ADMIN_BEARER_TOKEN = import.meta.env.VITE_ACCESS_TOKEN_SECRET;
+const getAuthToken = () => {
+  return localStorage.getItem('access_token');
+};
 
 const BookingPage: React.FC = () => {
   const location = useLocation();
@@ -240,7 +242,7 @@ const BookingPage: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${ADMIN_BEARER_TOKEN}`,
+          Authorization: `Bearer ${getAuthToken()}`,
         },
         body: JSON.stringify(bookingData),
       });

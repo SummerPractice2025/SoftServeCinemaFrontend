@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import '../styles/LoginModal.css';
+import apiService from '../services/api';
 
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
   onRegisterClick: () => void;
+  onLoginSuccess?: () => void;
 }
 
 const LoginModal: React.FC<LoginModalProps> = ({
   isOpen,
   onClose,
   onRegisterClick,
+  onLoginSuccess,
 }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,7 +22,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
   const isValidEmail = (value: string): boolean =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
       setError('Введіть email та пароль');
       return;
@@ -31,8 +34,29 @@ const LoginModal: React.FC<LoginModalProps> = ({
     }
 
     setError('');
-    console.log('Logging in:', { email, password });
-    onClose();
+
+    try {
+      await apiService.signIn({ email, password });
+      console.log('Успішний вхід');
+      onClose();
+      onLoginSuccess?.();
+      // Можно добавить обновление состояния приложения или перенаправление
+    } catch (error: any) {
+      console.error('Помилка входу:', error);
+
+      const serverError = error.response?.data?.message;
+      const statusCode = error.response?.status;
+
+      if (statusCode === 403) {
+        setError('Неправильний email або пароль');
+      } else if (serverError) {
+        setError(serverError);
+      } else if (error.code === 'ERR_NETWORK') {
+        setError("Помилка підключення до сервера. Перевірте з'єднання.");
+      } else {
+        setError('Помилка входу. Спробуйте ще раз.');
+      }
+    }
   };
 
   const handleRegister = () => {
