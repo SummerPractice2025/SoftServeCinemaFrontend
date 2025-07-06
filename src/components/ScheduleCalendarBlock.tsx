@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import '../styles/ScheduleCalendarBlock.css';
 import CustomSelectGrey from './CustomSelectGrey';
+import { SquarePen } from 'lucide-react';
 import type { Movie } from './MovieInfoAdmin';
 
 export type Session = {
@@ -21,10 +22,12 @@ type Props = {
   sessionsByDate: Record<string, Record<string, Session[]>>;
   savedSessionsByDate: Record<string, Record<string, Session[]>>;
   onUpdate: (updated: Record<string, Record<string, Session[]>>) => void;
+  onSavedUpdate?: (updated: Record<string, Record<string, Session[]>>) => void;
   basePriceStandard: number;
   basePriceVip: number;
 };
-const ADMIN_BEARER_TOKEN = '';
+const ADMIN_BEARER_TOKEN =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjowLCJpYXQiOjE3NTA2MTMxMzQsImV4cCI6MTc1MzIwNTEzNH0.__wtsnfhC2WIVeIVssF_UK_5IyfYHvFu-703CX5EGVA';
 
 const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
 
@@ -54,6 +57,7 @@ export default function ScheduleCalendarBlock({
   sessionsByDate,
   savedSessionsByDate,
   onUpdate,
+  onSavedUpdate,
   basePriceStandard,
   basePriceVip,
 }: Props) {
@@ -63,6 +67,45 @@ export default function ScheduleCalendarBlock({
     index: number;
     dateKey: string;
   } | null>(null);
+
+  const [editingField, setEditingField] = useState<{
+    sessionIndex: number;
+    field: keyof Session;
+  } | null>(null);
+  const [tempValue, setTempValue] = useState<string>('');
+
+  const startEditing = (
+    sessionIndex: number,
+    field: keyof Session,
+    currentValue: string | number | undefined,
+  ) => {
+    setEditingField({ sessionIndex, field });
+    if (typeof currentValue === 'number') {
+      setTempValue(currentValue.toString());
+    } else if (typeof currentValue === 'string') {
+      setTempValue(currentValue);
+    } else {
+      setTempValue('');
+    }
+  };
+
+  const finishEditing = () => {
+    if (editingField && editingField.sessionIndex < currentSessions.length) {
+      const session = currentSessions[editingField.sessionIndex];
+      let updatedValue: string | number = tempValue;
+
+      if (editingField.field === 'price' || editingField.field === 'vipPrice') {
+        updatedValue = Number(tempValue);
+      } else if (editingField.field === 'format') {
+        updatedValue = tempValue as '2D' | '3D';
+      }
+
+      const updatedSession = { ...session, [editingField.field]: updatedValue };
+      handleSessionChange(editingField.sessionIndex, updatedSession);
+    }
+    setEditingField(null);
+    setTempValue('');
+  };
 
   const dateKey = getLocalDateKey(selectedDate);
   const movieKey = movie?.title || '__unknown__';
@@ -87,13 +130,19 @@ export default function ScheduleCalendarBlock({
     const updatedSessions = [...currentSessions, newSession];
     console.log('Додаємо нову сесію, оновлений список:', updatedSessions);
 
-    onUpdate({
+    const updatedSessionsByDate = {
       ...sessionsByDate,
       [movieKey]: {
         ...sessionsByDate[movieKey],
         [dateKey]: updatedSessions,
       },
-    });
+    };
+
+    onUpdate(updatedSessionsByDate);
+
+    if (onSavedUpdate) {
+      onSavedUpdate(updatedSessionsByDate);
+    }
   };
 
   const openDeleteModal = (index: number) => {
@@ -117,46 +166,53 @@ export default function ScheduleCalendarBlock({
 
     console.log('confirmDelete - сесія, яку видаляємо:', session);
 
-    if (!session?.id) {
-      console.error('Сеанс не має ID для видалення!');
-      return;
-    }
+    if (session?.id) {
+      try {
+        const response = await fetch(`${backendBaseUrl}session/${session.id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${ADMIN_BEARER_TOKEN}`,
+          },
+        });
 
-    try {
-      const response = await fetch(`${backendBaseUrl}session/${session.id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${ADMIN_BEARER_TOKEN}`,
-        },
-      });
+        if (!response.ok) {
+          console.error('Помилка при видаленні сеансу на сервері');
+          return;
+        }
 
-      if (!response.ok) {
-        console.error('Помилка при видаленні сеансу на сервері');
+        updatedSessions[sessionToDelete.index] = {
+          ...session,
+          is_deleted: true,
+        };
+      } catch (error) {
+        console.error('Помилка при запиті до сервера:', error);
         return;
       }
+    } else {
+      console.log('Видаляємо новий сеанс без ID з локального стану');
+      updatedSessions.splice(sessionToDelete.index, 1);
+    }
 
-      updatedSessions[sessionToDelete.index] = {
-        ...session,
-        is_deleted: true,
-      };
+    const updatedByMovie = {
+      ...sessionsByDate[movieKey],
+      [dateKey]: updatedSessions,
+    };
 
-      const updatedByMovie = {
-        ...sessionsByDate[movieKey],
-        [dateKey]: updatedSessions,
-      };
+    console.log(
+      'confirmDelete - оновлені сесії після видалення:',
+      updatedByMovie[dateKey],
+    );
 
-      console.log(
-        'confirmDelete - оновлені сесії після видалення:',
-        updatedByMovie[dateKey],
-      );
+    const updatedSessionsByDate = {
+      ...sessionsByDate,
+      [movieKey]: updatedByMovie,
+    };
 
-      onUpdate({
-        ...sessionsByDate,
-        [movieKey]: updatedByMovie,
-      });
-    } catch (error) {
-      console.error('Помилка при запиті до сервера:', error);
+    onUpdate(updatedSessionsByDate);
+
+    if (onSavedUpdate) {
+      onSavedUpdate(updatedSessionsByDate);
     }
 
     setShowDeleteModal(false);
@@ -175,21 +231,27 @@ export default function ScheduleCalendarBlock({
     const updated = [...currentSessions];
     updated[index] = { ...updated[index], ...updatedSession };
     console.log('handleSessionChange - оновлені сесії:', updated);
-    onUpdate({
+    const updatedSessionsByDate = {
       ...sessionsByDate,
       [movieKey]: {
         ...sessionsByDate[movieKey],
         [dateKey]: updated,
       },
-    });
-  };
+    };
 
-  // ...далі без змін (Calendar, рендер сесій, модалки)
+    onUpdate(updatedSessionsByDate);
+
+    if (onSavedUpdate) {
+      onSavedUpdate(updatedSessionsByDate);
+    }
+  };
 
   const tileClassName = ({ date }: { date: Date }) => {
     const key = getLocalDateKey(date);
     const isSelected = key === dateKey;
-    const hasSessions = savedSessionsByDate[movieKey]?.[key]?.length > 0;
+    const sessions = savedSessionsByDate[movieKey]?.[key] || [];
+    const activeSessions = sessions.filter((s) => !s.is_deleted);
+    const hasSessions = activeSessions.length > 0;
     const disabled = isDateInPast(date);
     return [
       isSelected ? 'active-day' : '',
@@ -201,7 +263,9 @@ export default function ScheduleCalendarBlock({
   const tileContent = ({ date, view }: { date: Date; view: string }) => {
     if (view === 'month') {
       const key = getLocalDateKey(date);
-      const count = savedSessionsByDate[movieKey]?.[key]?.length || 0;
+      const sessions = savedSessionsByDate[movieKey]?.[key] || [];
+      const activeSessions = sessions.filter((s) => !s.is_deleted);
+      const count = activeSessions.length;
       const dotsCount = Math.min(count, 5);
       if (dotsCount > 0) {
         return (
@@ -233,7 +297,10 @@ export default function ScheduleCalendarBlock({
   };
 
   return (
-    <div className="calendar-wrapper layout">
+    <div
+      className="calendar-wrapper layout"
+      onClick={(e) => e.stopPropagation()}
+    >
       <Calendar
         value={selectedDate}
         onChange={(value) => setSelectedDate(value as Date)}
@@ -243,37 +310,82 @@ export default function ScheduleCalendarBlock({
         locale="uk-UA"
       />
 
-      <div className="session-panel">
-        <div className="date-header">
+      <div className="session-panel" onClick={(e) => e.stopPropagation()}>
+        <div className="date-header" onClick={(e) => e.stopPropagation()}>
           <span>Сеанси на {selectedDate.toLocaleDateString('uk-UA')}</span>
           {visibleSessions.length < 5 && !isDateInPast(selectedDate) && (
-            <button className="add-btn" onClick={handleAddSession}>
+            <button
+              className="add-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleAddSession();
+              }}
+            >
               +
             </button>
           )}
         </div>
 
         {visibleSessions.map((session, index) => (
-          <div key={`${session.time}-${index}`} className="session-card">
-            <div className="session-row">
-              <input
-                type="time"
-                className="time-input"
-                value={session.time}
-                onChange={(e) =>
-                  handleSessionChange(index, { time: e.target.value })
-                }
-              />
+          <div
+            key={`${session.time}-${index}`}
+            className="session-card"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="session-row" onClick={(e) => e.stopPropagation()}>
+              <div className="session-row-left">
+                <div className="field-container">
+                  {editingField?.sessionIndex === index &&
+                  editingField?.field === 'time' ? (
+                    <input
+                      type="time"
+                      className="time-input"
+                      value={tempValue}
+                      onChange={(e) => setTempValue(e.target.value)}
+                      onBlur={finishEditing}
+                      onKeyDown={(e) => e.key === 'Enter' && finishEditing()}
+                      onClick={(e) => e.stopPropagation()}
+                      autoFocus
+                    />
+                  ) : (
+                    <div className="field-display">
+                      <span>{session.time}</span>
+                      <button
+                        className="edit-icon-button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          startEditing(index, 'time', session.time);
+                        }}
+                        title="Редагувати час"
+                      >
+                        <SquarePen size={14} strokeWidth={1.5} />
+                      </button>
+                    </div>
+                  )}
+                </div>
 
-              <input
-                type="text"
-                className="movie-title-input"
-                value={session.title}
-                onChange={(e) =>
-                  handleSessionChange(index, { title: e.target.value })
-                }
-              />
+                <div className="field-container">
+                  <div className="field-display">
+                    <span>{session.title}</span>
+                  </div>
+                </div>
+              </div>
 
+              <button
+                className="delete-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openDeleteModal(index);
+                }}
+              >
+                <img src="/img/trash-icon.png" alt="Видалити" />
+              </button>
+            </div>
+
+            <div
+              className="session-dropdowns"
+              onClick={(e) => e.stopPropagation()}
+            >
               <CustomSelectGrey
                 options={hallOptions}
                 value={{ value: session.hall, label: session.hall }}
@@ -291,44 +403,72 @@ export default function ScheduleCalendarBlock({
                   })
                 }
               />
-
-              <button
-                className="delete-btn"
-                onClick={() => openDeleteModal(index)}
-              >
-                <img src="/img/trash-icon.png" alt="Видалити" />
-              </button>
             </div>
 
-            <div className="price-info">
-              <div className="price-field">
+            <div className="price-info" onClick={(e) => e.stopPropagation()}>
+              <div className="price-field" onClick={(e) => e.stopPropagation()}>
                 <span className="label">Стандарт:</span>
-                <input
-                  type="number"
-                  className="price-input-calendar"
-                  value={session.price ?? 0}
-                  onChange={(e) =>
-                    handleSessionChange(index, {
-                      price: Number(e.target.value),
-                    })
-                  }
-                  min={0}
-                />
+                {editingField?.sessionIndex === index &&
+                editingField?.field === 'price' ? (
+                  <input
+                    type="number"
+                    className="price-input-calendar"
+                    value={tempValue}
+                    onChange={(e) => setTempValue(e.target.value)}
+                    onBlur={finishEditing}
+                    onKeyDown={(e) => e.key === 'Enter' && finishEditing()}
+                    onClick={(e) => e.stopPropagation()}
+                    min={0}
+                    autoFocus
+                  />
+                ) : (
+                  <div className="field-display">
+                    <span>{session.price ?? 0}</span>
+                    <button
+                      className="edit-icon-button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        startEditing(index, 'price', session.price);
+                      }}
+                      title="Редагувати ціну"
+                    >
+                      <SquarePen size={14} strokeWidth={1.5} />
+                    </button>
+                  </div>
+                )}
                 <span className="currency-symbol-calendar">₴</span>
               </div>
-              <div className="price-field">
+
+              <div className="price-field" onClick={(e) => e.stopPropagation()}>
                 <span className="label">VIP:</span>
-                <input
-                  type="number"
-                  className="price-input-calendar"
-                  value={session.vipPrice ?? 0}
-                  onChange={(e) =>
-                    handleSessionChange(index, {
-                      vipPrice: Number(e.target.value),
-                    })
-                  }
-                  min={0}
-                />
+                {editingField?.sessionIndex === index &&
+                editingField?.field === 'vipPrice' ? (
+                  <input
+                    type="number"
+                    className="price-input-calendar"
+                    value={tempValue}
+                    onChange={(e) => setTempValue(e.target.value)}
+                    onBlur={finishEditing}
+                    onKeyDown={(e) => e.key === 'Enter' && finishEditing()}
+                    onClick={(e) => e.stopPropagation()}
+                    min={0}
+                    autoFocus
+                  />
+                ) : (
+                  <div className="field-display">
+                    <span>{session.vipPrice ?? 0}</span>
+                    <button
+                      className="edit-icon-button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        startEditing(index, 'vipPrice', session.vipPrice);
+                      }}
+                      title="Редагувати VIP ціну"
+                    >
+                      <SquarePen size={14} strokeWidth={1.5} />
+                    </button>
+                  </div>
+                )}
                 <span className="currency-symbol-calendar">₴</span>
               </div>
             </div>
@@ -341,10 +481,22 @@ export default function ScheduleCalendarBlock({
           <div className="modal">
             <h2>Ви точно хочете видалити цей сеанс?</h2>
             <div className="modal-buttons">
-              <button className="save-btn" onClick={confirmDelete}>
+              <button
+                className="save-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  confirmDelete();
+                }}
+              >
                 Так, видалити
               </button>
-              <button className="cancel-btn" onClick={cancelDelete}>
+              <button
+                className="cancel-btn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  cancelDelete();
+                }}
+              >
                 Скасувати
               </button>
             </div>

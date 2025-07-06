@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import '../styles/TrailerPlayer.css';
 
 interface TrailerPlayerProps {
@@ -16,12 +17,12 @@ const TrailerPlayer: React.FC<TrailerPlayerProps> = ({ videoUrl, onClose }) => {
 
   if (!embedUrl) return null;
 
-  return (
+  return ReactDOM.createPortal(
     <div className="trailer-modal">
+      <button className="close-button" onClick={onClose}>
+        ✖
+      </button>
       <div className="trailer-content">
-        <button className="close-button" onClick={onClose}>
-          ✖
-        </button>
         <div className="video-wrapper">
           <iframe
             src={embedUrl}
@@ -32,7 +33,8 @@ const TrailerPlayer: React.FC<TrailerPlayerProps> = ({ videoUrl, onClose }) => {
           ></iframe>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };
 

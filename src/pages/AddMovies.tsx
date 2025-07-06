@@ -194,7 +194,8 @@ const buildMoviePayload = (
   };
 };
 
-const ADMIN_BEARER_TOKEN = '';
+const ADMIN_BEARER_TOKEN =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjowLCJpYXQiOjE3NTA2MTMxMzQsImV4cCI6MTc1MzIwNTEzNH0.__wtsnfhC2WIVeIVssF_UK_5IyfYHvFu-703CX5EGVA';
 
 const AddMovies: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState(

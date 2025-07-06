@@ -1,23 +1,22 @@
-/* Обновленные стили для кнопок */
 .btn-group {
   display: flex;
   justify-content: center;
-  gap: 42rem; /* Увеличиваем расстояние между кнопками */
-  margin-top: 3rem; /* Отступ сверху, чтобы кнопки не сливались с содержимым */
+  gap: 42rem;
+  margin-top: 3rem;
 }
 
 .save-btn,
 .cancel-btn {
   background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
   color: white;
-  padding: 0.6rem 0.6rem; /* Уменьшаем размер кнопок */
-  font-size: 1rem; /* Уменьшаем размер шрифта */
+  padding: 0.6rem 0.6rem;
+  font-size: 1rem;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
-  width: 160px; /* Уменьшаем ширину кнопок */
-  text-align: center; /* Центрируем текст внутри кнопок */
+  width: 160px;
+  text-align: center;
 }
 
 .cancel-btn {
