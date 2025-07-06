@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Header.css';
+import LoginModal from './LoginModal';
+import { useModal } from '../context/ModalContext';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const { openRegisterModal } = useModal();
 
   const user = {
     firstName: 'Іван',
@@ -47,10 +51,6 @@ const Header: React.FC = () => {
     },
   ];
 
-  const handleLogin = () => {
-    navigate('/login');
-  };
-
   const handleHome = (e: React.MouseEvent<HTMLButtonElement>) => {
     navigate('/');
     e.currentTarget.blur();
@@ -58,6 +58,8 @@ const Header: React.FC = () => {
 
   const openPanel = () => setIsPanelOpen(true);
   const closePanel = () => setIsPanelOpen(false);
+  const openLoginModal = () => setIsLoginModalOpen(true);
+  const closeLoginModal = () => setIsLoginModalOpen(false);
 
   const handleLogout = () => {
     console.log('Вихід користувача');
@@ -103,8 +105,12 @@ const Header: React.FC = () => {
           </button>
         </div>
         <div className="header-right">
-          <button className="login-button" onClick={handleLogin} type="button">
-            Увійти
+          <button
+            className="login-button"
+            onClick={openLoginModal}
+            type="button"
+          >
+            Вхід
           </button>
           <button
             className="user-button"
@@ -120,6 +126,7 @@ const Header: React.FC = () => {
           </button>
         </div>
       </header>
+      {isLoginModalOpen && <div className="header-dark-overlay" />}
 
       <div className={`side-panel ${isPanelOpen ? 'open' : ''}`}>
         <button
@@ -175,6 +182,12 @@ const Header: React.FC = () => {
           </button>
         </div>
       </div>
+
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={closeLoginModal}
+        onRegisterClick={openRegisterModal}
+      />
     </>
   );
 };

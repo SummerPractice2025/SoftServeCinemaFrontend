@@ -4,8 +4,13 @@ import BookingPage from './pages/BookingPage';
 import AllMovies from './pages/AllMovies';
 import Header from './components/Header';
 import AddMovies from './pages/AddMovies';
+import RegisterModal from './components/RegisterModal';
+import { ModalProvider, useModal } from './context/ModalContext';
 
-const App = () => {
+const AppContent = () => {
+  const { isRegisterModalOpen, closeRegisterModal } = useModal();
+
+
   return (
     <>
       <Header />
@@ -18,7 +23,21 @@ const App = () => {
           element={<BookingPage />}
         />
       </Routes>
+      <RegisterModal
+        isOpen={isRegisterModalOpen}
+        onClose={closeRegisterModal}
+      />
     </>
+  );
+};
+
+const App = () => {
+  return (
+    <ModalProvider>
+      <AppContent />
+    </ModalProvider>
+
+
   );
 };
 
