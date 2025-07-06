@@ -1,39 +1,24 @@
-// import { Routes, Route } from 'react-router-dom';
-// import MovieEditPage from './pages/MovieEditPage';
-// import BookingPage from './pages/BookingPage';
+import { Routes, Route } from 'react-router-dom';
+import MovieEditPage from './pages/MovieEditPage';
+import BookingPage from './pages/BookingPage';
+import AllMovies from './pages/AllMovies';
+import Header from './components/Header';
+// import MainPage from './pages/MainPage';
 
-// const App = () => {
-  // return (
-    // <Routes>
-    //   <Route path="/" element={<MovieEditPage />} />
-    //   <Route
-    //     path="/booking-session/:date/:time/:format"
-    //     element={<BookingPage />}
-    //   />
-    // </Routes>
-    
-//   );
-// };
-
-import './styles/globals.css';
-// import Header from  './components/Header'
-import MovieCarousel from './components/Carusel';
-
-function App() {
+const App = () => {
   return (
-
-    // <Routes>
-    //   <Route path="/" element={<MovieEditPage />} />
-    //   <Route
-    //     path="/booking-session/:date/:time/:format"
-    //     element={<BookingPage />}
-    //   />
-    // </Routes>
-    <div className="min-h-screen">
-      {/* <Header/> */}
-      <MovieCarousel/>
-    </div>
+    <>
+      <Header />
+      <Routes>
+        <Route path="/" element={<AllMovies />} />
+        <Route path="/movie-info/:movieId" element={<MovieEditPage />} />
+        <Route
+          path="/booking-session/:date/:time/:format/"
+          element={<BookingPage />}
+        />
+      </Routes>
+    </>
   );
-}
+};
 
 export default App;
