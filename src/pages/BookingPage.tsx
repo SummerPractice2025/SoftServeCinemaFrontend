@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import CustomAlert from '../components/CustomAlert';
 import { useUserData } from '../context/UserDataContext';
+import apiService from '../services/api';
 import '../styles/BookingPage.css';
 
 interface Seat {
@@ -47,10 +48,6 @@ interface SessionDetails {
 
 const rows = 10;
 const seatsPerRow = 10;
-
-const getAuthToken = () => {
-  return localStorage.getItem('access_token');
-};
 
 const BookingPage: React.FC = () => {
   const location = useLocation();
@@ -245,7 +242,7 @@ const BookingPage: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${getAuthToken()}`,
+          Authorization: `Bearer ${apiService.getToken()}`,
         },
         body: JSON.stringify(bookingData),
       });

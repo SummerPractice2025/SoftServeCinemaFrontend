@@ -5,24 +5,32 @@ import ScheduleCalendarBlock from './ScheduleCalendarBlock';
 import CustomAlert from './CustomAlert';
 import type { Movie } from './MovieInfoAdmin';
 import type { Session } from './ScheduleCalendarBlock';
-
-const getAuthToken = () => {
-  return localStorage.getItem('access_token');
-};
+import apiService from '../services/api';
 
 const formatConflictMessage = (errorText: string): string => {
   if (errorText.includes('конфліктує з сеансом о')) {
-    const dateTimeRegex = /(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})/g;
-
-    return errorText.replace(
-      dateTimeRegex,
-      (year, month, day, hour, minute) => {
-        const formattedDate = `${day}.${month}.${year}`;
-        const formattedTime = `${hour}:${minute}`;
-
-        return `${formattedDate} ${formattedTime}`;
+    let formattedText = errorText.replace(
+      /(\d{2})\.(\d{4})\.(\d{4})-(\d{2})-(\d{2})/g,
+      (match, day, year1, year2, month, day2) => {
+        return `${day2}.${month}.${year2}`;
       },
     );
+
+    formattedText = formattedText.replace(
+      /(\d{2}):(\d{2}):(\d{2})/g,
+      (match, hour, minute) => {
+        return `${hour}:${minute}`;
+      },
+    );
+
+    formattedText = formattedText.replace(
+      /\(Фільм\s+'([^']+)';\s+хронометраж:\s+\d+\s+хв\.\}\)/g,
+      (match, movieName) => {
+        return `фільм ${movieName}`;
+      },
+    );
+
+    return formattedText;
   }
 
   return errorText;
@@ -417,7 +425,7 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${getAuthToken()}`,
+            Authorization: `Bearer ${apiService.getToken()}`,
           },
           body: JSON.stringify(sessionsArray),
         });
@@ -498,7 +506,7 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${getAuthToken()}`,
+            Authorization: `Bearer ${apiService.getToken()}`,
           },
           body: JSON.stringify(updateSessionsArray),
         });
@@ -656,14 +664,20 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
                   <div key={`2d-${i}-${j}`} className="schedule-time-wrapper">
                     <button
                       className="schedule-time-button"
-                      onClick={() =>
+                      onClick={() => {
+                        if (!apiService.isAuthenticated()) {
+                          setAlertMessage(
+                            'Щоб купити квитки спочатку треба авторизуватися',
+                          );
+                          return;
+                        }
                         navigate(
                           `/booking-session/${selectedDay.value}/${time}/${format}`,
                           {
                             state: { movieId, format, sessionId: id },
                           },
-                        )
-                      }
+                        );
+                      }}
                     >
                       {time}
                     </button>
@@ -679,14 +693,20 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
                   <div key={`3d-${i}-${j}`} className="schedule-time-wrapper">
                     <button
                       className="schedule-time-button"
-                      onClick={() =>
+                      onClick={() => {
+                        if (!apiService.isAuthenticated()) {
+                          setAlertMessage(
+                            'Ви не можете перейти на цю сторінку, поки не авторизуєтесь',
+                          );
+                          return;
+                        }
                         navigate(
                           `/booking-session/${selectedDay.value}/${time}/${format}`,
                           {
                             state: { movieId, format, sessionId: id },
                           },
-                        )
-                      }
+                        );
+                      }}
                     >
                       {time}
                     </button>
@@ -762,18 +782,7 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
               />
 
               {conflictError && (
-                <div
-                  style={{
-                    color: '#ff3366',
-                    fontSize: '12px',
-                    textAlign: 'center',
-
-                    padding: '4px 8px',
-                    borderRadius: '4px',
-                  }}
-                >
-                  {conflictError}
-                </div>
+                <div className="conflict-error-message">{conflictError}</div>
               )}
 
               <div className="schedule-modal-actions">
@@ -790,11 +799,44 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
                       setAlertMessage(null);
                     } catch (error) {
                       console.error('Помилка при збереженні:', error);
-
-                      if (!conflictError) {
+                      const errorMessage =
+                        error instanceof Error ? error.message : String(error);
+                      let extractedMessage = '';
+                      try {
+                        const match = errorMessage.match(
+                          /\{"message":"([^"]+)"/,
+                        );
+                        if (match && match[1]) {
+                          extractedMessage = match[1];
+                        } else {
+                          const parsed = JSON.parse(errorMessage);
+                          if (parsed && parsed.message) {
+                            extractedMessage = parsed.message;
+                          }
+                        }
+                      } catch (e) {
+                        console.error('Parsing error in errorMessage:', e);
+                      }
+                      if (
+                        !extractedMessage &&
+                        errorMessage.includes('Сеанс фільму') &&
+                        errorMessage.includes('вже існує')
+                      ) {
+                        extractedMessage = errorMessage.replace(
+                          /^Error:\s*/,
+                          '',
+                        );
+                      }
+                      if (extractedMessage) {
+                        setConflictError(
+                          formatConflictMessage(extractedMessage),
+                        );
+                        setAlertMessage(null);
+                      } else {
                         setAlertMessage(
                           'Помилка при збереженні сеансів. Спробуйте ще раз.',
                         );
+                        setConflictError(null);
                       }
                     }
                   }}

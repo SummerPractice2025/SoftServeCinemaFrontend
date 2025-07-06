@@ -6,6 +6,7 @@ import type { Movie } from '../components/MovieInfoAdmin';
 import TrailerPlayer from '../components/TrailerPlayer';
 import PriceBlock from '../components/PriceBlock';
 import CustomAlert from '../components/CustomAlert';
+import apiService from '../services/api';
 import '../styles/AddMovies.css';
 import ScheduleCalendarBlock from '../components/ScheduleCalendarBlock';
 import type { Session } from '../components/ScheduleCalendarBlock';
@@ -167,17 +168,28 @@ const formatConflictMessage = (
   movieTitle?: string,
 ): string => {
   if (errorText.includes('конфліктує з сеансом о')) {
-    const dateTimeRegex = /(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})/g;
-
-    return errorText.replace(
-      dateTimeRegex,
-      (year, month, day, hour, minute) => {
-        const formattedDate = `${day}.${month}.${year}`;
-        const formattedTime = `${hour}:${minute}`;
-
-        return `${formattedDate} ${formattedTime}`;
+    let formattedText = errorText.replace(
+      /(\d{2})\.(\d{4})\.(\d{4})-(\d{2})-(\d{2})/g,
+      (match, day, year1, year2, month, day2) => {
+        return `${day2}.${month}.${year2}`;
       },
     );
+
+    formattedText = formattedText.replace(
+      /(\d{2}):(\d{2}):(\d{2})/g,
+      (match, hour, minute) => {
+        return `${hour}:${minute}`;
+      },
+    );
+
+    formattedText = formattedText.replace(
+      /\(Фільм\s+'([^']+)';\s+хронометраж:\s+\d+\s+хв\.\}\)/g,
+      (match, movieName) => {
+        return `фільм ${movieName}`;
+      },
+    );
+
+    return formattedText;
   }
 
   return errorText;
@@ -215,10 +227,6 @@ const buildMoviePayload = (
       sessionTypeID: session.sessionType === '2D' ? 1 : 2,
     })),
   };
-};
-
-const getAuthToken = () => {
-  return localStorage.getItem('access_token');
 };
 
 const AddMovies: React.FC = () => {
@@ -472,7 +480,7 @@ const AddMovies: React.FC = () => {
       const response = await fetch(url, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${getAuthToken()}`,
+          Authorization: `Bearer ${apiService.getToken()}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),

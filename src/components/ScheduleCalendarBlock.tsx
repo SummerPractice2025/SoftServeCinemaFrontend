@@ -6,6 +6,8 @@ import CustomSelectGrey from './CustomSelectGrey';
 import { SquarePen } from 'lucide-react';
 import CustomAlert from './CustomAlert';
 import type { Movie } from './MovieInfoAdmin';
+import apiService from '../services/api';
+import { useUserData } from '../context/UserDataContext';
 
 export type Session = {
   id?: number;
@@ -51,10 +53,6 @@ const isDateInPast = (date: Date) => {
   return d < today;
 };
 
-const getAuthToken = () => {
-  return localStorage.getItem('access_token');
-};
-
 export default function ScheduleCalendarBlock({
   movie,
   sessionsByDate,
@@ -78,6 +76,8 @@ export default function ScheduleCalendarBlock({
     field: keyof Session;
   } | null>(null);
   const [tempValue, setTempValue] = useState<string>('');
+
+  const { refreshUserData } = useUserData();
 
   const startEditing = (
     sessionIndex: number,
@@ -188,7 +188,7 @@ export default function ScheduleCalendarBlock({
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${getAuthToken()}`,
+            Authorization: `Bearer ${apiService.getToken()}`,
           },
         });
 
@@ -232,6 +232,7 @@ export default function ScheduleCalendarBlock({
 
     setShowDeleteModal(false);
     setSessionToDelete(null);
+    refreshUserData();
   };
 
   const cancelDelete = () => {

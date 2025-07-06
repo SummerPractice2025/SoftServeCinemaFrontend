@@ -167,6 +167,19 @@ class ApiService {
     return this.getAccessToken();
   }
 
+  getCurrentUserId(): number | null {
+    const token = this.getAccessToken();
+    if (!token) return null;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.user_id || null;
+    } catch (error) {
+      console.error('Помилка декодування токена:', error);
+      return null;
+    }
+  }
+
   async get<T>(url: string, config?: any): Promise<AxiosResponse<T>> {
     return this.api.get<T>(url, config);
   }

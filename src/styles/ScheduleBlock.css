@@ -342,3 +342,11 @@
 .schedule-modal .react-select__menu-portal {
   z-index: 9999 !important;
 }
+
+.conflict-error-message {
+  color: #ff3366;
+  font-size: 14px;
+  text-align: center;
+  margin: 0 0;
+  padding: 0 12px;
+}

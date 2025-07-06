@@ -5,14 +5,11 @@ import ScheduleBlock from '../components/ScheduleBlock';
 import TrailerPlayer from '../components/TrailerPlayer';
 import CustomAlert from '../components/CustomAlert';
 import { useAdmin } from '../context/AdminContext';
+import apiService from '../services/api';
 import '../styles/MovieEditPage.css';
 import '../styles/ScheduleBlock.css';
 
 const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
-
-const getAuthToken = () => {
-  return localStorage.getItem('access_token');
-};
 
 const ageRateIdMap: Record<string, number> = {
   '0+': 1,
@@ -42,7 +39,7 @@ const MovieEdit = () => {
       try {
         const res = await fetch(`${backendBaseUrl}movie/${movieIdNum}`, {
           headers: {
-            Authorization: `Bearer ${getAuthToken()}`,
+            Authorization: `Bearer ${apiService.getToken()}`,
           },
         });
         if (!res.ok) throw new Error('Failed to fetch movie details');
@@ -83,7 +80,7 @@ const MovieEdit = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${getAuthToken()}`,
+          Authorization: `Bearer ${apiService.getToken()}`,
         },
         body: JSON.stringify(payload),
       });
