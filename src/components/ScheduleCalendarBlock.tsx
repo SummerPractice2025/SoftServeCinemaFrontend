@@ -4,6 +4,7 @@ import 'react-calendar/dist/Calendar.css';
 import '../styles/ScheduleCalendarBlock.css';
 import CustomSelectGrey from './CustomSelectGrey';
 import { SquarePen } from 'lucide-react';
+import CustomAlert from './CustomAlert';
 import type { Movie } from './MovieInfoAdmin';
 
 export type Session = {
@@ -66,6 +67,7 @@ export default function ScheduleCalendarBlock({
     index: number;
     dateKey: string;
   } | null>(null);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
   const [editingField, setEditingField] = useState<{
     sessionIndex: number;
@@ -138,10 +140,7 @@ export default function ScheduleCalendarBlock({
     };
 
     onUpdate(updatedSessionsByDate);
-
-    if (onSavedUpdate) {
-      onSavedUpdate(updatedSessionsByDate);
-    }
+    onSavedUpdate?.(updatedSessionsByDate);
   };
 
   const openDeleteModal = (index: number) => {
@@ -177,6 +176,7 @@ export default function ScheduleCalendarBlock({
 
         if (!response.ok) {
           console.error('Помилка при видаленні сеансу на сервері');
+          setAlertMessage('Помилка при видаленні сеансу на сервері');
           return;
         }
 
@@ -186,6 +186,7 @@ export default function ScheduleCalendarBlock({
         };
       } catch (error) {
         console.error('Помилка при запиті до сервера:', error);
+        setAlertMessage('Помилка мережі при видаленні сеансу');
         return;
       }
     } else {
@@ -209,10 +210,7 @@ export default function ScheduleCalendarBlock({
     };
 
     onUpdate(updatedSessionsByDate);
-
-    if (onSavedUpdate) {
-      onSavedUpdate(updatedSessionsByDate);
-    }
+    onSavedUpdate?.(updatedSessionsByDate);
 
     setShowDeleteModal(false);
     setSessionToDelete(null);
@@ -239,10 +237,7 @@ export default function ScheduleCalendarBlock({
     };
 
     onUpdate(updatedSessionsByDate);
-
-    if (onSavedUpdate) {
-      onSavedUpdate(updatedSessionsByDate);
-    }
+    onSavedUpdate?.(updatedSessionsByDate);
   };
 
   const tileClassName = ({ date }: { date: Date }) => {
@@ -501,6 +496,13 @@ export default function ScheduleCalendarBlock({
             </div>
           </div>
         </div>
+      )}
+
+      {alertMessage && (
+        <CustomAlert
+          message={alertMessage}
+          onClose={() => setAlertMessage(null)}
+        />
       )}
     </div>
   );

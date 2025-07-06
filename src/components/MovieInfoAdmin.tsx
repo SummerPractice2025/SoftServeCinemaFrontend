@@ -26,17 +26,7 @@ interface MovieInfoProps {
   onChange?: (updatedMovie: Movie) => void;
 }
 
-const editableFields = [
-  'title',
-  'year',
-  'ageRate',
-  'description',
-  'rating',
-  'genres',
-  'directors',
-  'actors',
-  'studios',
-] as const;
+const editableFields = ['ageRate', 'description'] as const;
 
 const ageOptions = [
   { value: '0+', label: '0+ (Без обмежень)' },
@@ -137,7 +127,9 @@ const MovieInfo: React.FC<MovieInfoProps> = ({ movie, onChange }) => {
   ];
 
   const hasIcon = (field: keyof Movie) =>
-    editableFields.includes(field as (typeof editableFields)[number]);
+    editableFields.includes(field as (typeof editableFields)[number]) &&
+    field !== 'title' &&
+    field !== 'year';
 
   const currentAgeOption = ageOptions.find(
     (opt) => opt.value === movie.ageRate,
@@ -148,37 +140,12 @@ const MovieInfo: React.FC<MovieInfoProps> = ({ movie, onChange }) => {
 
   return (
     <div style={{ flex: 1 }}>
-      <table className="movie-info-table">
-        <tbody>
-          <tr>
-            <td className="movie-title-cell">
-              {editingField === 'title' ? (
-                <input
-                  type="text"
-                  value={tempValue}
-                  onChange={(e) => setTempValue(e.target.value)}
-                  onBlur={finishEditing}
-                  onKeyDown={(e) => e.key === 'Enter' && finishEditing()}
-                  autoFocus
-                  className="edit-input"
-                />
-              ) : (
-                movie.title
-              )}
-            </td>
-            <td></td>
-            <td className="movie-title-icon-cell">
-              <button
-                type="button"
-                className="icon-button"
-                onClick={() => startEditing('title', movie.title)}
-                aria-label="Редагувати назву фільму"
-              >
-                <SquarePen size={18} strokeWidth={1.8} className="icon-image" />
-              </button>
-            </td>
-          </tr>
+      <div className="movie-title-row">
+        <div className="movie-title-cell">{movie.title}</div>
+      </div>
 
+      <table className="movie-info-table movie-info-admin-table">
+        <tbody>
           {rows.map(({ key, label }) => (
             <tr key={key}>
               <td className="category-cell">{label}:</td>

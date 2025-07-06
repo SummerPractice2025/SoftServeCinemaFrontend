@@ -1,4 +1,4 @@
-.page {
+.movie-edit-page {
   background-color: #222222;
   width: 100%;
   padding: 10px 0 2.5rem;
@@ -12,8 +12,8 @@
   margin-left: 0;
   padding-left: 0;
   position: relative;
-  left: 0;
-
+  right: 7rem;
+  top: 1rem;
   overflow-y: visible;
 
   font-family: 'Open Sans', sans-serif;
@@ -24,7 +24,7 @@
   min-width: 19rem !important;
   max-width: 20rem !important;
   margin-left: -6rem;
-  padding-left: 0;
+  padding-left: 10;
   transform: translateX(-2rem);
   height: 500px !important;
   min-height: 500px !important;
@@ -94,30 +94,6 @@
 }
 
 .confirm-button:hover {
-  background-color: white;
-  color: black;
-  transition:
-    0.3s ease,
-    color 0.3s ease;
-}
-
-.mode-toggle-small {
-  margin: 0.625rem 0;
-  padding: 0.25rem 0.625rem;
-  font-size: 0.9rem;
-  background-color: #434040;
-  color: white;
-  border: none;
-  border-radius: 0.375rem;
-  font-weight: bold;
-  transition: background-color 0.3s ease;
-  width: 100%;
-  max-width: 25rem;
-  cursor: pointer;
-  align-self: center;
-}
-
-.mode-toggle-small:hover {
   background-color: white;
   color: black;
   transition:

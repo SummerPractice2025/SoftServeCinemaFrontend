@@ -4,6 +4,7 @@ import MovieInfo, { type Movie } from '../components/MovieInfo';
 import ScheduleBlock from '../components/ScheduleBlock';
 import TrailerPlayer from '../components/TrailerPlayer';
 import CustomAlert from '../components/CustomAlert';
+import { useAdmin } from '../contexts/AdminContext';
 import '../styles/MovieEditPage.css';
 import '../styles/ScheduleBlock.css';
 
@@ -21,11 +22,11 @@ const ageRateIdMap: Record<string, number> = {
 const MovieEdit = () => {
   const { movieId } = useParams<{ movieId: string }>();
   const movieIdNum = movieId ? Number(movieId) : NaN;
+  const { isAdminMode } = useAdmin();
 
   const [posterUrl, setPosterUrl] = useState<string>('');
   const [trailerUrl, setTrailerUrl] = useState<string>('');
   const [showPlayer, setShowPlayer] = useState(false);
-  const [isAdminCheck, setIsAdminCheck] = useState(true);
   const [updatedMovie, setUpdatedMovie] = useState<Movie | null>(null);
   const [customAlertMessage, setCustomAlertMessage] = useState<string | null>(
     null,
@@ -101,7 +102,7 @@ const MovieEdit = () => {
   };
 
   return (
-    <div className="page">
+    <div className="movie-edit-page">
       {customAlertMessage && (
         <CustomAlert
           message={customAlertMessage}
@@ -124,7 +125,7 @@ const MovieEdit = () => {
             onClose={() => setShowPlayer(false)}
           />
         )}
-        {isAdminCheck && (
+        {isAdminMode && (
           <button className="confirm-button" onClick={handleConfirm}>
             Підтвердити
           </button>
@@ -134,20 +135,13 @@ const MovieEdit = () => {
       <div className="info-block">
         <MovieInfo
           movieId={movieIdNum}
-          readonly={!isAdminCheck}
+          readonly={!isAdminMode}
           onChange={(movie) => setUpdatedMovie(movie)}
         />
       </div>
 
       <div className="schedule-container">
-        <button
-          className="mode-toggle-small"
-          onClick={() => setIsAdminCheck((prev) => !prev)}
-        >
-          {isAdminCheck ? 'Режим клієнта' : 'Режим адміністратора'}
-        </button>
-
-        <ScheduleBlock isAdminCheck={isAdminCheck} movieId={movieIdNum} />
+        <ScheduleBlock isAdminCheck={isAdminMode} movieId={movieIdNum} />
       </div>
     </div>
   );

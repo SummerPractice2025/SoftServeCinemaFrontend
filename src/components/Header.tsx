@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAdmin } from '../contexts/AdminContext';
 import '../styles/Header.css';
 import LoginModal from './LoginModal';
 import { useModal } from '../context/ModalContext';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const { isAdminMode, setIsAdminMode } = useAdmin();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const { openRegisterModal } = useModal();
 
@@ -65,6 +68,14 @@ const Header: React.FC = () => {
     console.log('Вихід користувача');
     closePanel();
   };
+
+  const handleAddMovie = () => {
+    navigate('/add');
+  };
+
+  const isOnAddPage = location.pathname === '/add';
+
+  const shouldHideAdminElements = !isAdminMode;
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
@@ -126,6 +137,7 @@ const Header: React.FC = () => {
           </button>
         </div>
       </header>
+
       {isLoginModalOpen && <div className="header-dark-overlay" />}
 
       <div className={`side-panel ${isPanelOpen ? 'open' : ''}`}>
@@ -143,6 +155,13 @@ const Header: React.FC = () => {
             {user.firstName} {user.lastName}
           </p>
           <p className="user-email">{user.email}</p>
+          <button
+            className="mode-toggle-button"
+            onClick={() => setIsAdminMode(!isAdminMode)}
+            type="button"
+          >
+            {isAdminMode ? 'Режим клієнта' : 'Режим адміністратора'}
+          </button>
         </div>
 
         <div className="panel-content">
@@ -182,6 +201,15 @@ const Header: React.FC = () => {
           </button>
         </div>
       </div>
+
+      <button
+        className={`add-button ${isOnAddPage || shouldHideAdminElements ? 'hidden' : ''} ${isPanelOpen ? 'moved' : ''}`}
+        onClick={handleAddMovie}
+        type="button"
+        aria-label="Додати фільм"
+      >
+        +
+      </button>
 
       <LoginModal
         isOpen={isLoginModalOpen}
