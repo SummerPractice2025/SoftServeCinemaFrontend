@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
 
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = 'http://localhost:8080';
 
 class ApiService {
   private api: AxiosInstance;
@@ -165,6 +165,20 @@ class ApiService {
 
   getToken(): string | null {
     return this.getAccessToken();
+  }
+
+  getCurrentUserId(): number | null {
+    const token = this.getAccessToken();
+    if (!token) return null;
+
+    try {
+      // Декодируем JWT токен (без проверки подписи, только для получения payload)
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.user_id || null;
+    } catch (error) {
+      console.error('Помилка декодування токена:', error);
+      return null;
+    }
   }
 
   async get<T>(url: string, config?: any): Promise<AxiosResponse<T>> {

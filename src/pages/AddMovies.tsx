@@ -6,6 +6,7 @@ import type { Movie } from '../components/MovieInfoAdmin';
 import TrailerPlayer from '../components/TrailerPlayer';
 import PriceBlock from '../components/PriceBlock';
 import CustomAlert from '../components/CustomAlert';
+import apiService from '../services/api';
 import '../styles/AddMovies.css';
 import ScheduleCalendarBlock from '../components/ScheduleCalendarBlock';
 import type { Session } from '../components/ScheduleCalendarBlock';
@@ -215,10 +216,6 @@ const buildMoviePayload = (
       sessionTypeID: session.sessionType === '2D' ? 1 : 2,
     })),
   };
-};
-
-const getAuthToken = () => {
-  return localStorage.getItem('access_token');
 };
 
 const AddMovies: React.FC = () => {
@@ -472,7 +469,7 @@ const AddMovies: React.FC = () => {
       const response = await fetch(url, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${getAuthToken()}`,
+          Authorization: `Bearer ${apiService.getToken()}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),

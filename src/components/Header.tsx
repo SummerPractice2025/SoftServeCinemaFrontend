@@ -20,12 +20,22 @@ const Header: React.FC = () => {
   const { userData, refreshTrigger } = useUserData();
   const [loading, setLoading] = useState(false);
 
+  // Сбрасываем админский режим, если пользователь не является админом
+  useEffect(() => {
+    if (userData && !userData.user.is_admin && isAdminMode) {
+      setIsAdminMode(false);
+    }
+  }, [userData, isAdminMode, setIsAdminMode]);
+
   useEffect(() => {
     if (isPanelOpen) {
       setLoading(true);
       setTimeout(() => setLoading(false), 300);
     }
   }, [isPanelOpen, refreshTrigger]);
+
+  // Проверяем, авторизован ли пользователь
+  const isUserAuthenticated = apiService.isAuthenticated();
 
   const handleHome = (e: React.MouseEvent<HTMLButtonElement>) => {
     navigate('/');
@@ -56,7 +66,9 @@ const Header: React.FC = () => {
 
   const isOnAddPage = location.pathname === '/add';
 
-  const shouldHideAdminElements = !isAdminMode;
+  // Показываем админские элементы только если пользователь авторизован, админ И включен админский режим
+  const shouldHideAdminElements =
+    !isUserAuthenticated || !userData?.user.is_admin || !isAdminMode;
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
@@ -143,13 +155,15 @@ const Header: React.FC = () => {
                 {userData.user.first_name} {userData.user.last_name}
               </p>
               <p className="user-email">{userData.user.email}</p>
-              <button
-                className="mode-toggle-button"
-                onClick={() => setIsAdminMode(!isAdminMode)}
-                type="button"
-              >
-                {isAdminMode ? 'Режим клієнта' : 'Режим адміністратора'}
-              </button>
+              {isUserAuthenticated && userData.user.is_admin && (
+                <button
+                  className="mode-toggle-button"
+                  onClick={() => setIsAdminMode(!isAdminMode)}
+                  type="button"
+                >
+                  {isAdminMode ? 'Режим клієнта' : 'Режим адміністратора'}
+                </button>
+              )}
             </>
           ) : (
             <p>Дані користувача не знайдено</p>
@@ -201,14 +215,16 @@ const Header: React.FC = () => {
         </div>
       </div>
 
-      <button
-        className={`add-button ${isOnAddPage || shouldHideAdminElements ? 'hidden' : ''} ${isPanelOpen ? 'moved' : ''}`}
-        onClick={handleAddMovie}
-        type="button"
-        aria-label="Додати фільм"
-      >
-        +
-      </button>
+      {isUserAuthenticated && userData?.user.is_admin && (
+        <button
+          className={`add-button ${isOnAddPage || shouldHideAdminElements ? 'hidden' : ''} ${isPanelOpen ? 'moved' : ''}`}
+          onClick={handleAddMovie}
+          type="button"
+          aria-label="Додати фільм"
+        >
+          +
+        </button>
+      )}
 
       <LoginModal
         isOpen={isLoginModalOpen}

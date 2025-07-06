@@ -6,6 +6,7 @@ import CustomSelectGrey from './CustomSelectGrey';
 import { SquarePen } from 'lucide-react';
 import CustomAlert from './CustomAlert';
 import type { Movie } from './MovieInfoAdmin';
+import apiService from '../services/api';
 
 export type Session = {
   id?: number;
@@ -49,10 +50,6 @@ const isDateInPast = (date: Date) => {
   const d = new Date(date);
   d.setHours(0, 0, 0, 0);
   return d < today;
-};
-
-const getAuthToken = () => {
-  return localStorage.getItem('access_token');
 };
 
 export default function ScheduleCalendarBlock({
@@ -188,7 +185,7 @@ export default function ScheduleCalendarBlock({
           method: 'DELETE',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${getAuthToken()}`,
+            Authorization: `Bearer ${apiService.getToken()}`,
           },
         });
 

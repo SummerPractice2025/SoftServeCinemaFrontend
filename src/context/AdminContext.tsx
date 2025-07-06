@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
+import apiService from '../services/api';
 
 interface AdminContextType {
   isAdminMode: boolean;
@@ -22,6 +23,13 @@ interface AdminProviderProps {
 
 export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
   const [isAdminMode, setIsAdminMode] = useState(false);
+
+  // Сбрасываем админский режим, если пользователь не авторизован
+  useEffect(() => {
+    if (!apiService.isAuthenticated()) {
+      setIsAdminMode(false);
+    }
+  }, []);
 
   return (
     <AdminContext.Provider value={{ isAdminMode, setIsAdminMode }}>

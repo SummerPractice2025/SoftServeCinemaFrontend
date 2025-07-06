@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
+import apiService from '../services/api';
 
 interface User {
   first_name: string;
@@ -51,20 +52,38 @@ export const UserDataProvider: React.FC<UserDataProviderProps> = ({
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const fetchUserData = async () => {
-    const userId = 0;
+    // Проверяем, авторизован ли пользователь
+    if (!apiService.isAuthenticated()) {
+      console.log('Користувач не авторизован, пропускаємо завантаження даних');
+      return;
+    }
+
+    const userId = apiService.getCurrentUserId();
+    if (!userId) {
+      console.error('Не вдалося отримати ID користувача з токена');
+      return;
+    }
+
     const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
-    const ADMIN_BEARER_TOKEN = import.meta.env.VITE_ACCESS_TOKEN_SECRET;
+    const token = apiService.getToken();
 
     try {
       const response = await fetch(`${backendBaseUrl}user/${userId}`, {
         headers: {
-          Authorization: `Bearer ${ADMIN_BEARER_TOKEN}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
       if (response.ok) {
         const data: UserData = await response.json();
+        console.log('Дані користувача завантажено:', data);
         setUserData(data);
+      } else if (response.status === 403) {
+        console.error(
+          'Доступ заборонено. Користувач може переглядати тільки свої дані.',
+        );
+      } else if (response.status === 404) {
+        console.error('Користувача не знайдено');
       }
     } catch (err) {
       console.error('Помилка при отриманні даних користувача:', err);
@@ -73,6 +92,13 @@ export const UserDataProvider: React.FC<UserDataProviderProps> = ({
 
   useEffect(() => {
     fetchUserData();
+  }, [refreshTrigger]);
+
+  // Очищаем данные пользователя при выходе из системы
+  useEffect(() => {
+    if (!apiService.isAuthenticated()) {
+      setUserData(null);
+    }
   }, []);
 
   const refreshUserData = () => {
