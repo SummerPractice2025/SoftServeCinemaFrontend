@@ -38,6 +38,7 @@ const customStyles: StylesConfig<Option, false> = {
     borderRadius: '0 0 6px 6px',
     overflow: 'hidden',
     marginTop: -4,
+    zIndex: 9999,
   }),
   option: (base, state) => ({
     ...base,
@@ -78,6 +79,8 @@ const CustomSelectGrey = ({
       styles={customStyles}
       isSearchable={false}
       classNamePrefix={classNamePrefix}
+      menuPortalTarget={document.body}
+      menuPosition="fixed"
     />
   );
 };

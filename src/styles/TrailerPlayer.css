@@ -1,25 +1,29 @@
 .trailer-modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;
   background: rgba(0, 0, 0, 0.85);
-  z-index: 10000;
+  z-index: 2147483640;
   display: flex;
   justify-content: center;
   align-items: center;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .trailer-content {
   position: relative;
-  width: 90%;
-  max-width: 960px;
+  margin: 0 auto;
+  max-width: 60vw;
+  max-height: 80vh;
+  width: 100%;
   aspect-ratio: 16 / 9;
   background-color: black;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .video-wrapper {
@@ -32,21 +36,35 @@
   height: 100%;
   border: none;
   display: block;
+  border-radius: 12px;
 }
 
 .close-button {
-  position: fixed;
-  top: 20px;
-  right: 30px;
+  position: absolute;
+  top: 32px;
+  right: 48px;
   background: none;
   border: none;
-  font-size: 32px;
+  font-size: 40px;
   color: white;
   cursor: pointer;
-  z-index: 10001;
+  z-index: 2147483647;
   transition: transform 0.2s ease;
+  padding: 8px 16px;
+  line-height: 1;
 }
 
 .close-button:hover {
   transform: scale(1.2);
+}
+
+/* Глобальні стилі для забезпечення правильного відображення модальних вікон */
+.trailer-modal * {
+  box-sizing: border-box;
+}
+
+/* Забезпечуємо, що модальне вікно завжди поверх всього */
+.trailer-modal {
+  position: fixed !important;
+  z-index: 99999 !important;
 }

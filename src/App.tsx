@@ -10,6 +10,7 @@ import { ModalProvider, useModal } from './context/ModalContext';
 const AppContent = () => {
   const { isRegisterModalOpen, closeRegisterModal } = useModal();
 
+
   return (
     <>
       <Header />
@@ -35,6 +36,8 @@ const App = () => {
     <ModalProvider>
       <AppContent />
     </ModalProvider>
+
+
   );
 };
 

@@ -656,7 +656,6 @@ const AddMovies: React.FC = () => {
             onUpdate={(updated) => {
               console.log('ScheduleCalendarBlock onUpdate:', updated);
 
-              // Для додаткової безпеки можна логувати, що в сесіях щодо id:
               Object.entries(updated).forEach(([movieTitle, dateSessions]) => {
                 Object.entries(dateSessions).forEach(([date, sessions]) => {
                   sessions.forEach((session, idx) => {
