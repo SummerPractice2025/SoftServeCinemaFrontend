@@ -4,7 +4,7 @@ import MovieInfo, { type Movie } from '../components/MovieInfo';
 import ScheduleBlock from '../components/ScheduleBlock';
 import TrailerPlayer from '../components/TrailerPlayer';
 import CustomAlert from '../components/CustomAlert';
-import { useAdmin } from '../contexts/AdminContext';
+import { useAdmin } from '../context/AdminContext';
 import '../styles/MovieEditPage.css';
 import '../styles/ScheduleBlock.css';
 
