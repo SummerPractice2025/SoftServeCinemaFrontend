@@ -25,14 +25,6 @@ interface MovieInfoProps {
 
 const editableFields = ['ageRate', 'description'] as const;
 
-const ageOptions = [
-  { value: '0+', label: '0+ (Без обмежень)' },
-  { value: '6+', label: '6+ (Для дітей)' },
-  { value: '12+', label: '12+ (З обмеженнями)' },
-  { value: '16+', label: '16+ (Для підлітків)' },
-  { value: '18+', label: '18+ (Тільки для дорослих)' },
-];
-
 const AutoResizeTextarea: React.FC<{
   value: string;
   onChange: (value: string) => void;
@@ -76,6 +68,9 @@ const MovieInfo: React.FC<MovieInfoProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [editingField, setEditingField] = useState<keyof Movie | null>(null);
   const [tempValue, setTempValue] = useState<string | number>('');
+  const [ageOptions, setAgeOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
 
   useEffect(() => {
     const fetchMovie = async () => {
@@ -113,6 +108,20 @@ const MovieInfo: React.FC<MovieInfoProps> = ({
 
     fetchMovie();
   }, [movieId]);
+
+  useEffect(() => {
+    async function fetchAgeOptions() {
+      const res = await fetch(`${backendBaseUrl}age-rates`);
+      const data = await res.json();
+      setAgeOptions(
+        data.map((item: { age_rate: string }) => ({
+          value: item.age_rate,
+          label: item.age_rate,
+        })),
+      );
+    }
+    fetchAgeOptions();
+  }, []);
 
   const startEditing = (field: keyof Movie, currentValue: string | number) => {
     setEditingField(field);
@@ -205,7 +214,11 @@ const MovieInfo: React.FC<MovieInfoProps> = ({
                       />
                     ) : key === 'ageRate' ? (
                       <CustomSelectGrey
-                        value={{ value: movie.ageRate, label: movie.ageRate }}
+                        value={
+                          ageOptions.find(
+                            (opt) => opt.value === movie.ageRate,
+                          ) || { value: movie.ageRate, label: movie.ageRate }
+                        }
                         options={ageOptions}
                         onChange={(option) => {
                           const updatedMovie = {

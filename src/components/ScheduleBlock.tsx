@@ -23,12 +23,7 @@ const formatConflictMessage = (errorText: string): string => {
       },
     );
 
-    formattedText = formattedText.replace(
-      /\(Фільм\s+'([^']+)';\s+хронометраж:\s+\d+\s+хв\.\}\)/g,
-      (match, movieName) => {
-        return `фільм ${movieName}`;
-      },
-    );
+    formattedText = formattedText.replace(/\(Фільм([^)]*)\)/g, 'Фільм$1');
 
     return formattedText;
   }
@@ -290,8 +285,8 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
             id: detailedSession.id ?? session.id,
             time: timeStr,
             title: movieInfo.title,
-            hall: detailedSession.hall_name || 'Зала1',
-            format: sessionType,
+            hallId: String(detailedSession.hall_id ?? 1),
+            formatId: String(detailedSession.session_type_id ?? 1),
             price: detailedSession.price ?? movieInfo.priceStandard ?? 120,
             vipPrice: detailedSession.price_VIP ?? movieInfo.priceVip ?? 180,
           };
@@ -325,11 +320,11 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
       const seen = new Set<string>();
       for (const session of sessions) {
         if (session.is_deleted) continue;
-        const key = `${session.time}-${session.hall}`;
+        const key = `${session.time}-${session.hallId}`;
         if (seen.has(key)) {
           const [year, month, day] = dateStr.split('-');
           const formattedDate = `${day}.${month}.${year}`;
-          return `Сеанс фільму "${movieInfo.title}" на ${session.time} у ${session.hall} ${formattedDate} вже існує.`;
+          return `Сеанс фільму "${movieInfo.title}" на ${session.time} у залі ${session.hallId} ${formattedDate} вже існує.`;
         }
         seen.add(key);
       }
@@ -382,15 +377,16 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
       for (const [dateStr, sessions] of Object.entries(currentMovieSessions)) {
         for (const session of sessions) {
           if (!session.id) {
-            const hallID = parseInt(session.hall.replace(/\D/g, ''), 10) || 1;
+            const hallID = Number(session.hallId);
+            const sessionTypeID = Number(session.formatId);
 
             const sessionPayload = {
               movieID: Number(movieInfo.id),
               date: `${dateStr}T${session.time}:00`,
               price: Number(session.price),
               priceVIP: Number(session.vipPrice),
-              hallID: Number(hallID),
-              sessionTypeID: session.format === '2D' ? 1 : 2,
+              hallID,
+              sessionTypeID,
             };
 
             newSessions.push({
@@ -480,15 +476,16 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
 
         const updateSessionsArray = existingSessions.map(
           ({ session, dateStr }) => {
-            const hallID = parseInt(session.hall.replace(/\D/g, ''), 10) || 1;
+            const hallID = Number(session.hallId);
+            const sessionTypeID = Number(session.formatId);
 
             return {
               session_id: Number(session.id),
               date: `${dateStr}T${session.time}:00`,
               price: Number(session.price),
               price_VIP: Number(session.vipPrice),
-              hall_id: Number(hallID),
-              session_type_id: session.format === '2D' ? 1 : 2,
+              hall_id: hallID,
+              session_type_id: sessionTypeID,
               is_deleted: session.is_deleted || false,
             };
           },

@@ -21,6 +21,17 @@ const Header: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    const savedMode = localStorage.getItem('isAdminMode');
+    if (savedMode !== null) {
+      setIsAdminMode(savedMode === 'true');
+    }
+  }, [setIsAdminMode]);
+
+  useEffect(() => {
+    localStorage.setItem('isAdminMode', String(isAdminMode));
+  }, [isAdminMode]);
+
+  useEffect(() => {
     if (userData && !userData.user.is_admin && isAdminMode) {
       setIsAdminMode(false);
     }
@@ -51,6 +62,7 @@ const Header: React.FC = () => {
     try {
       await apiService.signOut();
       logout();
+      setIsAdminMode(false);
       console.log('Вихід користувача');
       closePanel();
     } catch (error) {
@@ -222,14 +234,34 @@ const Header: React.FC = () => {
       </div>
 
       {isUserAuthenticated && userData?.user.is_admin && (
-        <button
-          className={`add-button ${isOnAddPage || shouldHideAdminElements ? 'hidden' : ''} ${isPanelOpen ? 'moved' : ''}`}
-          onClick={handleAddMovie}
-          type="button"
-          aria-label="Додати фільм"
-        >
-          +
-        </button>
+        <>
+          <button
+            className={`data-button${location.pathname === '/movies' || shouldHideAdminElements ? ' hidden' : ''}${isPanelOpen ? ' moved' : ''}`}
+            onClick={() => navigate('/movies')}
+            type="button"
+            aria-label="Всі фільми"
+          >
+            <svg
+              width="40"
+              height="40"
+              viewBox="0 0 40 40"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <rect x="8" y="10" width="8" height="20" rx="2" fill="white" />
+              <rect x="18" y="20" width="8" height="10" rx="2" fill="white" />
+              <rect x="28" y="28" width="8" height="2" rx="2" fill="white" />
+            </svg>
+          </button>
+          <button
+            className={`add-button ${isOnAddPage || shouldHideAdminElements ? 'hidden' : ''} ${isPanelOpen ? 'moved' : ''}`}
+            onClick={handleAddMovie}
+            type="button"
+            aria-label="Додати фільм"
+          >
+            +
+          </button>
+        </>
       )}
 
       <LoginModal
