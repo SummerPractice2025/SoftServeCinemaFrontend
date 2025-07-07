@@ -3,6 +3,8 @@ import '../styles/MovieInfo.css';
 import CustomSelectGrey from './CustomSelectGrey';
 import { SquarePen } from 'lucide-react';
 
+const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
+
 export interface Movie {
   id?: number;
   title: string;
@@ -27,14 +29,6 @@ interface MovieInfoProps {
 }
 
 const editableFields = ['ageRate', 'description'] as const;
-
-const ageOptions = [
-  { value: '0+', label: '0+ (Без обмежень)' },
-  { value: '6+', label: '6+ (Для дітей)' },
-  { value: '12+', label: '12+ (З обмеженнями)' },
-  { value: '16+', label: '16+ (Для підлітків)' },
-  { value: '18+', label: '18+ (Тільки для дорослих)' },
-];
 
 const AutoResizeTextarea: React.FC<{
   value: string;
@@ -77,6 +71,23 @@ const stringToArray = (str: string) =>
 const MovieInfo: React.FC<MovieInfoProps> = ({ movie, onChange }) => {
   const [editingField, setEditingField] = useState<string | null>(null);
   const [tempValue, setTempValue] = useState<string>('');
+  const [ageOptions, setAgeOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+
+  useEffect(() => {
+    async function fetchAgeOptions() {
+      const res = await fetch(`${backendBaseUrl}age-rates`);
+      const data = await res.json();
+      setAgeOptions(
+        data.map((item: { age_rate: string }) => ({
+          value: item.age_rate,
+          label: item.age_rate,
+        })),
+      );
+    }
+    fetchAgeOptions();
+  }, []);
 
   const startEditing = (
     field: string,
@@ -159,7 +170,11 @@ const MovieInfo: React.FC<MovieInfoProps> = ({ movie, onChange }) => {
                     />
                   ) : key === 'ageRate' ? (
                     <CustomSelectGrey
-                      value={currentAgeOption}
+                      value={
+                        ageOptions.find(
+                          (opt) => opt.value === movie.ageRate,
+                        ) || { value: movie.ageRate, label: movie.ageRate }
+                      }
                       options={ageOptions}
                       onChange={(option) => {
                         onChange?.({ ...movie, ageRate: option.value });

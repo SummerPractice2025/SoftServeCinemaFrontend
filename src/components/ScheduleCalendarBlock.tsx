@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import '../styles/ScheduleCalendarBlock.css';
@@ -13,8 +13,8 @@ export type Session = {
   id?: number;
   time: string;
   title: string;
-  hall: string;
-  format: '2D' | '3D';
+  hallId: string;
+  formatId: string;
   price: number;
   vipPrice: number;
   is_deleted?: boolean;
@@ -31,12 +31,6 @@ type Props = {
 };
 
 const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
-
-const hallOptions = ['Зала1', 'Зала2', 'Зала3', 'Зала4', 'Зала5'].map((h) => ({
-  value: h,
-  label: h,
-}));
-const formatOptions = ['2D', '3D'].map((f) => ({ value: f, label: f }));
 
 const getLocalDateKey = (date: Date): string => {
   const year = date.getFullYear();
@@ -79,6 +73,37 @@ export default function ScheduleCalendarBlock({
 
   const { refreshUserData } = useUserData();
 
+  const [hallOptions, setHallOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [formatOptions, setFormatOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+
+  useEffect(() => {
+    async function fetchOptions() {
+      const hallsRes = await fetch(`${backendBaseUrl}halls`);
+      const halls = await hallsRes.json();
+      console.log('HALLS FROM BACKEND:', halls);
+      setHallOptions(
+        halls.map((h: { id: number; name: string }) => ({
+          value: String(h.id),
+          label: h.name,
+        })),
+      );
+      const typesRes = await fetch(`${backendBaseUrl}session/types`);
+      const types = await typesRes.json();
+      console.log('SESSION TYPES FROM BACKEND:', types);
+      setFormatOptions(
+        types.map((t: { id: number; type: string }) => ({
+          value: String(t.id),
+          label: t.type,
+        })),
+      );
+    }
+    fetchOptions();
+  }, [backendBaseUrl]);
+
   const startEditing = (
     sessionIndex: number,
     field: keyof Session,
@@ -101,8 +126,8 @@ export default function ScheduleCalendarBlock({
 
       if (editingField.field === 'price' || editingField.field === 'vipPrice') {
         updatedValue = Number(tempValue);
-      } else if (editingField.field === 'format') {
-        updatedValue = tempValue as '2D' | '3D';
+      } else if (editingField.field === 'formatId') {
+        updatedValue = Number(tempValue);
       }
 
       const updatedSession = { ...session, [editingField.field]: updatedValue };
@@ -122,19 +147,17 @@ export default function ScheduleCalendarBlock({
 
   const handleAddSession = () => {
     if (visibleSessions.length >= 5) return;
-
+    const defaultHallId = hallOptions[0]?.value ?? '1';
+    const defaultFormatId = formatOptions[0]?.value ?? '1';
     const newSession: Session = {
       time: '12:00',
       title: movie?.title || 'Назва',
-      hall: 'Зала1',
-      format: '2D',
+      hallId: defaultHallId,
+      formatId: defaultFormatId,
       price: basePriceStandard || 120,
       vipPrice: basePriceVip || 180,
     };
-
     const updatedSessions = [...currentSessions, newSession];
-    console.log('Додаємо нову сесію, оновлений список:', updatedSessions);
-
     const updatedSessionsByDate = {
       ...sessionsByDate,
       [movieKey]: {
@@ -142,7 +165,6 @@ export default function ScheduleCalendarBlock({
         [dateKey]: updatedSessions,
       },
     };
-
     onUpdate(updatedSessionsByDate);
     onSavedUpdate?.(updatedSessionsByDate);
   };
@@ -309,6 +331,11 @@ export default function ScheduleCalendarBlock({
     return null;
   };
 
+  const getHallLabel = (id: string) =>
+    hallOptions.find((h) => h.value === id)?.label || '';
+  const getFormatLabel = (id: string) =>
+    formatOptions.find((f) => f.value === id)?.label || '';
+
   return (
     <div
       className="calendar-wrapper layout"
@@ -401,19 +428,23 @@ export default function ScheduleCalendarBlock({
             >
               <CustomSelectGrey
                 options={hallOptions}
-                value={{ value: session.hall, label: session.hall }}
+                value={
+                  hallOptions.find((h) => h.value === session.hallId) ||
+                  hallOptions[0]
+                }
                 onChange={(option) =>
-                  handleSessionChange(index, { hall: option.value })
+                  handleSessionChange(index, { hallId: option.value })
                 }
               />
 
               <CustomSelectGrey
                 options={formatOptions}
-                value={{ value: session.format, label: session.format }}
+                value={
+                  formatOptions.find((f) => f.value === session.formatId) ||
+                  formatOptions[0]
+                }
                 onChange={(option) =>
-                  handleSessionChange(index, {
-                    format: option.value as '2D' | '3D',
-                  })
+                  handleSessionChange(index, { formatId: option.value })
                 }
               />
             </div>
@@ -512,15 +543,18 @@ export default function ScheduleCalendarBlock({
               </p>
             ) : null}
             <div className="modal-buttons">
-              <button
-                className="save-btn"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  confirmDelete();
-                }}
-              >
-                Так, видалити
-              </button>
+              {(!sessionToDelete?.bookingCount ||
+                sessionToDelete.bookingCount === 0) && (
+                <button
+                  className="save-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    confirmDelete();
+                  }}
+                >
+                  Так, видалити
+                </button>
+              )}
               <button
                 className="cancel-btn"
                 onClick={(e) => {

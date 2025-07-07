@@ -347,3 +347,42 @@
 .vip-status.regular {
   color: #ccc;
 }
+
+.data-button {
+  position: fixed;
+  bottom: 2rem;
+  right: 6.5rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(255, 51, 102, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1399;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+.data-button.moved {
+  right: calc(416px + 6.5rem);
+}
+.data-button.hidden {
+  display: none;
+}
+
+.data-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(255, 51, 102, 0.4);
+}
+.data-button:focus {
+  outline: none;
+  transform: scale(1.05);
+}
+.data-button:active {
+  transform: scale(0.95);
+}

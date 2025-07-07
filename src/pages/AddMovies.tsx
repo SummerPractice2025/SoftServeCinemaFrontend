@@ -17,8 +17,8 @@ interface SessionForPayload {
   time: string;
   price: number;
   priceVIP: number;
-  hall: string;
-  sessionType: '2D' | '3D';
+  hallId: string;
+  formatId: string;
 }
 
 interface MoviePayload {
@@ -167,32 +167,30 @@ const formatConflictMessage = (
   errorText: string,
   movieTitle?: string,
 ): string => {
-  if (errorText.includes('конфліктує з сеансом о')) {
-    let formattedText = errorText.replace(
+  let formattedText = errorText;
+  if (formattedText.includes('конфліктує з сеансом о')) {
+    formattedText = formattedText.replace(
       /(\d{2})\.(\d{4})\.(\d{4})-(\d{2})-(\d{2})/g,
       (match, day, year1, year2, month, day2) => {
         return `${day2}.${month}.${year2}`;
       },
     );
-
     formattedText = formattedText.replace(
       /(\d{2}):(\d{2}):(\d{2})/g,
       (match, hour, minute) => {
         return `${hour}:${minute}`;
       },
     );
-
     formattedText = formattedText.replace(
-      /\(Фільм\s+'([^']+)';\s+хронометраж:\s+\d+\s+хв\.\}\)/g,
+      /Фільм\s+'([^']+)';\s+хронометраж:\s+\d+\s+хв\\.\}\)/g,
       (match, movieName) => {
-        return `фільм ${movieName}`;
+        return `Фільм ${movieName}`;
       },
     );
-
-    return formattedText;
+    formattedText = formattedText.replace(/[(){}]+$/g, '').trim();
+    formattedText = formattedText.replace(/[()]/g, '');
   }
-
-  return errorText;
+  return formattedText;
 };
 
 const buildMoviePayload = (
@@ -223,8 +221,8 @@ const buildMoviePayload = (
       }`,
       price: session.price,
       priceVIP: session.priceVIP,
-      hallID: parseInt(session.hall.replace(/\D/g, ''), 10) || 1,
-      sessionTypeID: session.sessionType === '2D' ? 1 : 2,
+      hallID: parseInt(session.hallId.replace(/\D/g, ''), 10) || 1,
+      sessionTypeID: session.formatId === '2D' ? 1 : 2,
     })),
   };
 };
@@ -249,6 +247,9 @@ const AddMovies: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [hallOptions, setHallOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
 
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -287,6 +288,31 @@ const AddMovies: React.FC = () => {
       setSessionsByDate(updated);
     }
   }, [filteredMovie?.priceStandard, filteredMovie?.priceVip]);
+
+  useEffect(() => {
+    async function fetchHalls() {
+      try {
+        const baseURL = import.meta.env.VITE_BACKEND_BASE_URL;
+        const res = await fetch(`${baseURL}halls`);
+        const halls = await res.json();
+        setHallOptions(
+          halls.map((h: { id: number; name: string }) => ({
+            value: String(h.id),
+            label: h.name,
+          })),
+        );
+      } catch {
+        setHallOptions([
+          { value: '1', label: 'Зала 1' },
+          { value: '2', label: 'Зала 2' },
+          { value: '3', label: 'Зала 3' },
+          { value: '4', label: 'Зала 4' },
+          { value: '5', label: 'Зала 5' },
+        ]);
+      }
+    }
+    fetchHalls();
+  }, []);
 
   const handleSearch = async () => {
     setLoading(true);
@@ -375,8 +401,8 @@ const AddMovies: React.FC = () => {
               id: detailedSession.id ?? session.id,
               time: timeStr,
               title: movieObj.title,
-              hall: detailedSession.hall_name || 'Зала1',
-              format: sessionType,
+              hallId: detailedSession.hall_name || 'Зала1',
+              formatId: sessionType,
               price: detailedSession.price ?? movieObj.priceStandard ?? 120,
               vipPrice: detailedSession.price_VIP ?? movieObj.priceVip ?? 180,
             };
@@ -428,26 +454,28 @@ const AddMovies: React.FC = () => {
     const movieKey = filteredMovie.title;
     const currentMovieSessions = sessionsByDate[movieKey] || {};
 
-    const allSessions: { date: string; time: string; hall: string }[] = [];
+    const allSessions: { date: string; time: string; hallId: string }[] = [];
 
     for (const [date, sessions] of Object.entries(currentMovieSessions)) {
       for (const session of sessions) {
         allSessions.push({
           date,
           time: session.time,
-          hall: session.hall,
+          hallId: session.hallId,
         });
       }
     }
 
     const seen = new Set<string>();
     for (const session of allSessions) {
-      const key = `${session.date}-${session.time}-${session.hall}`;
+      const key = `${session.date}-${session.time}-${session.hallId}`;
       if (seen.has(key)) {
         const [year, month, day] = session.date.split('-');
         const formattedDate = `${day}.${month}.${year}`;
-
-        const message = `Сеанс фільму "${filteredMovie.title}" на ${session.time} у ${session.hall} ${formattedDate} вже існує.`;
+        const hallLabel =
+          hallOptions.find((h) => h.value === session.hallId)?.label ||
+          `Зала ${session.hallId}`;
+        const message = `Сеанс фільму "${filteredMovie.title}" на ${session.time} у ${hallLabel} ${formattedDate} вже існує.`;
         setErrorMessage(message);
         return;
       }
@@ -462,8 +490,8 @@ const AddMovies: React.FC = () => {
         time: session.time,
         price: session.price,
         priceVIP: session.vipPrice,
-        hall: session.hall,
-        sessionType: session.format,
+        hallId: session.hallId,
+        formatId: session.formatId,
       })),
     );
 
@@ -527,8 +555,8 @@ const AddMovies: React.FC = () => {
               id: detailedSession.id ?? session.id,
               time: timeStr,
               title: movieKey,
-              hall: detailedSession.hall_name || 'Зала1',
-              format: sessionType,
+              hallId: detailedSession.hall_name || 'Зала1',
+              formatId: sessionType,
               price:
                 detailedSession.price ?? filteredMovie.priceStandard ?? 120,
               vipPrice:

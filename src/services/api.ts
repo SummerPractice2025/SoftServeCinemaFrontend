@@ -203,6 +203,18 @@ class ApiService {
   async delete<T>(url: string, config?: any): Promise<AxiosResponse<T>> {
     return this.api.delete<T>(url, config);
   }
+
+  async getHalls(): Promise<{ id: number; name: string }[]> {
+    const response =
+      await this.api.get<{ id: number; name: string }[]>('/halls');
+    return response.data;
+  }
+
+  async getSessionTypes(): Promise<{ id: number; type: string }[]> {
+    const response =
+      await this.api.get<{ id: number; type: string }[]>('/session/types');
+    return response.data;
+  }
 }
 
 export const apiService = new ApiService();
