@@ -1,62 +1,145 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/StatisticsPage.css';
-
-const halls = [
-  { id: 1, percent: 25 },
-  { id: 2, percent: 25 },
-  { id: 3, percent: 25 },
-  { id: 4, percent: 25 },
-  { id: 5, percent: 25 },
-];
+import apiService from '../services/api';
 
 const StatisticsPage: React.FC = () => {
   const [activePeriod, setActivePeriod] = useState('week');
+  const [money, setMoney] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [halls, setHalls] = useState<
+    { hall_id: number; hall_name: string; occupancy: number }[]
+  >([]);
+  const [hallsLoading, setHallsLoading] = useState(true);
+  const [hallsError, setHallsError] = useState<string | null>(null);
+  const [topTickets, setTopTickets] = useState<
+    { film_name: string; sold_tickets: number }[]
+  >([]);
+  const [topTicketsLoading, setTopTicketsLoading] = useState(true);
+  const [topTicketsError, setTopTicketsError] = useState<string | null>(null);
+  const [topMoney, setTopMoney] = useState<
+    { film_name: string; money: number }[]
+  >([]);
+  const [topMoneyLoading, setTopMoneyLoading] = useState(true);
+  const [topMoneyError, setTopMoneyError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    apiService
+      .getStatsMoney()
+      .then((data) => {
+        setMoney(data.money);
+        setError(null);
+      })
+      .catch(() => {
+        setError('Не вдалося отримати дані про виручку');
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    setHallsLoading(true);
+    apiService
+      .getStatsOccupancy()
+      .then((data) => {
+        setHalls(data.halls);
+        setHallsError(null);
+      })
+      .catch(() => {
+        setHallsError('Не вдалося отримати дані про завантаженість залів');
+      })
+      .finally(() => setHallsLoading(false));
+  }, []);
+
+  useEffect(() => {
+    setTopTicketsLoading(true);
+    apiService
+      .getStatsTopTickets()
+      .then((data) => {
+        setTopTickets(Array.isArray(data.films) ? data.films : []);
+        setTopTicketsError(null);
+      })
+      .catch(() => {
+        setTopTicketsError('Не вдалося отримати топ фільмів за популярністю');
+      })
+      .finally(() => setTopTicketsLoading(false));
+  }, []);
+
+  useEffect(() => {
+    setTopMoneyLoading(true);
+    apiService
+      .getStatsTopMoney(activePeriod as 'day' | 'week' | 'month')
+      .then((films) => {
+        setTopMoney(Array.isArray(films) ? films : []);
+        setTopMoneyError(null);
+      })
+      .catch(() => {
+        setTopMoneyError('Не вдалося отримати топ фільмів за прибутковістю');
+      })
+      .finally(() => setTopMoneyLoading(false));
+  }, [activePeriod]);
 
   return (
     <div className="statistics-page-root">
       <div className="statistics-page-content">
         <h2 className="statistics-title">ПАНЕЛЬ АДМІНІСТРАТОРА</h2>
         <div className="statistics-revenue">
-          За сьогодні виручки: <span>20000000 грн</span>
+          {loading ? (
+            'Завантаження...'
+          ) : error ? (
+            <span style={{ color: 'red' }}>{error}</span>
+          ) : (
+            <>
+              За сьогодні виручки:{' '}
+              <span>
+                {money?.toLocaleString('uk-UA', { maximumFractionDigits: 2 })}{' '}
+                грн
+              </span>
+            </>
+          )}
         </div>
         <div className="statistics-halls-title">Завантаженість залів</div>
         <div className="statistics-halls">
-          {halls.map((hall) => (
-            <div key={hall.id} className="statistics-hall">
-              <div className="statistics-hall-percent">{hall.percent}%</div>
-              <div className="statistics-hall-label">Зала {hall.id}</div>
-            </div>
-          ))}
+          {hallsLoading ? (
+            <span>Завантаження...</span>
+          ) : hallsError ? (
+            <span style={{ color: 'red' }}>{hallsError}</span>
+          ) : halls.length === 0 ? (
+            <span>Дані відсутні</span>
+          ) : (
+            halls.map((hall) => (
+              <div key={hall.hall_id} className="statistics-hall">
+                <div className="statistics-hall-percent">{hall.occupancy}%</div>
+                <div className="statistics-hall-label">{hall.hall_name}</div>
+              </div>
+            ))
+          )}
         </div>
         <div className="statistics-block">
           <div className="statistics-block-title">
             Топ фільмів за популярністю
           </div>
           <div className="statistics-block-list">
-            <div className="statistics-block-row">
-              <span>#1 Фільм</span>
-              <span className="statistics-block-right">
-                3000 квитків
-                <br />
-                <span className="statistics-block-sub">за тиждень</span>
-              </span>
-            </div>
-            <div className="statistics-block-row">
-              <span>#2 Фільм</span>
-              <span className="statistics-block-right">
-                3000 квитків
-                <br />
-                <span className="statistics-block-sub">за тиждень</span>
-              </span>
-            </div>
-            <div className="statistics-block-row">
-              <span>#3 Фільм</span>
-              <span className="statistics-block-right">
-                3000 квитків
-                <br />
-                <span className="statistics-block-sub">за тиждень</span>
-              </span>
-            </div>
+            {topTicketsLoading ? (
+              <span>Завантаження...</span>
+            ) : topTicketsError ? (
+              <span style={{ color: 'red' }}>{topTicketsError}</span>
+            ) : topTickets.length === 0 ? (
+              <span>Дані відсутні</span>
+            ) : (
+              topTickets.map((film, idx) => (
+                <div className="statistics-block-row" key={film.film_name}>
+                  <span>
+                    #{idx + 1} {film.film_name}
+                  </span>
+                  <span className="statistics-block-right">
+                    {film.sold_tickets} квитків
+                    <br />
+                    <span className="statistics-block-sub">за тиждень</span>
+                  </span>
+                </div>
+              ))
+            )}
           </div>
         </div>
         <div className="statistics-period-buttons">
@@ -84,18 +167,24 @@ const StatisticsPage: React.FC = () => {
             Топ фільмів за прибутковістю
           </div>
           <div className="statistics-block-list">
-            <div className="statistics-block-row">
-              <span>#1 Фільм</span>
-              <span className="statistics-block-right">10000 грн</span>
-            </div>
-            <div className="statistics-block-row">
-              <span>#2 Фільм</span>
-              <span className="statistics-block-right">1000 грн</span>
-            </div>
-            <div className="statistics-block-row">
-              <span>#3 Фільм</span>
-              <span className="statistics-block-right">100 грн</span>
-            </div>
+            {topMoneyLoading ? (
+              <span>Завантаження...</span>
+            ) : topMoneyError ? (
+              <span style={{ color: 'red' }}>{topMoneyError}</span>
+            ) : topMoney.length === 0 ? (
+              <span>Дані відсутні</span>
+            ) : (
+              topMoney.map((film, idx) => (
+                <div className="statistics-block-row" key={film.film_name}>
+                  <span>
+                    #{idx + 1} {film.film_name}
+                  </span>
+                  <span className="statistics-block-right">
+                    {film.money} грн
+                  </span>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>

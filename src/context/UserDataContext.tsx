@@ -57,38 +57,28 @@ export const UserDataProvider: React.FC<UserDataProviderProps> = ({
 
   const fetchUserData = async () => {
     if (!apiService.isAuthenticated()) {
-      console.log('Користувач не авторизован, пропускаємо завантаження даних');
+      setUserData(null);
       return;
     }
 
     const userId = apiService.getCurrentUserId();
     if (!userId) {
-      console.error('Не вдалося отримати ID користувача з токена');
+      setUserData(null);
       return;
     }
 
-    const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
-    const token = apiService.getToken();
-
     try {
-      const response = await fetch(`${backendBaseUrl}user/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data: UserData = await response.json();
-        console.log('Дані користувача завантажено:', data);
-        setUserData(data);
-      } else if (response.status === 403) {
-        console.error(
-          'Доступ заборонено. Користувач може переглядати тільки свої дані.',
-        );
-      } else if (response.status === 404) {
-        console.error('Користувача не знайдено');
-      }
+      // Используем apiService для запроса (refresh токена сработает автоматически)
+      const response = await apiService.get<{
+        user: User;
+        bookings: Booking[];
+      }>(`/user/${userId}`);
+      setUserData(response.data);
     } catch (err) {
+      // Если после всех попыток пользователь не авторизован — сбрасываем userData
+      if (!apiService.isAuthenticated()) {
+        setUserData(null);
+      }
       console.error('Помилка при отриманні даних користувача:', err);
     }
   };
