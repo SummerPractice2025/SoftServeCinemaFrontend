@@ -275,7 +275,7 @@
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(255, 51, 102, 0.3);
   transition: all 0.3s ease;
-  z-index: 1400;
+  z-index: 1399;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -386,20 +386,11 @@
   transform: scale(0.95);
 }
 
-.data-button[disabled] {
-  pointer-events: none;
-  opacity: 0.5;
-  filter: grayscale(0.5);
-  cursor: not-allowed;
-}
-
-.disabled-when-panel button[disabled],
-.header button[disabled],
-.header .add-button[disabled] {
-  pointer-events: none;
-  opacity: 0.5;
-  filter: grayscale(0.5);
-  cursor: not-allowed;
+.panel-buttons-disabled {
+  opacity: 0.5 !important;
+  filter: grayscale(0.5) !important;
+  pointer-events: none !important;
+  cursor: not-allowed !important;
 }
 
 .fade-in {

@@ -359,7 +359,6 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
         throw new Error(conflict);
       }
 
-      // Валидация минимальной цены
       const minPrice = 0.1;
       const movieKey = movieInfo.title;
       const currentMovieSessions = sessionsData[movieKey] || {};
