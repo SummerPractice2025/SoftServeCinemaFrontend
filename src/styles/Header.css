@@ -69,7 +69,6 @@
   white-space: nowrap;
   height: auto;
   line-height: normal;
-
   margin-right: 1rem;
 }
 
@@ -276,7 +275,7 @@
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(255, 51, 102, 0.3);
   transition: all 0.3s ease;
-  z-index: 1400;
+  z-index: 1399;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -385,4 +384,42 @@
 }
 .data-button:active {
   transform: scale(0.95);
+}
+
+.panel-buttons-disabled {
+  opacity: 0.5 !important;
+  filter: grayscale(0.5) !important;
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+}
+
+.fade-in {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeInPanel 0.4s ease forwards;
+}
+
+@keyframes fadeInPanel {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.side-panel-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(30, 30, 30, 0.45);
+  z-index: 1400;
+  opacity: 0;
+  animation: fadeInOverlay 0.4s forwards;
+}
+
+@keyframes fadeInOverlay {
+  to {
+    opacity: 1;
+  }
 }

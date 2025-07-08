@@ -221,8 +221,8 @@ const buildMoviePayload = (
       }`,
       price: session.price,
       priceVIP: session.priceVIP,
-      hallID: parseInt(session.hallId.replace(/\D/g, ''), 10) || 1,
-      sessionTypeID: session.formatId === '2D' ? 1 : 2,
+      hallID: Number(session.hallId) || 1,
+      sessionTypeID: Number(session.formatId) || 1,
     })),
   };
 };
@@ -397,12 +397,29 @@ const AddMovies: React.FC = () => {
             const sessionType =
               detailedSession.session_type_id === 1 ? '2D' : '3D';
 
+            console.log('detailedSession:', detailedSession);
+            let hallId = '';
+            if (detailedSession.hall_id) {
+              hallId = String(detailedSession.hall_id);
+            } else if (detailedSession.hall_name) {
+              const found = hallOptions.find(
+                (h) => h.label === detailedSession.hall_name,
+              )?.value;
+              if (!found) {
+                console.warn(
+                  'Не знайдено hallId для hall_name:',
+                  detailedSession.hall_name,
+                  hallOptions,
+                );
+              }
+              hallId = found || '';
+            }
             const sessionData: Session = {
               id: detailedSession.id ?? session.id,
               time: timeStr,
               title: movieObj.title,
-              hallId: detailedSession.hall_name || 'Зала1',
-              formatId: sessionType,
+              hallId: hallId,
+              formatId: String(detailedSession.session_type_id ?? 1),
               price: detailedSession.price ?? movieObj.priceStandard ?? 120,
               vipPrice: detailedSession.price_VIP ?? movieObj.priceVip ?? 180,
             };
@@ -454,6 +471,35 @@ const AddMovies: React.FC = () => {
     const movieKey = filteredMovie.title;
     const currentMovieSessions = sessionsByDate[movieKey] || {};
 
+    const minPrice = 0.1;
+    const allRawSessions: SessionForPayload[] = Object.entries(
+      currentMovieSessions,
+    ).flatMap(([date, sessions]) =>
+      sessions.map((session) => ({
+        date,
+        time: session.time,
+        price: session.price,
+        priceVIP: session.vipPrice,
+        hallId: session.hallId,
+        formatId: session.formatId,
+      })),
+    );
+
+    for (const session of allRawSessions) {
+      if (session.price < minPrice) {
+        setErrorMessage(
+          `Мінімальна ціна для стандартного місця повинна бути не менше ${minPrice}₴`,
+        );
+        return;
+      }
+      if (session.priceVIP < minPrice) {
+        setErrorMessage(
+          `Мінімальна ціна для VIP місця повинна бути не менше ${minPrice}₴`,
+        );
+        return;
+      }
+    }
+
     const allSessions: { date: string; time: string; hallId: string }[] = [];
 
     for (const [date, sessions] of Object.entries(currentMovieSessions)) {
@@ -481,19 +527,6 @@ const AddMovies: React.FC = () => {
       }
       seen.add(key);
     }
-
-    const allRawSessions: SessionForPayload[] = Object.entries(
-      currentMovieSessions,
-    ).flatMap(([date, sessions]) =>
-      sessions.map((session) => ({
-        date,
-        time: session.time,
-        price: session.price,
-        priceVIP: session.vipPrice,
-        hallId: session.hallId,
-        formatId: session.formatId,
-      })),
-    );
 
     const payload = buildMoviePayload(filteredMovie, allRawSessions);
     console.log('handleSave - Payload JSON:', JSON.stringify(payload, null, 2));
@@ -551,12 +584,29 @@ const AddMovies: React.FC = () => {
             const sessionType =
               detailedSession.session_type_id === 1 ? '2D' : '3D';
 
+            console.log('detailedSession:', detailedSession);
+            let hallId = '';
+            if (detailedSession.hall_id) {
+              hallId = String(detailedSession.hall_id);
+            } else if (detailedSession.hall_name) {
+              const found = hallOptions.find(
+                (h) => h.label === detailedSession.hall_name,
+              )?.value;
+              if (!found) {
+                console.warn(
+                  'Не знайдено hallId для hall_name:',
+                  detailedSession.hall_name,
+                  hallOptions,
+                );
+              }
+              hallId = found || '';
+            }
             const sessionData: Session = {
               id: detailedSession.id ?? session.id,
               time: timeStr,
               title: movieKey,
-              hallId: detailedSession.hall_name || 'Зала1',
-              formatId: sessionType,
+              hallId: hallId,
+              formatId: String(detailedSession.session_type_id ?? 1),
               price:
                 detailedSession.price ?? filteredMovie.priceStandard ?? 120,
               vipPrice:
@@ -644,39 +694,7 @@ const AddMovies: React.FC = () => {
   };
 
   return (
-    <div className="search-filter-container">
-      <div className="search-filter-row">
-        <CustomSelectGrey
-          options={getLastYears(15)}
-          value={{ value: selectedYear, label: selectedYear }}
-          onChange={(option) => {
-            setSelectedYear(option.value);
-            setFilteredMovie(null);
-            setShowPlayer(false);
-          }}
-          classNamePrefix="year-select"
-        />
-
-        <div className="search-input-wrapper">
-          <input
-            ref={searchInputRef}
-            type="text"
-            placeholder="Введіть назву фільму..."
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            onKeyDown={onKeyDown}
-          />
-          <button
-            className="search-button"
-            onClick={handleSearch}
-            aria-label="Search"
-            disabled={loading}
-          >
-            <img src="/img/search-icon.png" alt="Search" />
-          </button>
-        </div>
-      </div>
-
+    <>
       {errorMessage && (
         <CustomAlert
           message={errorMessage}
@@ -684,124 +702,161 @@ const AddMovies: React.FC = () => {
         />
       )}
 
-      {loading ? (
-        <p className="no-movie-message">Завантаження...</p>
-      ) : filteredMovie ? (
-        <div className="movie-details-container">
-          <div className="poster-block">
-            {filteredMovie.posterUrl && (
-              <img
-                src={filteredMovie.posterUrl}
-                alt={`${filteredMovie.title} poster`}
-              />
-            )}
-
-            {filteredMovie.trailerUrl && (
-              <>
-                <button
-                  className="trailer-button"
-                  onClick={() => setShowPlayer(true)}
-                >
-                  ▶ Дивитись трейлер
-                </button>
-                {showPlayer && (
-                  <TrailerPlayer
-                    videoUrl={filteredMovie.trailerUrl}
-                    onClose={() => setShowPlayer(false)}
-                  />
-                )}
-              </>
-            )}
+      {showSuccessModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h2>Фільм створено успішно!</h2>
+            <p>Ви хочете додати ще фільм?</p>
+            <div className="modal-buttons">
+              <button className="save-btn" onClick={handleAddAnotherMovie}>
+                Так, додати ще
+              </button>
+              <button className="cancel-btn" onClick={handleGoToAllMovies}>
+                Ні
+              </button>
+            </div>
           </div>
-
-          <MovieInfo movie={filteredMovie} onChange={setFilteredMovie} />
-
-          <PriceBlock
-            priceStandard={filteredMovie?.priceStandard}
-            priceVip={filteredMovie?.priceVip}
-            onPriceChange={(priceStandard, priceVip) =>
-              setFilteredMovie((prev) =>
-                prev ? { ...prev, priceStandard, priceVip } : prev,
-              )
-            }
-          />
         </div>
-      ) : (
-        <p className="no-movie-message">Фільм не знайдено або не вибрано.</p>
       )}
 
-      {filteredMovie && (
-        <div className="fade-in">
-          <ScheduleCalendarBlock
-            movie={filteredMovie}
-            sessionsByDate={sessionsByDate}
-            savedSessionsByDate={savedSessionsByDate}
-            onUpdate={(updated) => {
-              console.log('ScheduleCalendarBlock onUpdate:', updated);
+      {showCancelModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h2>Ви впевнені, що хочете скасувати всі зміни?</h2>
+            <div className="modal-buttons">
+              <button className="save-btn" onClick={confirmCancel}>
+                Так, скасувати
+              </button>
+              <button
+                className="cancel-btn"
+                onClick={() => setShowCancelModal(false)}
+              >
+                Ні, повернутись
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
-              Object.entries(updated).forEach(([movieTitle, dateSessions]) => {
-                Object.entries(dateSessions).forEach(([date, sessions]) => {
-                  sessions.forEach((session, idx) => {
-                    if (!session.id) {
-                      console.warn(
-                        `Session без id у onUpdate [${movieTitle}][${date}][${idx}]:`,
-                        session,
-                      );
-                    }
-                  });
-                });
-              });
-
-              setSessionsByDate(updated);
+      <div className="search-filter-container">
+        <div className="search-filter-row">
+          <CustomSelectGrey
+            options={getLastYears(15)}
+            value={{ value: selectedYear, label: selectedYear }}
+            onChange={(option) => {
+              setSelectedYear(option.value);
+              setFilteredMovie(null);
+              setShowPlayer(false);
             }}
-            onSavedUpdate={(updated) => {
-              console.log('ScheduleCalendarBlock onSavedUpdate:', updated);
-              setSavedSessionsByDate(updated);
-            }}
-            basePriceStandard={filteredMovie.priceStandard ?? 0}
-            basePriceVip={filteredMovie.priceVip ?? 0}
+            classNamePrefix="year-select"
           />
 
-          <ActionButtons onSave={handleSave} onCancel={handleCancel} />
+          <div className="search-input-wrapper">
+            <input
+              ref={searchInputRef}
+              type="text"
+              placeholder="Введіть назву фільму..."
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              onKeyDown={onKeyDown}
+            />
+            <button
+              className="search-button"
+              onClick={handleSearch}
+              aria-label="Search"
+              disabled={loading}
+            >
+              <img src="/img/search-icon.png" alt="Search" />
+            </button>
+          </div>
+        </div>
 
-          {showCancelModal && (
-            <div className="modal-overlay">
-              <div className="modal">
-                <h2>Ви впевнені, що хочете скасувати всі зміни?</h2>
-                <div className="modal-buttons">
-                  <button className="save-btn" onClick={confirmCancel}>
-                    Так, скасувати
-                  </button>
+        {loading ? (
+          <p className="no-movie-message">Завантаження...</p>
+        ) : filteredMovie ? (
+          <div className="movie-details-container">
+            <div className="poster-block">
+              {filteredMovie.posterUrl && (
+                <img
+                  src={filteredMovie.posterUrl}
+                  alt={`${filteredMovie.title} poster`}
+                />
+              )}
+
+              {filteredMovie.trailerUrl && (
+                <>
                   <button
-                    className="cancel-btn"
-                    onClick={() => setShowCancelModal(false)}
+                    className="trailer-button"
+                    onClick={() => setShowPlayer(true)}
                   >
-                    Ні, повернутись
+                    ▶ Дивитись трейлер
                   </button>
-                </div>
-              </div>
+                  {showPlayer && (
+                    <TrailerPlayer
+                      videoUrl={filteredMovie.trailerUrl}
+                      onClose={() => setShowPlayer(false)}
+                    />
+                  )}
+                </>
+              )}
             </div>
-          )}
 
-          {showSuccessModal && (
-            <div className="modal-overlay">
-              <div className="modal">
-                <h2>Фільм створено успішно!</h2>
-                <p>Ви хочете додати ще фільм?</p>
-                <div className="modal-buttons">
-                  <button className="save-btn" onClick={handleAddAnotherMovie}>
-                    Так, додати ще
-                  </button>
-                  <button className="cancel-btn" onClick={handleGoToAllMovies}>
-                    Ні
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
+            <MovieInfo movie={filteredMovie} onChange={setFilteredMovie} />
+
+            <PriceBlock
+              priceStandard={filteredMovie?.priceStandard}
+              priceVip={filteredMovie?.priceVip}
+              onPriceChange={(priceStandard, priceVip) =>
+                setFilteredMovie((prev) =>
+                  prev ? { ...prev, priceStandard, priceVip } : prev,
+                )
+              }
+              onError={(message) => setErrorMessage(message)}
+            />
+          </div>
+        ) : (
+          <p className="no-movie-message">Фільм не знайдено або не вибрано.</p>
+        )}
+
+        {filteredMovie && (
+          <div className="fade-in">
+            <ScheduleCalendarBlock
+              movie={filteredMovie}
+              sessionsByDate={sessionsByDate}
+              savedSessionsByDate={savedSessionsByDate}
+              onUpdate={(updated) => {
+                console.log('ScheduleCalendarBlock onUpdate:', updated);
+
+                Object.entries(updated).forEach(
+                  ([movieTitle, dateSessions]) => {
+                    Object.entries(dateSessions).forEach(([date, sessions]) => {
+                      sessions.forEach((session, idx) => {
+                        if (!session.id) {
+                          console.warn(
+                            `Session без id у onUpdate [${movieTitle}][${date}][${idx}]:`,
+                            session,
+                          );
+                        }
+                      });
+                    });
+                  },
+                );
+
+                setSessionsByDate(updated);
+              }}
+              onSavedUpdate={(updated) => {
+                console.log('ScheduleCalendarBlock onSavedUpdate:', updated);
+                setSavedSessionsByDate(updated);
+              }}
+              basePriceStandard={filteredMovie.priceStandard ?? 0}
+              basePriceVip={filteredMovie.priceVip ?? 0}
+            />
+
+            <ActionButtons onSave={handleSave} onCancel={handleCancel} />
+          </div>
+        )}
+      </div>
+    </>
   );
 };
 

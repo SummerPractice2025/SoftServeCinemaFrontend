@@ -66,8 +66,8 @@ const LoginModal: React.FC<LoginModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="login-modal-overlay">
-      <div className="login-modal">
+    <div className="login-modal-overlay fade-in">
+      <div className="login-modal fade-in">
         <button className="close" onClick={onClose} aria-label="Закрити" />
         <h2>Вхід</h2>
         <input

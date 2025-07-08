@@ -215,7 +215,7 @@ export default function AllMovies() {
         </div>
 
         <div className="grid">
-          {filteredMovies.map((movie) => {
+          {filteredMovies.map((movie, index) => {
             const session = movie.session ?? {};
 
             const sessionId = session.id ?? null;
@@ -236,12 +236,12 @@ export default function AllMovies() {
             return (
               <div
                 key={movie.id}
-                className="card"
+                className="card fade-in"
+                style={{ cursor: 'pointer', animationDelay: `${index * 80}ms` }}
                 onClick={(e) => {
                   if ((e.target as HTMLElement).closest('button')) return;
                   handleCardClick(movie.id);
                 }}
-                style={{ cursor: 'pointer' }}
               >
                 <div className="poster-wrapper">
                   <img

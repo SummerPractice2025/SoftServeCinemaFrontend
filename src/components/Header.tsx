@@ -18,7 +18,6 @@ const Header: React.FC = () => {
   const { isAuthenticated, login, logout } = useAuth();
 
   const { userData, refreshTrigger, refreshUserData } = useUserData();
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const savedMode = localStorage.getItem('isAdminMode');
@@ -38,11 +37,10 @@ const Header: React.FC = () => {
   }, [userData, isAdminMode, setIsAdminMode]);
 
   useEffect(() => {
-    if (isPanelOpen) {
-      setLoading(true);
-      setTimeout(() => setLoading(false), 300);
+    if (apiService.isAuthenticated() && !userData) {
+      refreshUserData();
     }
-  }, [isPanelOpen, refreshTrigger]);
+  }, [userData, refreshUserData]);
 
   useEffect(() => {
     if (
@@ -122,6 +120,8 @@ const Header: React.FC = () => {
             onClick={handleHome}
             type="button"
             aria-label="На головну"
+            disabled={isPanelOpen}
+            aria-disabled={isPanelOpen}
           >
             <span className="gradient">Softserve</span>Cinema
           </button>
@@ -132,6 +132,8 @@ const Header: React.FC = () => {
               className="login-button"
               onClick={openLoginModal}
               type="button"
+              disabled={isPanelOpen}
+              aria-disabled={isPanelOpen}
             >
               Вхід
             </button>
@@ -141,6 +143,8 @@ const Header: React.FC = () => {
               onClick={openPanel}
               type="button"
               aria-label="Панель користувача"
+              disabled={isPanelOpen}
+              aria-disabled={isPanelOpen}
             >
               <img
                 src="/img/user.png"
@@ -154,6 +158,10 @@ const Header: React.FC = () => {
 
       {isLoginModalOpen && <div className="header-dark-overlay" />}
 
+      {isPanelOpen && (
+        <div className="side-panel-overlay" onClick={closePanel} />
+      )}
+
       <div className={`side-panel ${isPanelOpen ? 'open' : ''}`}>
         <button
           className="close-button"
@@ -165,10 +173,10 @@ const Header: React.FC = () => {
         </button>
 
         <div className="panel-header">
-          {loading ? (
+          {!userData ? (
             <p>Завантаження...</p>
-          ) : userData ? (
-            <>
+          ) : (
+            <div className="fade-in">
               <p className="user-name">
                 {userData.user.first_name} {userData.user.last_name}
               </p>
@@ -182,23 +190,27 @@ const Header: React.FC = () => {
                   {isAdminMode ? 'Режим клієнта' : 'Режим адміністратора'}
                 </button>
               )}
-            </>
-          ) : (
-            <p>Дані користувача не знайдено</p>
+            </div>
           )}
         </div>
 
         <div className="panel-content">
           <h3 className="tickets-title">Куплені квитки</h3>
           <div className="ticket-list-container">
-            {loading ? (
+            {!userData ? (
               <p>Завантаження квитків...</p>
-            ) : userData?.bookings.length === 0 ? (
-              <p>Квитків немає</p>
-            ) : userData?.bookings ? (
+            ) : userData.bookings.length === 0 ? (
+              <div className="fade-in">
+                <p>Квитків немає</p>
+              </div>
+            ) : (
               <ul className="ticket-list">
                 {userData.bookings.map((booking, index) => (
-                  <li key={index} className="ticket-card">
+                  <li
+                    key={index}
+                    className="ticket-card fade-in"
+                    style={{ animationDelay: `${index * 80}ms` }}
+                  >
                     <img
                       src={
                         booking.moviePosterUrl ||
@@ -225,8 +237,6 @@ const Header: React.FC = () => {
                   </li>
                 ))}
               </ul>
-            ) : (
-              <p>Дані про квитки не знайдено</p>
             )}
           </div>
         </div>
@@ -262,14 +272,18 @@ const Header: React.FC = () => {
               <rect x="28" y="28" width="8" height="2" rx="2" fill="white" />
             </svg>
           </button>
-          <button
-            className={`add-button ${isOnAddPage || shouldHideAdminElements ? 'hidden' : ''} ${isPanelOpen ? 'moved' : ''}`}
-            onClick={handleAddMovie}
-            type="button"
-            aria-label="Додати фільм"
-          >
-            +
-          </button>
+          <div className="disabled-when-panel">
+            <button
+              className={`add-button ${isOnAddPage || shouldHideAdminElements ? 'hidden' : ''} ${isPanelOpen ? 'moved' : ''}`}
+              onClick={handleAddMovie}
+              type="button"
+              aria-label="Додати фільм"
+              disabled={isPanelOpen}
+              aria-disabled={isPanelOpen}
+            >
+              +
+            </button>
+          </div>
         </>
       )}
 

@@ -5,21 +5,34 @@ interface PriceBlockProps {
   priceStandard?: number;
   priceVip?: number;
   onPriceChange: (priceStandard: number, priceVip: number) => void;
+  onError?: (message: string) => void;
 }
 
 const PriceBlock: React.FC<PriceBlockProps> = ({
   priceStandard,
   priceVip,
   onPriceChange,
+  onError,
 }) => {
   const safePriceStandard = Number.isNaN(priceStandard)
-    ? 0
-    : (priceStandard ?? 0);
-  const safePriceVip = Number.isNaN(priceVip) ? 0 : (priceVip ?? 0);
+    ? 120
+    : (priceStandard ?? 120);
+  const safePriceVip = Number.isNaN(priceVip) ? 180 : (priceVip ?? 180);
 
   const handlePriceChange = (value: string, isStandard: boolean) => {
     const numericValue = value.replace(/[^0-9]/g, '');
     const numericValueParsed = numericValue ? parseInt(numericValue) : 0;
+
+    // Валидация минимальной цены
+    const minPrice = 0.1;
+    if (numericValueParsed < minPrice && numericValueParsed !== 0) {
+      const fieldName = isStandard ? 'стандартної ціни' : 'VIP ціни';
+      onError?.(
+        `Мінімальна ціна для ${fieldName} повинна бути не менше ${minPrice}₴`,
+      );
+      return;
+    }
+
     if (isStandard) {
       onPriceChange(numericValueParsed, safePriceVip);
     } else {
@@ -37,7 +50,7 @@ const PriceBlock: React.FC<PriceBlockProps> = ({
               type="text"
               inputMode="numeric"
               className="price-input"
-              placeholder="0"
+              placeholder="120"
               value={safePriceStandard}
               onChange={(e) => handlePriceChange(e.target.value, true)}
             />
@@ -52,7 +65,7 @@ const PriceBlock: React.FC<PriceBlockProps> = ({
               type="text"
               inputMode="numeric"
               className="price-input"
-              placeholder="0"
+              placeholder="180"
               value={safePriceVip}
               onChange={(e) => handlePriceChange(e.target.value, false)}
             />
