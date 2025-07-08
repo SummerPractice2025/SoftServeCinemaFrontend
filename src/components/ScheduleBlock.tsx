@@ -813,6 +813,7 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
                       setShowEditModal(false);
                       setConflictError(null);
                       setAlertMessage(null);
+                      window.location.reload();
                     } catch (error) {
                       console.error('Помилка при збереженні:', error);
                       const errorMessage =
