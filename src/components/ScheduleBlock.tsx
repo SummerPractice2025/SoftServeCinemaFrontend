@@ -179,6 +179,33 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
 
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
+  const [hallOptions, setHallOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  useEffect(() => {
+    async function fetchHalls() {
+      try {
+        const res = await fetch(`${backendBaseUrl}halls`);
+        const halls = await res.json();
+        setHallOptions(
+          halls.map((h: { id: number; name: string }) => ({
+            value: String(h.id),
+            label: h.name,
+          })),
+        );
+      } catch {
+        setHallOptions([
+          { value: '1', label: 'Зала 1' },
+          { value: '2', label: 'Зала 2' },
+          { value: '3', label: 'Зала 3' },
+          { value: '4', label: 'Зала 4' },
+          { value: '5', label: 'Зала 5' },
+        ]);
+      }
+    }
+    fetchHalls();
+  }, [backendBaseUrl]);
+
   useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && showEditModal) {
@@ -283,11 +310,28 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
           const sessionType =
             detailedSession.session_type_id === 1 ? '2D' : '3D';
 
+          console.log('detailedSession:', detailedSession);
+          let hallId = '';
+          if (detailedSession.hall_id) {
+            hallId = String(detailedSession.hall_id);
+          } else if (detailedSession.hall_name) {
+            const found = hallOptions.find(
+              (h) => h.label === detailedSession.hall_name,
+            )?.value;
+            if (!found) {
+              console.warn(
+                'Не знайдено hallId для hall_name:',
+                detailedSession.hall_name,
+                hallOptions,
+              );
+            }
+            hallId = found || '';
+          }
           const sessionData: Session = {
             id: detailedSession.id ?? session.id,
             time: timeStr,
             title: movieInfo.title,
-            hallId: String(detailedSession.hall_id ?? 1),
+            hallId: hallId,
             formatId: String(detailedSession.session_type_id ?? 1),
             price: detailedSession.price ?? movieInfo.priceStandard ?? 120,
             vipPrice: detailedSession.price_VIP ?? movieInfo.priceVip ?? 180,
@@ -309,6 +353,15 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
 
     loadExistingSessions();
   }, [movieInfo, movieId, backendBaseUrl]);
+
+  useEffect(() => {
+    setCalendarSessionsByDate({});
+    setSavedSessionsByDate({});
+    return () => {
+      setCalendarSessionsByDate({});
+      setSavedSessionsByDate({});
+    };
+  }, [movieId]);
 
   const checkSessionConflicts = (
     sessionsData: Record<string, Record<string, Session[]>>,

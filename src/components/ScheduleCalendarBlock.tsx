@@ -208,7 +208,11 @@ export default function ScheduleCalendarBlock({
 
   const handleAddSession = () => {
     if (visibleSessions.length >= 5) return;
-    const defaultHallId = hallOptions[0]?.value ?? '1';
+    const lastHallId =
+      currentSessions.length > 0
+        ? currentSessions[currentSessions.length - 1].hallId
+        : (hallOptions[0]?.value ?? '1');
+    const defaultHallId = lastHallId;
     const defaultFormatId = formatOptions[0]?.value ?? '1';
 
     const minPrice = 0.1;
@@ -505,8 +509,9 @@ export default function ScheduleCalendarBlock({
                 <CustomSelectGrey
                   options={hallOptions}
                   value={
-                    hallOptions.find((h) => h.value === session.hallId) ||
-                    hallOptions[0]
+                    hallOptions.find(
+                      (h) => String(h.value) === String(session.hallId),
+                    ) || hallOptions[0]
                   }
                   onChange={(option) =>
                     handleSessionChange(index, { hallId: option.value })

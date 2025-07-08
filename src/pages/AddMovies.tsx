@@ -221,8 +221,8 @@ const buildMoviePayload = (
       }`,
       price: session.price,
       priceVIP: session.priceVIP,
-      hallID: parseInt(session.hallId.replace(/\D/g, ''), 10) || 1,
-      sessionTypeID: session.formatId === '2D' ? 1 : 2,
+      hallID: Number(session.hallId) || 1,
+      sessionTypeID: Number(session.formatId) || 1,
     })),
   };
 };
@@ -397,12 +397,29 @@ const AddMovies: React.FC = () => {
             const sessionType =
               detailedSession.session_type_id === 1 ? '2D' : '3D';
 
+            console.log('detailedSession:', detailedSession);
+            let hallId = '';
+            if (detailedSession.hall_id) {
+              hallId = String(detailedSession.hall_id);
+            } else if (detailedSession.hall_name) {
+              const found = hallOptions.find(
+                (h) => h.label === detailedSession.hall_name,
+              )?.value;
+              if (!found) {
+                console.warn(
+                  'Не знайдено hallId для hall_name:',
+                  detailedSession.hall_name,
+                  hallOptions,
+                );
+              }
+              hallId = found || '';
+            }
             const sessionData: Session = {
               id: detailedSession.id ?? session.id,
               time: timeStr,
               title: movieObj.title,
-              hallId: detailedSession.hall_name || 'Зала1',
-              formatId: sessionType,
+              hallId: hallId,
+              formatId: String(detailedSession.session_type_id ?? 1),
               price: detailedSession.price ?? movieObj.priceStandard ?? 120,
               vipPrice: detailedSession.price_VIP ?? movieObj.priceVip ?? 180,
             };
@@ -454,7 +471,6 @@ const AddMovies: React.FC = () => {
     const movieKey = filteredMovie.title;
     const currentMovieSessions = sessionsByDate[movieKey] || {};
 
-    // Валидация минимальной цены
     const minPrice = 0.1;
     const allRawSessions: SessionForPayload[] = Object.entries(
       currentMovieSessions,
@@ -469,7 +485,6 @@ const AddMovies: React.FC = () => {
       })),
     );
 
-    // Проверяем цены всех сеансов
     for (const session of allRawSessions) {
       if (session.price < minPrice) {
         setErrorMessage(
@@ -569,12 +584,29 @@ const AddMovies: React.FC = () => {
             const sessionType =
               detailedSession.session_type_id === 1 ? '2D' : '3D';
 
+            console.log('detailedSession:', detailedSession);
+            let hallId = '';
+            if (detailedSession.hall_id) {
+              hallId = String(detailedSession.hall_id);
+            } else if (detailedSession.hall_name) {
+              const found = hallOptions.find(
+                (h) => h.label === detailedSession.hall_name,
+              )?.value;
+              if (!found) {
+                console.warn(
+                  'Не знайдено hallId для hall_name:',
+                  detailedSession.hall_name,
+                  hallOptions,
+                );
+              }
+              hallId = found || '';
+            }
             const sessionData: Session = {
               id: detailedSession.id ?? session.id,
               time: timeStr,
               title: movieKey,
-              hallId: detailedSession.hall_name || 'Зала1',
-              formatId: sessionType,
+              hallId: hallId,
+              formatId: String(detailedSession.session_type_id ?? 1),
               price:
                 detailedSession.price ?? filteredMovie.priceStandard ?? 120,
               vipPrice:
