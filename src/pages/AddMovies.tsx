@@ -454,6 +454,37 @@ const AddMovies: React.FC = () => {
     const movieKey = filteredMovie.title;
     const currentMovieSessions = sessionsByDate[movieKey] || {};
 
+    // Валидация минимальной цены
+    const minPrice = 0.1;
+    const allRawSessions: SessionForPayload[] = Object.entries(
+      currentMovieSessions,
+    ).flatMap(([date, sessions]) =>
+      sessions.map((session) => ({
+        date,
+        time: session.time,
+        price: session.price,
+        priceVIP: session.vipPrice,
+        hallId: session.hallId,
+        formatId: session.formatId,
+      })),
+    );
+
+    // Проверяем цены всех сеансов
+    for (const session of allRawSessions) {
+      if (session.price < minPrice) {
+        setErrorMessage(
+          `Мінімальна ціна для стандартного місця повинна бути не менше ${minPrice}₴`,
+        );
+        return;
+      }
+      if (session.priceVIP < minPrice) {
+        setErrorMessage(
+          `Мінімальна ціна для VIP місця повинна бути не менше ${minPrice}₴`,
+        );
+        return;
+      }
+    }
+
     const allSessions: { date: string; time: string; hallId: string }[] = [];
 
     for (const [date, sessions] of Object.entries(currentMovieSessions)) {
@@ -481,19 +512,6 @@ const AddMovies: React.FC = () => {
       }
       seen.add(key);
     }
-
-    const allRawSessions: SessionForPayload[] = Object.entries(
-      currentMovieSessions,
-    ).flatMap(([date, sessions]) =>
-      sessions.map((session) => ({
-        date,
-        time: session.time,
-        price: session.price,
-        priceVIP: session.vipPrice,
-        hallId: session.hallId,
-        formatId: session.formatId,
-      })),
-    );
 
     const payload = buildMoviePayload(filteredMovie, allRawSessions);
     console.log('handleSave - Payload JSON:', JSON.stringify(payload, null, 2));
@@ -724,6 +742,7 @@ const AddMovies: React.FC = () => {
                 prev ? { ...prev, priceStandard, priceVip } : prev,
               )
             }
+            onError={(message) => setErrorMessage(message)}
           />
         </div>
       ) : (

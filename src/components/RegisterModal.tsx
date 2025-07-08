@@ -135,8 +135,11 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="register-modal-overlay">
-      <div className="register-modal" onClick={(e) => e.stopPropagation()}>
+    <div className="register-modal-overlay fade-in">
+      <div
+        className="register-modal fade-in"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button className="close" onClick={handleClose} aria-label="Закрити" />
         <h2>Реєстрація</h2>
 

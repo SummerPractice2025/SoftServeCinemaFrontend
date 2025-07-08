@@ -7,8 +7,11 @@ interface CustomAlertProps {
 
 export default function CustomAlert({ message, onClose }: CustomAlertProps) {
   return (
-    <div className="custom-alert-backdrop" onClick={onClose}>
-      <div className="custom-alert" onClick={(e) => e.stopPropagation()}>
+    <div className="custom-alert-backdrop fade-in" onClick={onClose}>
+      <div
+        className="custom-alert fade-in"
+        onClick={(e) => e.stopPropagation()}
+      >
         <p>{message}</p>
         <button className="custom-alert-btn" onClick={onClose}>
           Закрити

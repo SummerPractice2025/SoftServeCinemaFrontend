@@ -12,8 +12,11 @@ const RegistrationConfirmationModal: React.FC<
   if (!isOpen) return null;
 
   return (
-    <div className="confirmation-modal-overlay" onClick={onClose}>
-      <div className="confirmation-modal" onClick={(e) => e.stopPropagation()}>
+    <div className="confirmation-modal-overlay fade-in" onClick={onClose}>
+      <div
+        className="confirmation-modal fade-in"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button className="close" onClick={onClose} aria-label="Закрити" />
         <div className="confirmation-content">
           <h2>Реєстрація успішна!</h2>

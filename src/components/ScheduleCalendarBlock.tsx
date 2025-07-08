@@ -126,6 +126,19 @@ export default function ScheduleCalendarBlock({
 
       if (editingField.field === 'price' || editingField.field === 'vipPrice') {
         updatedValue = Number(tempValue);
+
+        // Валидация минимальной цены
+        const minPrice = 0.1;
+        if (updatedValue < minPrice) {
+          const fieldName =
+            editingField.field === 'price' ? 'стандартного місця' : 'VIP місця';
+          setAlertMessage(
+            `Мінімальна ціна для ${fieldName} повинна бути не менше ${minPrice}₴`,
+          );
+          setEditingField(null);
+          setTempValue('');
+          return;
+        }
       } else if (editingField.field === 'formatId') {
         updatedValue = Number(tempValue);
       }
@@ -149,13 +162,19 @@ export default function ScheduleCalendarBlock({
     if (visibleSessions.length >= 5) return;
     const defaultHallId = hallOptions[0]?.value ?? '1';
     const defaultFormatId = formatOptions[0]?.value ?? '1';
+
+    // Валидация минимальной цены для новых сеансов
+    const minPrice = 0.1;
+    const standardPrice = Math.max(basePriceStandard || 120, minPrice);
+    const vipPrice = Math.max(basePriceVip || 180, minPrice);
+
     const newSession: Session = {
       time: '12:00',
       title: movie?.title || 'Назва',
       hallId: defaultHallId,
       formatId: defaultFormatId,
-      price: basePriceStandard || 120,
-      vipPrice: basePriceVip || 180,
+      price: standardPrice,
+      vipPrice: vipPrice,
     };
     const updatedSessions = [...currentSessions, newSession];
     const updatedSessionsByDate = {
@@ -267,6 +286,25 @@ export default function ScheduleCalendarBlock({
     updatedSession: Partial<Session>,
   ) => {
     const updated = [...currentSessions];
+
+    // Валидация минимальной цены при изменении сеанса
+    const minPrice = 0.1;
+    if (updatedSession.price !== undefined && updatedSession.price < minPrice) {
+      setAlertMessage(
+        `Мінімальна ціна для стандартного місця повинна бути не менше ${minPrice}₴`,
+      );
+      return;
+    }
+    if (
+      updatedSession.vipPrice !== undefined &&
+      updatedSession.vipPrice < minPrice
+    ) {
+      setAlertMessage(
+        `Мінімальна ціна для VIP місця повинна бути не менше ${minPrice}₴`,
+      );
+      return;
+    }
+
     updated[index] = { ...updated[index], ...updatedSession };
     console.log('handleSessionChange - оновлені сесії:', updated);
     const updatedSessionsByDate = {
@@ -462,7 +500,8 @@ export default function ScheduleCalendarBlock({
                     onBlur={finishEditing}
                     onKeyDown={(e) => e.key === 'Enter' && finishEditing()}
                     onClick={(e) => e.stopPropagation()}
-                    min={0}
+                    min={0.1}
+                    step={0.1}
                     autoFocus
                   />
                 ) : (
@@ -495,7 +534,8 @@ export default function ScheduleCalendarBlock({
                     onBlur={finishEditing}
                     onKeyDown={(e) => e.key === 'Enter' && finishEditing()}
                     onClick={(e) => e.stopPropagation()}
-                    min={0}
+                    min={0.1}
+                    step={0.1}
                     autoFocus
                   />
                 ) : (

@@ -25,10 +25,12 @@ const formatConflictMessage = (errorText: string): string => {
 
     formattedText = formattedText.replace(/\(Фільм([^)]*)\)/g, 'Фільм$1');
 
+    formattedText = formattedText.trim().replace(/[})]+$/, '');
+
     return formattedText;
   }
 
-  return errorText;
+  return errorText.trim().replace(/[})]+$/, '');
 };
 
 interface Option {
@@ -357,15 +359,32 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
         throw new Error(conflict);
       }
 
+      // Валидация минимальной цены
+      const minPrice = 0.1;
+      const movieKey = movieInfo.title;
+      const currentMovieSessions = sessionsData[movieKey] || {};
+
+      for (const [dateStr, sessions] of Object.entries(currentMovieSessions)) {
+        for (const session of sessions) {
+          if (session.price < minPrice) {
+            const errorMessage = `Мінімальна ціна для стандартного місця повинна бути не менше ${minPrice}₴ (сеанс ${session.time} ${dateStr})`;
+            setConflictError(errorMessage);
+            throw new Error(errorMessage);
+          }
+          if (session.vipPrice < minPrice) {
+            const errorMessage = `Мінімальна ціна для VIP місця повинна бути не менше ${minPrice}₴ (сеанс ${session.time} ${dateStr})`;
+            setConflictError(errorMessage);
+            throw new Error(errorMessage);
+          }
+        }
+      }
+
       setConflictError(null);
 
       console.log(' Діагностика для створення сеансу:');
       console.log('  - movieInfo.id:', movieInfo.id);
       console.log('  - movieInfo.title:', movieInfo.title);
       console.log('  - backendBaseUrl:', backendBaseUrl);
-
-      const movieKey = movieInfo.title;
-      const currentMovieSessions = sessionsData[movieKey] || {};
 
       const newSessions: {
         payload: CreateSessionPayload;
