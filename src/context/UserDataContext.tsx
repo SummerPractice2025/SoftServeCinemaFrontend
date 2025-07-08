@@ -98,7 +98,9 @@ export const UserDataProvider: React.FC<UserDataProviderProps> = ({
   }, [refreshTrigger]);
 
   useEffect(() => {
-    if (!apiService.isAuthenticated()) {
+    if (apiService.isAuthenticated()) {
+      fetchUserData();
+    } else {
       setUserData(null);
     }
   }, []);

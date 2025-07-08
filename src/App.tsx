@@ -10,6 +10,7 @@ import { AuthProvider } from './context/AuthContext';
 import { AdminProvider } from './context/AdminContext';
 import { UserDataProvider } from './context/UserDataContext';
 import AdminRoute from './components/AdminRoute';
+import StatisticsPage from './pages/StatisticsPage';
 
 const AppContent = () => {
   const { isRegisterModalOpen, closeRegisterModal } = useModal();
@@ -31,6 +32,14 @@ const AppContent = () => {
         <Route
           path="/booking-session/:date/:time/:format/"
           element={<BookingPage />}
+        />
+        <Route
+          path="/statistics"
+          element={
+            <AdminRoute>
+              <StatisticsPage />
+            </AdminRoute>
+          }
         />
       </Routes>
       <RegisterModal

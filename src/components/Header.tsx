@@ -44,6 +44,15 @@ const Header: React.FC = () => {
     }
   }, [isPanelOpen, refreshTrigger]);
 
+  useEffect(() => {
+    if (
+      !isAdminMode &&
+      (location.pathname === '/add' || location.pathname === '/statistics')
+    ) {
+      navigate('/');
+    }
+  }, [isAdminMode, location.pathname, navigate]);
+
   const isUserAuthenticated = apiService.isAuthenticated();
 
   const handleHome = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -236,8 +245,8 @@ const Header: React.FC = () => {
       {isUserAuthenticated && userData?.user.is_admin && (
         <>
           <button
-            className={`data-button${location.pathname === '/movies' || shouldHideAdminElements ? ' hidden' : ''}${isPanelOpen ? ' moved' : ''}`}
-            onClick={() => navigate('/movies')}
+            className={`data-button${location.pathname === '/statistics' || shouldHideAdminElements ? ' hidden' : ''}${isPanelOpen ? ' moved' : ''}`}
+            onClick={() => navigate('/statistics')}
             type="button"
             aria-label="Всі фільми"
           >
