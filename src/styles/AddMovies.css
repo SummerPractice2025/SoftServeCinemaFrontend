@@ -121,11 +121,12 @@
   justify-content: center;
   align-items: flex-start;
   max-width: 90rem;
+  margin: 0 auto;
 }
 
 .poster-block {
   flex: 0 1 200px;
-  min-width: 200px;
+  min-width: 300px;
   margin-left: 200px;
 }
 
@@ -159,19 +160,4 @@
   transition:
     0.3s ease,
     color 0.3s ease;
-}
-
-@media (max-width: 768px) {
-  .movie-details-container {
-    flex-direction: column;
-    padding: 20px;
-  }
-
-  .poster-block img {
-    max-width: 100%;
-  }
-
-  .trailer-button {
-    max-width: 100%;
-  }
 }
