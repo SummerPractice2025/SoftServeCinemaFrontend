@@ -215,6 +215,46 @@ class ApiService {
       await this.api.get<{ id: number; type: string }[]>('/session/types');
     return response.data;
   }
+
+  async getStatsMoney(): Promise<{ money: number }> {
+    const url = '/stats/money';
+    console.log('GET запрос к:', this.api.defaults.baseURL + url);
+    const response = await this.api.get<{ money: number }>(url);
+    return response.data;
+  }
+
+  async getStatsOccupancy(): Promise<{
+    halls: { hall_id: number; hall_name: string; occupancy: number }[];
+  }> {
+    const url = '/stats/occupancy';
+    console.log('GET запрос к:', this.api.defaults.baseURL + url);
+    const response = await this.api.get<{
+      halls: { hall_id: number; hall_name: string; occupancy: number }[];
+    }>(url);
+    return response.data;
+  }
+
+  async getStatsTopTickets(): Promise<{
+    films: { film_name: string; sold_tickets: number }[];
+  }> {
+    const url = '/stats/top/tickets';
+    const response = await this.api.get<{
+      films: { film_name: string; sold_tickets: number }[];
+    }>(url);
+    return response.data;
+  }
+
+  async getStatsTopMoney(
+    period: 'day' | 'week' | 'month' = 'week',
+  ): Promise<{ film_name: string; money: number }[]> {
+    const url = '/stats/top/money';
+    const response = await this.api.get<{
+      day: any[];
+      week: any[];
+      month: any[];
+    }>(url);
+    return Array.isArray(response.data[period]) ? response.data[period] : [];
+  }
 }
 
 export const apiService = new ApiService();

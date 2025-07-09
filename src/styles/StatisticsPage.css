@@ -112,6 +112,6 @@
 }
 .statistics-period-btn.active,
 .statistics-period-btn:hover {
-  background: linear-gradient(90deg, #ff4b7e 0%, #ff6a85 100%);
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
   color: #fff;
 }
