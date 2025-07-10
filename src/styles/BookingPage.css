@@ -9,31 +9,29 @@ body {
 .booking-page {
   background-color: #222222;
   width: 100%;
-  padding: 2rem 2.5rem 2.5rem;
-  box-sizing: border-box;
-
+  padding: 2rem 0 2.5rem;
   color: white;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-
   justify-content: center;
   align-items: flex-start;
-
   font-family: 'Open Sans', sans-serif;
 }
 
-.main-section {
+.booking-page .main-section {
   flex: 1;
   display: flex;
   flex-direction: column;
-  margin-left: 5rem;
+  margin-left: 11%;
 }
 
-.top-block {
+.booking-page .top-block {
   display: flex;
   flex-direction: row;
   gap: 20px;
+  max-width: 800px;
+  min-width: 600px;
   align-items: flex-start;
 }
 
@@ -43,23 +41,23 @@ body {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
-.movie-details {
+.booking-page .movie-details {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
 }
 
-.movie-details h2 {
+.booking-page .movie-details h2 {
   line-height: 1;
   font-family: 'Montserrat', sans-serif;
 }
 
-.movie-details p {
+.booking-page .movie-details p {
   line-height: 1.9;
   margin: 0px;
 }
 
-.seat-section {
+.booking-page .seat-section {
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -67,7 +65,7 @@ body {
   margin-left: 8%;
 }
 
-.screen {
+.booking-page .screen {
   width: calc(var(--seats-per-row) * 40px);
   height: 20px;
   border-top: 4px solid white;
@@ -79,14 +77,14 @@ body {
   position: relative;
 }
 
-.seat-grid {
+.booking-page .seat-grid {
   width: calc(var(--seats-per-row) * 40px);
   display: grid;
   grid-template-columns: repeat(var(--seats-per-row), 1fr);
   gap: 9px;
 }
 
-.seat-button {
+.booking-page .seat-button {
   width: 30px;
   height: 35px;
   border: 3.5px solid #5a5a5a;
@@ -96,16 +94,16 @@ body {
   padding: 0;
 }
 
-.seat-button:hover {
+.booking-page .seat-button:hover {
   background-color: #444;
   border-color: white;
 }
 
-.seat-button.selected {
+.booking-page .seat-button.selected {
   background-color: #5a5a5a;
 }
 
-.seat-button.vip {
+.booking-page .seat-button.vip {
   position: relative;
   width: 30px;
   height: 35px;
@@ -116,7 +114,7 @@ body {
   border: none;
 }
 
-.seat-button.vip::before {
+.booking-page .seat-button.vip::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -132,17 +130,17 @@ body {
   z-index: -1;
 }
 
-.seat-button.vip:hover {
+.booking-page .seat-button.vip:hover {
   background: #991f40;
 }
 
-.seat-button.selected.vip {
+.booking-page .seat-button.selected.vip {
   background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
   color: #222222;
   border-radius: 5px;
 }
 
-.order-section {
+.booking-page .order-section {
   position: fixed;
   top: 6rem;
   height: 580px;
@@ -156,13 +154,15 @@ body {
   box-sizing: border-box;
   overflow: hidden;
 }
-.seat-info {
+
+.booking-page .seat-info {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 10px;
 }
-.order-section h3 {
+
+.booking-page .order-section h3 {
   font-family: 'Montserrat', sans-serif;
 }
 
@@ -223,7 +223,6 @@ body {
   line-height: 1.1;
   margin-top: 6px;
   position: absolute;
-
   left: 12px;
   right: 12px;
   z-index: 2;
@@ -254,7 +253,7 @@ body {
   margin-left: 50px;
 }
 
-.order-actions {
+.booking-page .order-actions {
   margin-top: auto;
   display: flex;
   justify-content: space-between;
@@ -262,7 +261,7 @@ body {
   gap: 10px;
 }
 
-.continue-button {
+.booking-page .continue-button {
   background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
   color: white;
   padding: 8px 20px;
@@ -276,7 +275,7 @@ body {
   white-space: nowrap;
 }
 
-.continue-button:hover {
+.booking-page .continue-button:hover {
   background: white;
   color: black;
   transition:
@@ -284,20 +283,20 @@ body {
     color 0.3s ease;
 }
 
-.total-price {
+.booking-page .total-price {
   font-weight: bold;
   font-size: 1.1rem;
   white-space: nowrap;
 }
 
-.gradient-vip {
+.booking-page .gradient-vip {
   background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: bold;
 }
 
-.seat-button.booked {
+.booking-page .seat-button.booked {
   background-color: #ccc;
   color: #333;
   cursor: not-allowed;
