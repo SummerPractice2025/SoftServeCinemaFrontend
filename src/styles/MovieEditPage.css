@@ -2,12 +2,14 @@
   background-color: #222222;
   width: 100%;
   max-width: 1200px;
+  min-width: 900px;
   margin: 0 auto;
   padding: 1rem 10px 2.5rem;
   box-sizing: border-box;
   color: white;
   display: flex;
   flex-direction: row;
+
   gap: 20px;
   justify-content: center;
   align-items: flex-start;
@@ -93,4 +95,44 @@
   transition:
     0.3s ease,
     color 0.3s ease;
+}
+
+@media (max-width: 900px) {
+  .movie-edit-page {
+    flex-direction: column;
+    min-width: 0;
+    align-items: stretch;
+    gap: 30px;
+  }
+  .movie-edit-page .poster-block,
+  .movie-edit-page .info-block,
+  .movie-edit-page .schedule-container {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    transform: none !important;
+    height: auto !important;
+    min-height: unset !important;
+    max-height: unset !important;
+  }
+  .movie-edit-page .poster-block img {
+    height: auto !important;
+    min-height: unset !important;
+    max-height: 350px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .movie-edit-page {
+    padding: 0.5rem 2px 1.5rem;
+    gap: 15px;
+  }
+  .movie-edit-page .trailer-button,
+  .movie-edit-page .confirm-button {
+    width: 100% !important;
+    max-width: 100% !important;
+    font-size: 1rem;
+    padding: 0.5rem 0.5rem;
+  }
 }

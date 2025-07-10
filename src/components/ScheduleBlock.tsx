@@ -6,6 +6,7 @@ import CustomAlert from './CustomAlert';
 import type { Movie } from './MovieInfoAdmin';
 import type { Session } from './ScheduleCalendarBlock';
 import apiService from '../services/api';
+import { useAdmin } from '../context/AdminContext';
 
 const formatConflictMessage = (errorText: string): string => {
   if (errorText.includes('конфліктує з сеансом о')) {
@@ -153,6 +154,7 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
   movieId,
   isAdminCheck = false,
 }) => {
+  const { isAdminMode } = useAdmin();
   const navigate = useNavigate();
   const dayOptions = getDateOptions();
   const backendBaseUrl = import.meta.env.VITE_BACKEND_BASE_URL;
@@ -163,6 +165,12 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
     {},
   );
   const [showEditModal, setShowEditModal] = useState(false);
+  // Закривати модальне вікно, якщо вимикається адмін-режим
+  useEffect(() => {
+    if (!isAdminMode && showEditModal) {
+      setShowEditModal(false);
+    }
+  }, [isAdminMode, showEditModal]);
 
   const [calendarSessionsByDate, setCalendarSessionsByDate] = useState<
     Record<string, Record<string, Session[]>>
