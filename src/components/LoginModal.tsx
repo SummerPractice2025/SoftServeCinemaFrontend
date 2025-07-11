@@ -40,7 +40,6 @@ const LoginModal: React.FC<LoginModalProps> = ({
       console.log('Успішний вхід');
       onClose();
       onLoginSuccess?.();
-      // Можно добавить обновление состояния приложения или перенаправление
     } catch (error: any) {
       console.error('Помилка входу:', error);
 

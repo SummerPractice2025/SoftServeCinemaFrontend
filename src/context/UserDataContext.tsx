@@ -68,14 +68,12 @@ export const UserDataProvider: React.FC<UserDataProviderProps> = ({
     }
 
     try {
-      // Используем apiService для запроса (refresh токена сработает автоматически)
       const response = await apiService.get<{
         user: User;
         bookings: Booking[];
       }>(`/user/${userId}`);
       setUserData(response.data);
     } catch (err) {
-      // Если после всех попыток пользователь не авторизован — сбрасываем userData
       if (!apiService.isAuthenticated()) {
         setUserData(null);
       }
@@ -93,6 +91,18 @@ export const UserDataProvider: React.FC<UserDataProviderProps> = ({
     } else {
       setUserData(null);
     }
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (apiService.isAuthenticated()) {
+        fetchUserData();
+      } else {
+        setUserData(null);
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const refreshUserData = () => {

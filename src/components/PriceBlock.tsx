@@ -23,7 +23,6 @@ const PriceBlock: React.FC<PriceBlockProps> = ({
     const numericValue = value.replace(/[^0-9]/g, '');
     const numericValueParsed = numericValue ? parseInt(numericValue) : 0;
 
-    // Валидация минимальной цены
     const minPrice = 0.1;
     if (numericValueParsed < minPrice && numericValueParsed !== 0) {
       const fieldName = isStandard ? 'стандартної ціни' : 'VIP ціни';

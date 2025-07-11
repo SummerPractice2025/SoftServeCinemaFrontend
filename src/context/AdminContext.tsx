@@ -24,11 +24,20 @@ interface AdminProviderProps {
 export const AdminProvider: React.FC<AdminProviderProps> = ({ children }) => {
   const [isAdminMode, setIsAdminMode] = useState(false);
 
-  // Сбрасываем админский режим, если пользователь не авторизован
   useEffect(() => {
     if (!apiService.isAuthenticated()) {
       setIsAdminMode(false);
     }
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!apiService.isAuthenticated()) {
+        setIsAdminMode(false);
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
   }, []);
 
   return (

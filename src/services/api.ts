@@ -282,6 +282,15 @@ if (typeof window !== 'undefined') {
       console.log('Авторизований:', auth);
       return auth;
     },
+    testTokenUpdate: () => {
+      console.log(' Тестирование обновления токена...');
+      const newToken = 'test-token-' + Date.now();
+      localStorage.setItem('access_token', newToken);
+      console.log(' Новый токен установлен:', newToken);
+      console.log(
+        'Теперь состояние должно обновиться автоматически через 1-3 секунды',
+      );
+    },
     showAllTokens: () => {
       console.log(' === ПЕРЕГЛЯД ВСІХ ТОКЕНІВ ===');
 
@@ -330,5 +339,6 @@ if (typeof window !== 'undefined') {
   );
   console.log('- devUtils.getToken() - показати поточний токен');
   console.log('- devUtils.isAuthenticated() - перевірити авторизацію');
+  console.log('- devUtils.testTokenUpdate() - протестувати оновлення токена');
   console.log('- devUtils.showAllTokens() - показати всі токени та cookies');
 }
