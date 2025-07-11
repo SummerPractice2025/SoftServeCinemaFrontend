@@ -43,6 +43,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkAuth();
   }, []);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      checkAuth();
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
