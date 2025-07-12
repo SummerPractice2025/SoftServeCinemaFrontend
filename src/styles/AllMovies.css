@@ -1,0 +1,178 @@
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 0.5rem 2.5rem;
+  background-color: #222222;
+  box-sizing: border-box;
+  width: 100%;
+  color: white;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr));
+  gap: 2rem 6rem;
+  justify-content: center;
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.content-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  color: white;
+  width: 19rem;
+  min-width: 8rem;
+}
+
+.poster-wrapper {
+  position: relative;
+  min-height: 500px !important;
+  height: 500px !important;
+  width: 100%;
+  overflow: hidden;
+}
+
+.poster {
+  width: 100%;
+  max-width: 19rem;
+  height: 500px !important;
+  object-fit: cover;
+  display: block;
+  transition: filter 0.3s;
+  box-shadow: 0 0.25rem 0.625rem rgba(0, 0, 0, 0.5);
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition:
+    background-color 0.3s,
+    opacity 0.3s;
+}
+
+.poster-wrapper:hover .overlay {
+  background-color: rgba(0, 0, 0, 0.4);
+  opacity: 1;
+  pointer-events: all;
+}
+
+.sessionTime {
+  font-size: 20px;
+  text-align: center;
+  margin: 5px 0;
+}
+
+.trailer-btn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.trailer-btn .icon {
+  transform: translateX(2px);
+}
+
+.trailer-btn:hover {
+  background: white;
+  color: black;
+  transition:
+    0.3s ease,
+    color 0.3s ease;
+}
+
+.buy-btn {
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
+  border: none;
+  border-radius: 5px;
+  padding: 8px 15px;
+  color: white;
+  cursor: pointer;
+  font-size: 20px;
+  margin: 5px auto 0 auto;
+  display: block;
+}
+
+.buy-btn:hover {
+  background: white;
+  color: black;
+  transition:
+    0.3s ease,
+    color 0.3s ease;
+}
+
+.title {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 2rem;
+}
+
+.nextSession {
+  font-size: 20px;
+  text-align: center;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+  display: inline-block;
+}
+
+.filter-bar {
+  display: inline-block;
+  margin: 0 70rem 20px 0;
+  width: 100%;
+  max-width: 300px;
+}
+
+.narrow-select {
+  max-width: 200px;
+  width: 100%;
+}
+
+.no-sessions {
+  color: white;
+}
+
+.fade-in {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeInPanel 0.4s ease forwards;
+}
+
+@keyframes fadeInPanel {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

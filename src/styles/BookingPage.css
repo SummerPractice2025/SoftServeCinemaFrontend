@@ -1,0 +1,303 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Open Sans', sans-serif;
+  background-color: #222222;
+  color: white;
+}
+
+.booking-page {
+  background-color: #222222;
+  width: 100%;
+  padding: 2rem 0 2.5rem;
+  color: white;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.booking-page .main-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: 11%;
+}
+
+.booking-page .top-block {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  max-width: 800px;
+  min-width: 600px;
+  align-items: flex-start;
+}
+
+.booking-page .poster {
+  width: 150px !important;
+  height: 240px !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.booking-page .movie-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.booking-page .movie-details h2 {
+  line-height: 1;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.booking-page .movie-details p {
+  line-height: 1.9;
+  margin: 0px;
+}
+
+.booking-page .seat-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: flex-start;
+  margin-left: 8%;
+}
+
+.booking-page .screen {
+  width: calc(var(--seats-per-row) * 40px);
+  height: 20px;
+  border-top: 4px solid white;
+  border-radius: 0 0 100% 100%;
+  text-align: center;
+  font-size: 14px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.booking-page .seat-grid {
+  width: calc(var(--seats-per-row) * 40px);
+  display: grid;
+  grid-template-columns: repeat(var(--seats-per-row), 1fr);
+  gap: 9px;
+}
+
+.booking-page .seat-button {
+  width: 30px;
+  height: 35px;
+  border: 3.5px solid #5a5a5a;
+  background-color: transparent;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.booking-page .seat-button:hover {
+  background-color: #444;
+  border-color: white;
+}
+
+.booking-page .seat-button.selected {
+  background-color: #5a5a5a;
+}
+
+.booking-page .seat-button.vip {
+  position: relative;
+  width: 30px;
+  height: 35px;
+  background: #222222;
+  color: #ff6b99;
+  border-radius: 10px;
+  z-index: 0;
+  border: none;
+}
+
+.booking-page .seat-button.vip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 2.8px;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
+  -webkit-mask:
+    linear-gradient(#ff3366 0 0) content-box,
+    linear-gradient(#ff6b99 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.booking-page .seat-button.vip:hover {
+  background: #991f40;
+}
+
+.booking-page .seat-button.selected.vip {
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
+  color: #222222;
+  border-radius: 5px;
+}
+
+.booking-page .order-section {
+  position: fixed;
+  top: 6rem;
+  height: 580px;
+  right: 18%;
+  background-color: #5a5a5a;
+  padding: 20px;
+  border-radius: 12px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.booking-page .seat-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.booking-page .order-section h3 {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.booking-page .ticket-list-container {
+  overflow-y: auto;
+  flex-grow: 1;
+  max-height: 380px;
+  margin-bottom: 20px;
+  padding-right: 10px;
+  box-sizing: border-box;
+}
+
+.booking-page .ticket-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.booking-page .ticket-list-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.booking-page .ticket-list-container::-webkit-scrollbar-track {
+  background: #5a5a5a;
+  border-radius: 8px;
+}
+
+.booking-page .ticket-list-container::-webkit-scrollbar-thumb {
+  background-color: #222222;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.booking-page .ticket-list-container::-webkit-scrollbar-thumb:hover {
+  background-color: #222222;
+}
+
+.booking-page .ticket-card {
+  background-color: #222222;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 60px;
+  min-height: 60px;
+  position: relative;
+}
+
+.booking-page .seat-location {
+  font-weight: bold;
+  color: white;
+  line-height: 1.1;
+  margin-top: 6px;
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  z-index: 2;
+}
+
+.booking-page .seat-type-price {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  position: absolute;
+  bottom: 8px;
+  left: 12px;
+  right: 12px;
+  z-index: 1;
+}
+
+.booking-page .seat-type {
+  text-align: left;
+  color: #ccc;
+  margin-right: 90px;
+}
+
+.booking-page .seat-price {
+  font-weight: bold;
+  color: white;
+  text-align: right;
+  margin-left: 50px;
+}
+
+.booking-page .order-actions {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.booking-page .continue-button {
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
+  color: white;
+  padding: 8px 20px;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 80%;
+  flex-grow: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.booking-page .continue-button:hover {
+  background: white;
+  color: black;
+  transition:
+    0.3s ease,
+    color 0.3s ease;
+}
+
+.booking-page .total-price {
+  font-weight: bold;
+  font-size: 1.1rem;
+  white-space: nowrap;
+}
+
+.booking-page .gradient-vip {
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+}
+
+.booking-page .seat-button.booked {
+  background-color: #ccc;
+  color: #333;
+  cursor: not-allowed;
+}

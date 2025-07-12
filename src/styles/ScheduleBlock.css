@@ -1,0 +1,352 @@
+.schedule-block {
+  width: 100%;
+  max-width: 320px;
+  min-width: 280px;
+  background-color: #5a5a5a;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  color: white;
+  font-family: 'Open Sans', sans-serif;
+  align-self: flex-start;
+  height: auto;
+  flex-grow: 0;
+  min-height: 0;
+}
+
+.schedule-header,
+.schedule-footer {
+  background-color: #7a7a7a;
+  text-align: center;
+  padding-top: 4px;
+  padding-bottom: 16px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.schedule-header h3 {
+  font-size: 24px;
+  margin-bottom: 10px;
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+}
+
+.schedule-middle {
+  background-color: #3a3a3a;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  box-sizing: border-box;
+  min-height: 200px;
+  height: auto;
+  flex-grow: 0;
+}
+
+.schedule-dropdown {
+  background-color: #434040;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  padding: 8px 20px;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: inherit;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+  width: 100%;
+  max-width: 320px;
+  outline: none;
+  appearance: none;
+}
+
+.schedule-dropdown:hover,
+.schedule-dropdown:focus {
+  background-color: white;
+  color: black;
+  outline: none;
+}
+
+.schedule-dropdown option {
+  background-color: #302f2f;
+  color: white;
+  font-weight: bold;
+  font-family: inherit;
+  border-radius: 6px;
+}
+.schedule-dropdown option:hover {
+  background-color: white;
+  color: black;
+}
+
+.schedule-row {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.schedule-time-button {
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
+  font-weight: bold;
+  cursor: pointer;
+  width: auto;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+.schedule-time-button:hover {
+  background: none;
+  -webkit-text-fill-color: white;
+  color: white;
+}
+
+.redact-button {
+  background-color: #434040;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  padding: 8px 20px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  width: 100%;
+  max-width: 320px;
+}
+
+.redact-button:hover {
+  background-color: white;
+  color: black;
+}
+
+.schedule-time-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0px;
+  min-width: 50px;
+}
+
+.no-sessions {
+  padding: 20px;
+  text-align: center;
+  font-size: 1.1em;
+  color: gray;
+}
+.schedule-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+  pointer-events: auto;
+}
+
+.schedule-modal {
+  position: fixed;
+  top: 53%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #3a3a3a;
+  border-radius: 8px;
+  padding: 30px;
+  max-height: 90vh;
+  overflow-y: hidden;
+  width: 95%;
+  max-width: 1100px;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 1);
+  z-index: 100;
+  pointer-events: auto;
+  color: white;
+}
+
+.schedule-modal-content {
+  pointer-events: auto;
+  position: relative;
+  z-index: 1000002;
+  user-select: none;
+}
+
+.schedule-modal-content * {
+  pointer-events: auto;
+}
+
+.schedule-modal-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #555;
+}
+
+.schedule-save-button,
+.schedule-cancel-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.schedule-save-button {
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
+  color: white;
+}
+
+.schedule-save-button:hover {
+  background: white;
+  color: black;
+  transition:
+    0.3s ease,
+    color 0.3s ease;
+}
+
+.schedule-cancel-button {
+  background-color: #555;
+  color: white;
+}
+
+.schedule-cancel-button:hover {
+  background-color: white;
+  color: black;
+}
+
+.schedule-modal-close-button {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  appearance: none;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: none !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+
+  font-size: 25px;
+  cursor: pointer;
+  color: white;
+  z-index: 1000020;
+  pointer-events: auto;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.schedule-modal * {
+  pointer-events: auto;
+}
+
+.schedule-modal .calendar-wrapper {
+  background-color: #3a3a3a;
+  color: white;
+}
+
+.schedule-modal .session-panel {
+  background-color: #5a5a5a;
+  color: white;
+  max-height: 60vh;
+  overflow-y: auto;
+  overflow-x: visible;
+  padding-right: 10px;
+  position: relative;
+}
+
+.schedule-modal .session-panel::-webkit-scrollbar {
+  width: 8px;
+}
+
+.schedule-modal .session-panel::-webkit-scrollbar-track {
+  background-color: #555;
+  border-radius: 10px;
+}
+
+.schedule-modal .session-panel::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
+  border-radius: 4px;
+  border: 1px solid #555;
+}
+
+.schedule-modal .session-panel::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #ff6b99 0%, #ff3366 100%);
+}
+
+.schedule-modal .session-panel {
+  scrollbar-width: thin;
+  scrollbar-color: #2a2a2a #555;
+}
+
+.schedule-modal .session-card {
+  background-color: #2a2a2a;
+  color: white;
+  border: 1px solid #555;
+}
+
+.schedule-modal * {
+  color: inherit;
+}
+
+.schedule-modal .react-calendar {
+  background-color: transparent;
+  color: white;
+}
+
+.schedule-modal .react-calendar__tile,
+.schedule-modal .react-calendar__navigation button {
+  color: white;
+  background-color: transparent;
+}
+
+.schedule-modal .react-calendar__tile:hover {
+  background-color: #5a5a5a;
+  color: white;
+}
+
+.schedule-modal .custom-select-container {
+  position: relative;
+  z-index: 1000;
+}
+
+.schedule-modal .custom-select-dropdown {
+  position: absolute;
+  z-index: 1001;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.schedule-modal .react-select__menu {
+  z-index: 9999 !important;
+  position: fixed !important;
+}
+
+.schedule-modal .react-select__menu-portal {
+  z-index: 9999 !important;
+}
+
+.conflict-error-message {
+  color: #ff3366;
+  font-size: 14px;
+  text-align: center;
+  margin: 0 0;
+  padding: 0 12px;
+}

@@ -1,0 +1,168 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+
+.login-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.login-modal {
+  background: #3a3a3a;
+  padding: 40px 30px 30px;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 380px;
+  position: relative;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: inherit;
+}
+
+.login-modal h2 {
+  font-size: 24px;
+  margin-bottom: 25px;
+  text-align: center;
+  width: 100%;
+}
+
+.login-modal input {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  border: 1px solid #3a3a4a;
+  background: #222222;
+  color: #fff;
+  font-size: 14px;
+  transition: border 0.2s;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.login-modal input::placeholder {
+  color: #888;
+}
+
+.login-modal input:focus {
+  outline: none;
+  border-color: #ff6b99;
+}
+
+.login-modal .error {
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 13px;
+  margin-bottom: 10px;
+  text-align: center;
+  width: 100%;
+  font-family: inherit;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  margin-top: 10px;
+  font-family: inherit;
+}
+
+.login-modal .actions .login-btn {
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
+  color: white;
+  padding: 8px 18px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  width: 110px;
+  height: 38px;
+  text-align: center;
+  font-family: inherit;
+  display: block;
+  margin: 0 auto;
+  box-shadow: 0 4px 12px rgba(255, 107, 153, 0.3);
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+
+.login-modal .actions .login-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(255, 107, 153, 0.3);
+}
+
+.close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: transparent;
+  border: none;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.close::before,
+.close::after {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: 0;
+  width: 30px;
+  height: 2px;
+  background: #fff;
+  font-family: inherit;
+}
+
+.close::before {
+  transform: rotate(45deg);
+}
+
+.close::after {
+  transform: rotate(-45deg);
+}
+
+.actions.single {
+  justify-content: center;
+}
+
+.register-btn {
+  margin-top: 16px;
+  background: none;
+  border: none;
+  color: #ff6b99;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: underline;
+  font-family: inherit;
+  transition: color 0.2s;
+}
+
+.register-btn:hover {
+  color: #ff3366;
+}
+
+.fade-in {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeInPanel 0.4s ease forwards;
+}
+
+@keyframes fadeInPanel {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

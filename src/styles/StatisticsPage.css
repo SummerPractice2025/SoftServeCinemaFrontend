@@ -1,0 +1,116 @@
+.statistics-page-root {
+  background: #222222;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.statistics-page-content {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 16px 0 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.statistics-title {
+  font-weight: 400;
+  font-size: 28px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.statistics-revenue {
+  font-size: 22px;
+  margin-bottom: 32px;
+  text-align: center;
+}
+.statistics-revenue span {
+  font-weight: 500;
+}
+
+.statistics-halls-title {
+  font-size: 20px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.statistics-halls {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 36px;
+  justify-content: center;
+}
+
+.statistics-hall {
+  text-align: center;
+}
+.statistics-hall-percent {
+  font-size: 28px;
+  font-weight: 500;
+}
+.statistics-hall-label {
+  font-size: 16px;
+  color: #ccc;
+}
+
+.statistics-block {
+  background: #2a2a2e;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  max-width: 800px;
+  width: 100%;
+}
+.statistics-block-title {
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+.statistics-block-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.statistics-block-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+.statistics-block-right {
+  color: #ccc;
+  text-align: right;
+}
+.statistics-block-sub {
+  font-size: 13px;
+}
+
+.statistics-period-buttons {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 24px;
+  justify-content: center;
+}
+
+.statistics-period-btn {
+  background: #2a2a2e;
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  padding: 12px 36px;
+  font-size: 18px;
+  font-weight: 400;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+  outline: none;
+  position: relative;
+}
+.statistics-period-btn.active,
+.statistics-period-btn:hover {
+  background: linear-gradient(135deg, #ff3366 0%, #ff6b99 100%);
+  color: #fff;
+}
