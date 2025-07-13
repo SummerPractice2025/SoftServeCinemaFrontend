@@ -81,7 +81,6 @@ const MovieInfo: React.FC<MovieInfoProps> = ({
         const res = await fetch(`${backendBaseUrl}movie/${movieId}`);
         if (!res.ok) throw new Error('Помилка при завантаженні фільму');
         const raw = await res.json();
-        console.log('Backend movie data:', raw);
 
         const transformedMovie: Movie = {
           id: raw.id,
@@ -96,7 +95,6 @@ const MovieInfo: React.FC<MovieInfoProps> = ({
           genres: raw.genres ?? [],
           studios: raw.studios ?? [],
         };
-        console.log('Backend movie data:', raw);
 
         setMovie(transformedMovie);
       } catch (err) {

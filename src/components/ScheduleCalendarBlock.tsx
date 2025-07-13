@@ -133,7 +133,6 @@ export default function ScheduleCalendarBlock({
     async function fetchOptions() {
       const hallsRes = await fetch(`${backendBaseUrl}halls`);
       const halls = await hallsRes.json();
-      console.log('HALLS FROM BACKEND:', halls);
       setHallOptions(
         halls.map((h: { id: number; name: string }) => ({
           value: String(h.id),
@@ -142,7 +141,6 @@ export default function ScheduleCalendarBlock({
       );
       const typesRes = await fetch(`${backendBaseUrl}session/types`);
       const types = await typesRes.json();
-      console.log('SESSION TYPES FROM BACKEND:', types);
       setFormatOptions(
         types.map((t: { id: number; type: string }) => ({
           value: String(t.id),
@@ -201,9 +199,6 @@ export default function ScheduleCalendarBlock({
   const dateKey = getLocalDateKey(selectedDate);
   const movieKey = movie?.title || '__unknown__';
   const currentSessions = sessionsByDate[movieKey]?.[dateKey] || [];
-
-  console.log('currentSessions при рендері:', currentSessions);
-
   const visibleSessions = currentSessions.filter((s) => !s.is_deleted);
 
   const handleAddSession = () => {
@@ -253,9 +248,7 @@ export default function ScheduleCalendarBlock({
           const data = await response.json();
           bookingCount = data.bookings_count || 0;
         }
-      } catch (error) {
-        console.error('Помилка при отриманні кількості бронювань:', error);
-      }
+      } catch (error) {}
     }
     setSessionToDelete({ index: realIndex, dateKey, bookingCount });
     setShowDeleteModal(true);
@@ -341,7 +334,6 @@ export default function ScheduleCalendarBlock({
     }
 
     updated[index] = { ...updated[index], ...updatedSession };
-    console.log('handleSessionChange - оновлені сесії:', updated);
     const updatedSessionsByDate = {
       ...sessionsByDate,
       [movieKey]: {

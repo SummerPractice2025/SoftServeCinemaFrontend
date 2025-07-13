@@ -151,9 +151,7 @@ class ApiService {
             withCredentials: true,
           },
         );
-      } catch (error) {
-        console.log('Помилка при виході через API, але продовжуємо очистку');
-      }
+      } catch (error) {}
     }
 
     this.clearTokens();
@@ -175,7 +173,6 @@ class ApiService {
       const payload = JSON.parse(atob(token.split('.')[1]));
       return payload.user_id || null;
     } catch (error) {
-      console.error('Помилка декодування токена:', error);
       return null;
     }
   }
@@ -218,7 +215,6 @@ class ApiService {
 
   async getStatsMoney(): Promise<{ money: number }> {
     const url = '/stats/money';
-    console.log('GET запрос к:', this.api.defaults.baseURL + url);
     const response = await this.api.get<{ money: number }>(url);
     return response.data;
   }
@@ -227,7 +223,6 @@ class ApiService {
     halls: { hall_id: number; hall_name: string; occupancy: number }[];
   }> {
     const url = '/stats/occupancy';
-    console.log('GET запрос к:', this.api.defaults.baseURL + url);
     const response = await this.api.get<{
       halls: { hall_id: number; hall_name: string; occupancy: number }[];
     }>(url);
@@ -269,76 +264,32 @@ if (typeof window !== 'undefined') {
       localStorage.removeItem('access_token');
       document.cookie =
         'refresh_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-      console.log('Примусовий вихід виконано');
     },
     forceClearCookies: () => {},
     getToken: () => {
       const token = apiService.getToken();
-      console.log('Поточний токен:', token);
       return token;
     },
     isAuthenticated: () => {
       const auth = apiService.isAuthenticated();
-      console.log('Авторизований:', auth);
       return auth;
     },
     testTokenUpdate: () => {
-      console.log(' Тестирование обновления токена...');
       const newToken = 'test-token-' + Date.now();
       localStorage.setItem('access_token', newToken);
-      console.log(' Новый токен установлен:', newToken);
-      console.log(
-        'Теперь состояние должно обновиться автоматически через 1-3 секунды',
-      );
     },
     showAllTokens: () => {
-      console.log(' === ПЕРЕГЛЯД ВСІХ ТОКЕНІВ ===');
-
       const accessToken = localStorage.getItem('access_token');
-      console.log(
-        ' Access Token (localStorage):',
-        accessToken ? ' Є' : ' Немає',
-      );
       if (accessToken) {
-        console.log('   Довжина:', accessToken.length);
-        console.log('   Початок:', accessToken.substring(0, 20) + '...');
       }
 
       const cookies = document.cookie.split(';');
       const refreshTokenCookie = cookies.find((cookie) =>
         cookie.trim().startsWith('refresh_token='),
       );
-      console.log(
-        ' Refresh Token (cookie):',
-        refreshTokenCookie ? ' Є' : ' Немає',
-      );
       if (refreshTokenCookie) {
         const tokenValue = refreshTokenCookie.split('=')[1];
-        console.log('   Довжина:', tokenValue.length);
-        console.log('   Початок:', tokenValue.substring(0, 20) + '...');
       }
-
-      console.log(' Всі cookies:', document.cookie || 'Немає cookies');
-
-      console.log(
-        ' Статус авторизації:',
-        apiService.isAuthenticated() ? ' Авторизований' : ' Не авторизований',
-      );
-
-      console.log(' === КІНЕЦЬ ПЕРЕГЛЯДУ ===');
     },
   };
-
-  console.log(' Dev Utils доступні в консолі:');
-  console.log(
-    '- devUtils.clearTokens() - очистити токени (включаючи refresh token)',
-  );
-  console.log('- devUtils.forceSignOut() - примусовий вихід без API');
-  console.log(
-    '- devUtils.forceClearCookies() - примусово очистити всі cookies',
-  );
-  console.log('- devUtils.getToken() - показати поточний токен');
-  console.log('- devUtils.isAuthenticated() - перевірити авторизацію');
-  console.log('- devUtils.testTokenUpdate() - протестувати оновлення токена');
-  console.log('- devUtils.showAllTokens() - показати всі токени та cookies');
 }

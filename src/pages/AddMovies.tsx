@@ -60,15 +60,11 @@ const fetchMovie = async (name: string, year: string) => {
 
     const response = await fetch(url.toString());
     if (!response.ok) {
-      console.error('Помилка при отриманні фільму:', response.statusText);
       return null;
     }
     const data = await response.json();
-
-    console.log('fetchMovie response:', data);
     return data;
   } catch (error) {
-    console.error('Помилка при отриманні фільму:', error);
     return null;
   }
 };
@@ -80,10 +76,6 @@ const fetchMovieIdByName = async (name: string): Promise<number | null> => {
 
     const response = await fetch(url.toString());
     if (!response.ok) {
-      console.error(
-        'Помилка при отриманні списку фільмів:',
-        response.statusText,
-      );
       return null;
     }
 
@@ -101,13 +93,11 @@ const fetchMovieIdByName = async (name: string): Promise<number | null> => {
     );
 
     if (!movie) {
-      console.warn('Фільм не знайдено у списку /movies:', name);
       return null;
     }
 
     return movie.id;
   } catch (error) {
-    console.error('Помилка при отриманні id фільму:', error);
     return null;
   }
 };
@@ -119,13 +109,11 @@ const fetchSessionsByMovieId = async (movieId: number) => {
 
     const response = await fetch(url);
     if (!response.ok) {
-      console.error('Помилка отримання сеансів:', response.statusText);
       return [];
     }
 
     return await response.json();
   } catch (error) {
-    console.error('Fetch error sessions:', error);
     return [];
   }
 };
@@ -138,7 +126,6 @@ const fetchSessionById = async (sessionId: number) => {
     const response = await fetch(url);
     if (!response.ok) {
       if (response.status === 400 || response.status === 404) {
-        console.warn(`Session ${sessionId} not found or bad request.`);
         return null;
       }
       throw new Error(response.statusText);
@@ -147,7 +134,6 @@ const fetchSessionById = async (sessionId: number) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error fetching session by id:', error);
     return null;
   }
 };
@@ -284,7 +270,6 @@ const AddMovies: React.FC = () => {
         ...sessionsByDate,
         [movieKey]: updatedSessionsByDate,
       };
-      console.log('useEffect - оновлені sessionsByDate:', updated);
       setSessionsByDate(updated);
     }
   }, [filteredMovie?.priceStandard, filteredMovie?.priceVip]);
@@ -361,19 +346,10 @@ const AddMovies: React.FC = () => {
           setSavedSessionsByDate({});
         } else {
           const sessionList = await fetchSessionsByMovieId(movieId);
-          console.log(
-            'handleSearch - Сеанси, отримані після пошуку:',
-            sessionList,
-          );
-
           const newSessionMap: Record<string, Session[]> = {};
 
           for (const session of sessionList) {
             if (!session.id) {
-              console.warn(
-                'handleSearch - У сеанса нет id, пропускаем:',
-                session,
-              );
               continue;
             }
 
@@ -396,8 +372,6 @@ const AddMovies: React.FC = () => {
 
             const sessionType =
               detailedSession.session_type_id === 1 ? '2D' : '3D';
-
-            console.log('detailedSession:', detailedSession);
             let hallId = '';
             if (detailedSession.hall_id) {
               hallId = String(detailedSession.hall_id);
@@ -405,13 +379,7 @@ const AddMovies: React.FC = () => {
               const found = hallOptions.find(
                 (h) => h.label === detailedSession.hall_name,
               )?.value;
-              if (!found) {
-                console.warn(
-                  'Не знайдено hallId для hall_name:',
-                  detailedSession.hall_name,
-                  hallOptions,
-                );
-              }
+              
               hallId = found || '';
             }
             const sessionData: Session = {
@@ -429,11 +397,6 @@ const AddMovies: React.FC = () => {
           }
 
           const updatedSessionsByDate = { [movieObj.title]: newSessionMap };
-          console.log(
-            'handleSearch - Встановлюємо sessionsByDate:',
-            updatedSessionsByDate,
-          );
-
           setSessionsByDate(updatedSessionsByDate);
           setSavedSessionsByDate(updatedSessionsByDate);
         }
@@ -529,15 +492,9 @@ const AddMovies: React.FC = () => {
     }
 
     const payload = buildMoviePayload(filteredMovie, allRawSessions);
-    console.log('handleSave - Payload JSON:', JSON.stringify(payload, null, 2));
-
     try {
       const baseURL = import.meta.env.VITE_BACKEND_BASE_URL;
-      console.log('handleSave - Base URL from env:', baseURL);
       const url = joinUrl(baseURL, 'movie');
-      console.log('handleSave - Full POST URL:', url);
-
-      console.log('handleSave - Отправляю POST запрос на:', url);
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -557,10 +514,6 @@ const AddMovies: React.FC = () => {
 
           for (const session of sessionList) {
             if (!session.id) {
-              console.warn(
-                'handleSave - У сеанса нет id, пропускаем:',
-                session,
-              );
               continue;
             }
 
@@ -583,8 +536,6 @@ const AddMovies: React.FC = () => {
 
             const sessionType =
               detailedSession.session_type_id === 1 ? '2D' : '3D';
-
-            console.log('detailedSession:', detailedSession);
             let hallId = '';
             if (detailedSession.hall_id) {
               hallId = String(detailedSession.hall_id);
@@ -592,13 +543,7 @@ const AddMovies: React.FC = () => {
               const found = hallOptions.find(
                 (h) => h.label === detailedSession.hall_name,
               )?.value;
-              if (!found) {
-                console.warn(
-                  'Не знайдено hallId для hall_name:',
-                  detailedSession.hall_name,
-                  hallOptions,
-                );
-              }
+          
               hallId = found || '';
             }
             const sessionData: Session = {
@@ -616,12 +561,6 @@ const AddMovies: React.FC = () => {
             if (!newSessionMap[dateStr]) newSessionMap[dateStr] = [];
             newSessionMap[dateStr].push(sessionData);
           }
-
-          console.log(
-            'handleSave - Оновлені sessionsByDate після збереження:',
-            { [movieKey]: newSessionMap },
-          );
-
           setSessionsByDate({ [movieKey]: newSessionMap });
           setSavedSessionsByDate({ [movieKey]: newSessionMap });
         }
@@ -650,7 +589,6 @@ const AddMovies: React.FC = () => {
         setErrorMessage(msg);
       }
     } catch (error) {
-      console.error('=== Fetch error ===', error);
       setErrorMessage('Невідома помилка при збереженні.');
     }
   };
@@ -663,10 +601,6 @@ const AddMovies: React.FC = () => {
     if (filteredMovie) {
       const movieKey = filteredMovie.title;
       const restoredSessions = savedSessionsByDate[movieKey] || {};
-      console.log(
-        'confirmCancel - Відновлюємо sessionsByDate:',
-        restoredSessions,
-      );
       setSessionsByDate({ ...sessionsByDate, [movieKey]: restoredSessions });
     }
     setFilteredMovie(null);
@@ -825,17 +759,11 @@ const AddMovies: React.FC = () => {
               sessionsByDate={sessionsByDate}
               savedSessionsByDate={savedSessionsByDate}
               onUpdate={(updated) => {
-                console.log('ScheduleCalendarBlock onUpdate:', updated);
-
                 Object.entries(updated).forEach(
                   ([movieTitle, dateSessions]) => {
                     Object.entries(dateSessions).forEach(([date, sessions]) => {
                       sessions.forEach((session, idx) => {
                         if (!session.id) {
-                          console.warn(
-                            `Session без id у onUpdate [${movieTitle}][${date}][${idx}]:`,
-                            session,
-                          );
                         }
                       });
                     });
@@ -845,7 +773,6 @@ const AddMovies: React.FC = () => {
                 setSessionsByDate(updated);
               }}
               onSavedUpdate={(updated) => {
-                console.log('ScheduleCalendarBlock onSavedUpdate:', updated);
                 setSavedSessionsByDate(updated);
               }}
               basePriceStandard={filteredMovie.priceStandard ?? 0}

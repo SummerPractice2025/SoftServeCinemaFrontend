@@ -66,15 +66,12 @@ const Header: React.FC = () => {
   const closeLoginModal = () => setIsLoginModalOpen(false);
 
   const handleLogout = async () => {
-    try {
+   
       await apiService.signOut();
       logout();
       setIsAdminMode(false);
-      console.log('Вихід користувача');
       closePanel();
-    } catch (error) {
-      console.error('Помилка виходу:', error);
-    }
+    
   };
 
   const handleAddMovie = () => {

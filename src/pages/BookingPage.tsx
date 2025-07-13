@@ -104,7 +104,6 @@ const BookingPage: React.FC = () => {
           studios: data.studios ?? [],
         });
       } catch (err) {
-        console.error('Помилка завантаження фільму:', err);
         setMovieInfo(null);
         setCustomAlert({
           message: 'Не вдалося завантажити фільм',
@@ -133,7 +132,6 @@ const BookingPage: React.FC = () => {
 
         setPrices({ standard: data.price, vip: data.price_VIP });
       } catch (err) {
-        console.error('Помилка при завантаженні сеансу:', err);
         setCustomAlert({
           message: 'Не вдалося завантажити сеанс',
           type: 'error',
@@ -265,7 +263,6 @@ const BookingPage: React.FC = () => {
       ]);
       setSelectedSeats([]);
     } catch (err) {
-      console.error('Помилка бронювання:', err);
       setCustomAlert({
         message: 'Не вдалося забронювати місця. Спробуйте ще раз.',
         type: 'error',

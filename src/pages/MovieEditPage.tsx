@@ -48,7 +48,6 @@ const MovieEdit = () => {
         setPosterUrl(data.posterUrl ?? '');
         setTrailerUrl(data.trailerUrl ?? '');
       } catch (error) {
-        console.error(error);
         setPosterUrl('');
         setTrailerUrl('');
         setCustomAlertMessage('Не вдалося завантажити деталі фільму');
@@ -60,7 +59,6 @@ const MovieEdit = () => {
 
   const handleConfirm = async () => {
     if (!updatedMovie) {
-      console.error('Немає оновлених даних для збереження');
       setCustomAlertMessage('Немає оновлених даних для збереження');
       return;
     }
@@ -72,8 +70,6 @@ const MovieEdit = () => {
     };
 
     const url = `${backendBaseUrl}movie/${movieIdNum}`;
-    console.log('Відправка PUT на:', url);
-    console.log('Payload:', payload);
 
     try {
       const res = await fetch(url, {
@@ -87,16 +83,13 @@ const MovieEdit = () => {
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        console.error('Помилка відповіді:', errorData);
         setCustomAlertMessage('Помилка при збереженні змін');
         throw new Error('Помилка при збереженні змін');
       }
 
       const data = await res.json();
-      console.log('Успішно оновлено:', data);
       setCustomAlertMessage('Зміни збережено успішно!');
     } catch (error) {
-      console.error(error);
       setCustomAlertMessage('Не вдалося зберегти зміни');
     }
   };

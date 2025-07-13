@@ -37,12 +37,9 @@ const LoginModal: React.FC<LoginModalProps> = ({
 
     try {
       await apiService.signIn({ email, password });
-      console.log('Успішний вхід');
       onClose();
       onLoginSuccess?.();
     } catch (error: any) {
-      console.error('Помилка входу:', error);
-
       const serverError = error.response?.data?.message;
       const statusCode = error.response?.status;
 

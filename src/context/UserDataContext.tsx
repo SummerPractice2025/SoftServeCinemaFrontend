@@ -77,7 +77,6 @@ export const UserDataProvider: React.FC<UserDataProviderProps> = ({
       if (!apiService.isAuthenticated()) {
         setUserData(null);
       }
-      console.error('Помилка при отриманні даних користувача:', err);
     }
   };
 

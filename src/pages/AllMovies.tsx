@@ -117,16 +117,12 @@ export default function AllMovies() {
         const moviesData: MovieFromBackend[] = await moviesResponse.json();
         const genresData: Genre[] = await genresResponse.json();
 
-        console.log('Movies data from API:', moviesData);
-        console.log('Sample movie session:', moviesData[0]?.session);
-
         setMovies(moviesData);
         setGenres(genresData);
       } catch (error: unknown) {
         if (error instanceof Error) {
           setError(error.message || 'Помилка при завантаженні даних');
         } else {
-          console.error(error);
           setError('Сталася невідома помилка');
         }
       } finally {
@@ -160,10 +156,8 @@ export default function AllMovies() {
       setShowPlayer(true);
     } catch (error: unknown) {
       if (error instanceof Error) {
-        console.error(error);
         setCustomAlertMessage(error.message || 'Помилка завантаження трейлера');
       } else {
-        console.error(error);
         setCustomAlertMessage('Сталася невідома помилка');
       }
     }

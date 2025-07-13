@@ -121,12 +121,10 @@ const fetchSessionsByMovieId = async (
     const url = `${backendBaseUrl}session/by-movie/${movieId}`;
     const response = await fetch(url);
     if (!response.ok) {
-      console.error('Помилка отримання сеансів:', response.statusText);
       return [];
     }
     return await response.json();
   } catch (error) {
-    console.error('Fetch error sessions:', error);
     return [];
   }
 };
@@ -137,7 +135,6 @@ const fetchSessionById = async (sessionId: number, backendBaseUrl: string) => {
     const response = await fetch(url);
     if (!response.ok) {
       if (response.status === 400 || response.status === 404) {
-        console.warn(`Session ${sessionId} not found or bad request.`);
         return null;
       }
       throw new Error(response.statusText);
@@ -145,7 +142,6 @@ const fetchSessionById = async (sessionId: number, backendBaseUrl: string) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error fetching session by id:', error);
     return null;
   }
 };
@@ -241,8 +237,6 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
         const res = await fetch(`${backendBaseUrl}movie/${movieId}`);
         if (!res.ok) throw new Error('Помилка при завантаженні фільму');
         const raw = await res.json();
-        console.log('Backend movie data:', raw);
-        console.log('Raw movie ID:', raw.id, 'Type:', typeof raw.id);
 
         const transformedMovie: Movie = {
           id: raw.id,
@@ -265,7 +259,6 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
         setMovieInfo(transformedMovie);
       } catch (err) {
         setError((err as Error).message);
-        console.error('Помилка завантаження фільму:', err);
       } finally {
         setLoading(false);
       }
@@ -278,20 +271,16 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
     if (!movieInfo) return;
 
     const loadExistingSessions = async () => {
-      try {
-        console.log('Завантажуємо існуючі сеанси для фільму:', movieInfo.title);
-
+      
         const sessionList = await fetchSessionsByMovieId(
           movieId,
           backendBaseUrl,
         );
-        console.log('Отримані сеанси з API:', sessionList);
 
         const newSessionMap: Record<string, Session[]> = {};
 
         for (const session of sessionList) {
           if (!session.id) {
-            console.warn('У сеанса нет id, пропускаем:', session);
             continue;
           }
 
@@ -318,7 +307,6 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
           const sessionType =
             detailedSession.session_type_id === 1 ? '2D' : '3D';
 
-          console.log('detailedSession:', detailedSession);
           let hallId = '';
           if (detailedSession.hall_id) {
             hallId = String(detailedSession.hall_id);
@@ -326,13 +314,6 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
             const found = hallOptions.find(
               (h) => h.label === detailedSession.hall_name,
             )?.value;
-            if (!found) {
-              console.warn(
-                'Не знайдено hallId для hall_name:',
-                detailedSession.hall_name,
-                hallOptions,
-              );
-            }
             hallId = found || '';
           }
           const sessionData: Session = {
@@ -350,13 +331,10 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
         }
 
         const updatedSessionsByDate = { [movieInfo.title]: newSessionMap };
-        console.log('Встановлюємо sessionsByDate:', updatedSessionsByDate);
 
         setCalendarSessionsByDate(updatedSessionsByDate);
         setSavedSessionsByDate(updatedSessionsByDate);
-      } catch (error) {
-        console.error('Помилка при завантаженні існуючих сеансів:', error);
-      }
+      
     };
 
     loadExistingSessions();
@@ -398,19 +376,12 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
   const saveSessionsToServer = async (
     sessionsData: Record<string, Record<string, Session[]>>,
   ) => {
-    try {
-      console.log('Зберігаємо сеанси на сервері:', sessionsData);
-
+   
       if (!movieInfo) {
-        console.error('Немає інформації про фільм для збереження');
         return;
       }
 
       if (!movieInfo.id) {
-        console.error(
-          ' movieInfo.id відсутній! Неможливо зберегти сеанси. movieInfo:',
-          movieInfo,
-        );
         return;
       }
 
@@ -440,11 +411,6 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
       }
 
       setConflictError(null);
-
-      console.log(' Діагностика для створення сеансу:');
-      console.log('  - movieInfo.id:', movieInfo.id);
-      console.log('  - movieInfo.title:', movieInfo.title);
-      console.log('  - backendBaseUrl:', backendBaseUrl);
 
       const newSessions: {
         payload: CreateSessionPayload;
@@ -482,19 +448,8 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
         }
       }
 
-      console.log(
-        `Знайдено ${newSessions.length} нових сеансів та ${existingSessions.length} існуючих`,
-      );
-
       if (newSessions.length > 0) {
-        console.log('Створюємо нові сеанси...');
-
         const sessionsArray = newSessions.map(({ payload }) => payload);
-
-        console.log(
-          `Відправляємо ${sessionsArray.length} сеансів одним запитом`,
-        );
-        console.log('Payload масив:', JSON.stringify(sessionsArray, null, 2));
 
         const response = await fetch(`${backendBaseUrl}session`, {
           method: 'POST',
@@ -508,26 +463,15 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
         if (!response.ok) {
           const errorText = await response.text();
           const formattedError = formatConflictMessage(errorText);
-          console.error(
-            `Помилка при створенні ${sessionsArray.length} сеансів:`,
-            response.status,
-            response.statusText,
-          );
-          console.error('Деталі помилки:', errorText);
           throw new Error(
             `Помилка при створенні сеансів: ${response.statusText} - ${formattedError}`,
           );
         }
 
         const responseText = await response.text();
-        console.log(`Відповідь сервера: ${responseText}`);
 
         try {
           const createdSessions: { id: number }[] = JSON.parse(responseText);
-          console.log(
-            `Створено ${createdSessions.length} сеансів:`,
-            createdSessions,
-          );
 
           if (Array.isArray(createdSessions)) {
             for (
@@ -536,23 +480,12 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
               i++
             ) {
               newSessions[i].session.id = createdSessions[i].id;
-              console.log(
-                `Сеанс ${newSessions[i].dateStr} ${newSessions[i].session.time} отримав ID: ${createdSessions[i].id}`,
-              );
             }
           }
-        } catch (parseError) {
-          console.log('Сервер повернув текст замість JSON, але запит успішний');
-          console.log('Текст відповіді:', responseText);
-          console.log(
-            'Нові сеанси створені, але ID не отримано. Сервер сам присвоїть ID при наступному запиті.',
-          );
-        }
+        } catch (parseError) {}
       }
 
       if (existingSessions.length > 0) {
-        console.log('Оновлюємо існуючі сеанси...');
-
         const updateSessionsArray = existingSessions.map(
           ({ session, dateStr }) => {
             const hallID = Number(session.hallId);
@@ -570,14 +503,6 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
           },
         );
 
-        console.log(
-          `Відправляємо ${updateSessionsArray.length} сеансів для оновлення`,
-        );
-        console.log(
-          'Payload для оновлення:',
-          JSON.stringify(updateSessionsArray, null, 2),
-        );
-
         const updateResponse = await fetch(`${backendBaseUrl}sessions`, {
           method: 'PUT',
           headers: {
@@ -590,28 +515,13 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
         if (!updateResponse.ok) {
           const errorText = await updateResponse.text();
           const formattedError = formatConflictMessage(errorText);
-          console.error(
-            `Помилка при оновленні ${updateSessionsArray.length} сеансів:`,
-            updateResponse.status,
-            updateResponse.statusText,
-          );
-          console.error('Деталі помилки:', errorText);
-          throw new Error(
-            `Помилка при оновленні сеансів: ${updateResponse.statusText} - ${formattedError}`,
-          );
         }
 
         const updateResponseText = await updateResponse.text();
-        console.log(`Відповідь сервера на оновлення: ${updateResponseText}`);
-        console.log(`Успішно оновлено ${updateSessionsArray.length} сеансів`);
       }
 
       setSavedSessionsByDate(sessionsData);
-      console.log('Всі сеанси успішно збережені');
-    } catch (error) {
-      console.error('Помилка при збереженні сеансів:', error);
-      throw error;
-    }
+    
   };
 
   useEffect(() => {
@@ -624,9 +534,7 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
           map[item.id] = item.type;
         });
         setSessionTypeMap(map);
-      } catch (error) {
-        console.error('Не вдалося завантажити типи сеансів:', error);
-      }
+      } catch (error) {}
     };
 
     fetchSessionTypes();
@@ -666,9 +574,7 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
           .sort((a, b) => a.time.localeCompare(b.time));
 
         setSessions(formattedSessions);
-      } catch (error) {
-        console.error('Не вдалося завантажити сеанси:', error);
-      }
+      } catch (error) {}
     };
 
     fetchSessions();
@@ -846,11 +752,9 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
                 sessionsByDate={calendarSessionsByDate}
                 savedSessionsByDate={savedSessionsByDate}
                 onUpdate={(updated) => {
-                  console.log('Оновлені сесії:', updated);
                   setCalendarSessionsByDate(updated);
                 }}
                 onSavedUpdate={(updated) => {
-                  console.log('Оновлені збережені сесії:', updated);
                   setSavedSessionsByDate(updated);
                 }}
                 basePriceStandard={movieInfo.priceStandard || 120}
@@ -866,16 +770,12 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
                   className="schedule-save-button"
                   onClick={async () => {
                     try {
-                      console.log(
-                        'Зберігаємо всі зміни при натисканні кнопки "Зберегти"',
-                      );
                       await saveSessionsToServer(calendarSessionsByDate);
                       setShowEditModal(false);
                       setConflictError(null);
                       setAlertMessage(null);
                       window.location.reload();
                     } catch (error) {
-                      console.error('Помилка при збереженні:', error);
                       const errorMessage =
                         error instanceof Error ? error.message : String(error);
                       let extractedMessage = '';
@@ -891,9 +791,7 @@ const ScheduleBlock: React.FC<ScheduleBlockProps> = ({
                             extractedMessage = parsed.message;
                           }
                         }
-                      } catch (e) {
-                        console.error('Parsing error in errorMessage:', e);
-                      }
+                      } catch (e) {}
                       if (
                         !extractedMessage &&
                         errorMessage.includes('Сеанс фільму') &&

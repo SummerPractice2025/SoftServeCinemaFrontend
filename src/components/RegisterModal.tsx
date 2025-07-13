@@ -79,8 +79,6 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose }) => {
         last_name: lastName,
         password,
       });
-
-      console.log('Успішна реєстрація');
       setIsLoading(false);
       setShowConfirmationModal(true);
 
@@ -92,7 +90,6 @@ const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose }) => {
       setNotification(false);
       setErrors({});
     } catch (error: any) {
-      console.error('Помилка реєстрації:', error);
       setIsLoading(false);
 
       const serverError = error.response?.data?.message;
